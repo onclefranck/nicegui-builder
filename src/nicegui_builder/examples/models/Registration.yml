@@ -1,0 +1,28 @@
+- card.tight:
+    classes: w-full p-4 gap-3
+    children:
+    - label:
+        params:
+          text: Registration Desk
+        classes: text-lg
+    - label:
+        params:
+          text: The line is moving nicely, if one ignores the accordion solo near the badge printer.
+        classes: text-caption text-grey-7
+    - grid:
+        params:
+          columns: 12
+        classes: w-full gap-3
+        children:
+        - field__participant_name:
+            classes: col-span-6
+        - field__contest_title:
+            classes: col-span-6
+        - field__status:
+            methods: radio
+            classes: col-span-12
+        - field__checked_in_at:
+            classes: col-span-12
+        - field__notes:
+            methods: textarea
+            classes: col-span-12

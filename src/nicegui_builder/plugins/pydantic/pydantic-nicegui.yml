@@ -1,0 +1,389 @@
+# String-like fields
+str|std:
+  methods: input
+  params:
+    value: _{fieldvalue}
+    label: _{attributes_title}
+    placeholder: _{attributes_description}
+  props: clearable
+str|textarea:
+  methods: textarea
+  params:
+    value: _{fieldvalue}
+    label: _{attributes_title}
+    placeholder: _{attributes_description}
+  props: autogrow clearable
+str|password:
+  methods: input
+  params:
+    value: _{fieldvalue}
+    label: _{attributes_title}
+    password: True
+    password_toggle_button: True
+    placeholder: _{attributes_description}
+str|email:
+  methods: input
+  params:
+    value: _{fieldvalue}
+    label: _{attributes_title}
+    placeholder: _{attributes_description}
+  props: type=email clearable
+str|search:
+  methods: input
+  params:
+    value: _{fieldvalue}
+    label: _{attributes_title}
+    placeholder: _{attributes_description}
+  props: clearable
+str|color:
+  methods: color_input
+  params:
+    value: _{fieldvalue}
+    label: _{attributes_title}
+str|label:
+  methods: label
+  params:
+    text: _{fieldvalue}
+
+bytes|std:
+  methods: input
+  params:
+    value: _{fieldvalue}
+    label: _{attributes_title}
+    placeholder: _{attributes_description}
+  props: clearable
+bytes|textarea:
+  methods: textarea
+  params:
+    value: _{fieldvalue}
+    label: _{attributes_title}
+    placeholder: _{attributes_description}
+  props: autogrow clearable
+bytes|label:
+  methods: label
+  params:
+    text: _{fieldvalue}
+
+SecretStr|std:
+  methods: input
+  params:
+    value: _{fieldvalue}
+    label: _{attributes_title}
+    password: True
+    password_toggle_button: True
+    placeholder: _{attributes_description}
+
+EmailStr|std:
+  methods: input
+  params:
+    value: _{fieldvalue}
+    label: _{attributes_title}
+    placeholder: _{attributes_description}
+  props: type=email clearable
+NameEmail|std:
+  methods: input
+  params:
+    value: _{fieldvalue}
+    label: _{attributes_title}
+    placeholder: _{attributes_description}
+  props: type=email clearable
+AnyUrl|std:
+  methods: input
+  params:
+    value: _{fieldvalue}
+    label: _{attributes_title}
+    placeholder: _{attributes_description}
+  props: type=url clearable
+AnyHttpUrl|std:
+  methods: input
+  params:
+    value: _{fieldvalue}
+    label: _{attributes_title}
+    placeholder: _{attributes_description}
+  props: type=url clearable
+HttpUrl|std:
+  methods: input
+  params:
+    value: _{fieldvalue}
+    label: _{attributes_title}
+    placeholder: _{attributes_description}
+  props: type=url clearable
+FileUrl|std:
+  methods: input
+  params:
+    value: _{fieldvalue}
+    label: _{attributes_title}
+    placeholder: _{attributes_description}
+  props: type=url clearable
+Path|std:
+  methods: input
+  params:
+    value: _{fieldvalue}
+    label: _{attributes_title}
+    placeholder: _{attributes_description}
+  props: clearable
+UUID|std:
+  methods: input
+  params:
+    value: _{fieldvalue}
+    label: _{attributes_title}
+    placeholder: _{attributes_description}
+UUID1|std:
+  methods: input
+  params:
+    value: _{fieldvalue}
+    label: _{attributes_title}
+    placeholder: _{attributes_description}
+UUID3|std:
+  methods: input
+  params:
+    value: _{fieldvalue}
+    label: _{attributes_title}
+    placeholder: _{attributes_description}
+UUID4|std:
+  methods: input
+  params:
+    value: _{fieldvalue}
+    label: _{attributes_title}
+    placeholder: _{attributes_description}
+UUID5|std:
+  methods: input
+  params:
+    value: _{fieldvalue}
+    label: _{attributes_title}
+    placeholder: _{attributes_description}
+IPvAnyAddress|std:
+  methods: input
+  params:
+    value: _{fieldvalue}
+    label: _{attributes_title}
+    placeholder: _{attributes_description}
+IPvAnyInterface|std:
+  methods: input
+  params:
+    value: _{fieldvalue}
+    label: _{attributes_title}
+    placeholder: _{attributes_description}
+IPvAnyNetwork|std:
+  methods: input
+  params:
+    value: _{fieldvalue}
+    label: _{attributes_title}
+    placeholder: _{attributes_description}
+
+# Numeric fields
+int|std:
+  methods: number
+  params:
+    value: _{fieldvalue}
+    label: _{attributes_title}
+    precision: 0
+  props: clearable
+int|slider:
+  methods: slider
+  params:
+    value: _{fieldvalue}
+int|knob:
+  methods: knob
+  params:
+    value: _{fieldvalue}
+int|label:
+  methods: label
+  params:
+    text: _{fieldvalue}
+
+float|std:
+  methods: number
+  params:
+    value: _{fieldvalue}
+    label: _{attributes_title}
+    precision: 2
+  props: clearable
+float|slider:
+  methods: slider
+  params:
+    value: _{fieldvalue}
+float|knob:
+  methods: knob
+  params:
+    value: _{fieldvalue}
+float|label:
+  methods: label
+  params:
+    text: _{fieldvalue}
+
+Decimal|std:
+  methods: number
+  params:
+    value: _{fieldvalue}
+    label: _{attributes_title}
+    precision: 2
+  props: clearable
+Decimal|label:
+  methods: label
+  params:
+    text: _{fieldvalue}
+
+# Boolean fields
+bool|std:
+  methods: checkbox
+  params:
+    value: _{fieldvalue}
+    text: _{attributes_title}
+bool|switch:
+  methods: switch
+  params:
+    value: _{fieldvalue}
+    text: _{attributes_title}
+bool|select:
+  methods: select
+  params:
+    value: _{fieldvalue}
+    label: _{attributes_title}
+    options:
+      - true
+      - false
+  props: clearable
+bool|label:
+  methods: label
+  params:
+    text: _{fieldvalue}
+
+# Choice fields
+Literal|std:
+  methods: select
+  params:
+    value: _{fieldvalue}
+    label: _{attributes_title}
+    options: $nicegui_builder.plugins.pydantic:extract_options
+  props: clearable
+Literal|radio:
+  methods: radio
+  params:
+    value: _{fieldvalue}
+    options: $nicegui_builder.plugins.pydantic:extract_options
+Literal|label:
+  methods: label
+  params:
+    text: _{fieldvalue}
+
+Enum|std:
+  methods: select
+  params:
+    value: _{fieldvalue}
+    label: _{attributes_title}
+    options: $nicegui_builder.plugins.pydantic:extract_options
+  props: clearable
+Enum|radio:
+  methods: radio
+  params:
+    value: _{fieldvalue}
+    options: $nicegui_builder.plugins.pydantic:extract_options
+Enum|label:
+  methods: label
+  params:
+    text: _{fieldvalue}
+
+# Temporal fields
+date|std:
+  methods: input
+  params:
+    value: _{fieldvalue}
+    label: _{attributes_title}
+  props: clearable
+date|picker:
+  methods: date
+  params:
+    value: _{fieldvalue}
+    label: _{attributes_title}
+date|label:
+  methods: label
+  params:
+    text: _{fieldvalue}
+
+time|std:
+  methods: input
+  params:
+    value: _{fieldvalue}
+    label: _{attributes_title}
+  props: clearable
+time|picker:
+  methods: time
+  params:
+    value: _{fieldvalue}
+    label: _{attributes_title}
+time|label:
+  methods: label
+  params:
+    text: _{fieldvalue}
+
+datetime|std:
+  methods: input
+  params:
+    value: _{fieldvalue}
+    label: _{attributes_title}
+  props: clearable
+datetime|split:
+  methods: row
+  classes: w-full items-end gap-2
+datetime|label:
+  methods: label
+  params:
+    text: _{fieldvalue}
+
+timedelta|std:
+  methods: input
+  params:
+    value: _{fieldvalue}
+    label: _{attributes_title}
+  props: clearable
+timedelta|label:
+  methods: label
+  params:
+    text: _{fieldvalue}
+
+# Structured fields
+dict|std:
+  methods: textarea
+  params:
+    value: _{fieldvalue}
+    label: _{attributes_title}
+    placeholder: _{attributes_description}
+  props: autogrow clearable
+  classes: font-mono
+list|std:
+  methods: textarea
+  params:
+    value: _{fieldvalue}
+    label: _{attributes_title}
+    placeholder: _{attributes_description}
+  props: autogrow clearable
+  classes: font-mono
+set|std:
+  methods: textarea
+  params:
+    value: _{fieldvalue}
+    label: _{attributes_title}
+    placeholder: _{attributes_description}
+  props: autogrow clearable
+  classes: font-mono
+tuple|std:
+  methods: textarea
+  params:
+    value: _{fieldvalue}
+    label: _{attributes_title}
+    placeholder: _{attributes_description}
+  props: autogrow clearable
+  classes: font-mono
+Json|std:
+  methods: textarea
+  params:
+    value: _{fieldvalue}
+    label: _{attributes_title}
+    placeholder: _{attributes_description}
+  props: autogrow clearable
+  classes: font-mono
+Json|label:
+  methods: label
+  params:
+    text: _{fieldvalue}

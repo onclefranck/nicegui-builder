@@ -1,0 +1,17 @@
+line-length = 120
+target-version = "py312"
+
+extend-exclude = [
+    ".git",
+    ".venv",
+]
+
+[lint]
+select = []
+ignore = [ "D100", "D101", "D102", "D103", "D104", "D105", ]
+
+[format]
+quote-style = "double"
+indent-style = "space"
+line-ending = "auto"
+docstring-code-format = true

@@ -1,0 +1,7 @@
+include README.md
+include LICENSE
+include requirements.txt
+include requirements-dev.txt
+include requirements-docs.txt
+include requirements-pandas.txt
+recursive-include src *.yml *.yaml

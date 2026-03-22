@@ -1,0 +1,266 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Example 01: Basic Builder",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "nicegui_builder.examples.01_basic_builder",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "justMyCode": false
+    },
+    {
+      "name": "Example 02: Inline Builder",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "nicegui_builder.examples.02_inline_builder",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "justMyCode": false
+    },
+    {
+      "name": "Example 03: First Pydantic Form",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "nicegui_builder.examples.03_pydantic_form_basic",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "justMyCode": false
+    },
+    {
+      "name": "Example 04: First Pandas Table",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "nicegui_builder.examples.04_pandas_table_basic",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "justMyCode": false
+    },
+    {
+      "name": "Example 05: Pydantic Form with YAML",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "nicegui_builder.examples.05_pydantic_form_yaml",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "justMyCode": false
+    },
+    {
+      "name": "Example 06: Pydantic Form Flavors",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "nicegui_builder.examples.06_pydantic_form_flavors",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "justMyCode": false
+    },
+    {
+      "name": "Example 07: Pydantic Field Variants",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "nicegui_builder.examples.07_pydantic_field_variants",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "justMyCode": false
+    },
+    {
+      "name": "Example 08: Pydantic Structured Fields",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "nicegui_builder.examples.08_pydantic_structured_fields",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "justMyCode": false
+    },
+    {
+      "name": "Example 09: Datetime Split",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "nicegui_builder.examples.09_pydantic_datetime_split",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "justMyCode": false
+    },
+    {
+      "name": "Example 10: Pandas Table Filters",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "nicegui_builder.examples.10_pandas_table_filters",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "justMyCode": false
+    },
+    {
+      "name": "Example 11: FormHandle Basics",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "nicegui_builder.examples.11_form_handle_basics",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "justMyCode": false
+    },
+    {
+      "name": "Example 12: Form Validation",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "nicegui_builder.examples.12_form_validation",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "justMyCode": false
+    },
+    {
+      "name": "Example 13: Form Submit",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "nicegui_builder.examples.13_form_submit",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "justMyCode": false
+    },
+    {
+      "name": "Example 14: Dirty State",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "nicegui_builder.examples.14_form_dirty_state",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "justMyCode": false
+    },
+    {
+      "name": "Example 15: Live Helpers",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "nicegui_builder.examples.15_form_live_helpers",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "justMyCode": false
+    },
+    {
+      "name": "Example 16: Actionable Form",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "nicegui_builder.examples.16_form_actionable",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "justMyCode": false
+    },
+    {
+      "name": "Example 17: Form CRUD",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "nicegui_builder.examples.17_form_crud",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "justMyCode": false
+    },
+    {
+      "name": "Example 18: TableHandle Basics",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "nicegui_builder.examples.18_table_handle_basics",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "justMyCode": false
+    },
+    {
+      "name": "Example 19: Table Pagination Selection Export",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "nicegui_builder.examples.19_table_pagination_selection_export",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "justMyCode": false
+    },
+    {
+      "name": "Example 20: Table CRUD",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "nicegui_builder.examples.20_table_crud",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "justMyCode": false
+    },
+    {
+      "name": "Example 21: CLI Examples",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "nicegui_builder.examples.21_cli_examples",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "justMyCode": false
+    },
+    {
+      "name": "Example 22: CLI Layout Run",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "nicegui_builder.examples.22_cli_layout_run",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "justMyCode": false
+    },
+    {
+      "name": "Example 23: CLI Form Run",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "nicegui_builder.examples.23_cli_form_run",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "justMyCode": false
+    },
+    {
+      "name": "Example 24: Field Context Resolution",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "nicegui_builder.examples.24_field_context_resolution",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "justMyCode": false
+    },
+    {
+      "name": "Example 25: Plugin Mapping Customization",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "nicegui_builder.examples.25_plugin_mapping_customization",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "justMyCode": false
+    },
+    {
+      "name": "Example 26: Custom Plugin Minimal",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "nicegui_builder.examples.26_custom_plugin_minimal",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "justMyCode": false
+    },
+    {
+      "name": "Example Demo: Basic Builder",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "nicegui_builder.examples.demo_basic_builder",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "justMyCode": false
+    },
+    {
+      "name": "Example Demo: Pydantic Builder",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "nicegui_builder.examples.demo_pydantic_builder",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "justMyCode": false
+    },
+    {
+      "name": "Example Demo: Contact Address",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "nicegui_builder.examples.example_contact_address",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "justMyCode": false
+    }
+  ]
+}

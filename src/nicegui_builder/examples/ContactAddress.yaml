@@ -1,0 +1,40 @@
+- dark_mode:
+    params:
+        value: true
+- card.tight:
+    params:
+    classes: p-3 gap-3
+    children:
+    - label:
+        params:
+          text: Contact and address form
+        classes: w-full
+    - separator:
+    - grid:
+        params:
+            columns: 12
+        classes: w-full
+        children:
+        - field__civility:
+            classes: col-span-2
+        - field__fullname:
+            classes: col-span-10
+    - field__address:
+        classes: w-full
+    - grid:
+        params:
+            columns: 12
+        children:
+        - field__city:
+            classes: col-span-9
+        - field__province:
+            classes: col-span-3
+    - grid:
+        params:
+            columns: 12
+        classes: w-full
+        children:
+        - field__postalcode:
+            classes: col-start-7 col-span-3
+        - field__country:
+            classes: col-span-3

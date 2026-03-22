@@ -1,0 +1,61 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "nicegui-builder"
+version = "0.0.0.dev1"
+description = "Plugin-first NiceGUI builders for declarative layouts, forms, and tables"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.10"
+keywords = ["nicegui", "pydantic", "forms", "tables", "yaml", "ui"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Developers",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
+  "Framework :: Pydantic",
+  "Topic :: Software Development :: Libraries :: Python Modules",
+  "Topic :: Software Development :: User Interfaces",
+]
+
+dynamic = ["dependencies", "optional-dependencies"]
+
+[project.urls]
+Homepage = "https://github.com/onclefranck/nicegui-builder"
+Repository = "https://github.com/onclefranck/nicegui-builder"
+Issues = "https://github.com/onclefranck/nicegui-builder/issues"
+
+[project.scripts]
+nicegui-builder = "nicegui_builder.cli:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+packages = {find = {where = ["src"]}}
+include-package-data = true
+
+[tool.setuptools.package-data]
+nicegui_builder = [
+  "examples/*.yml",
+  "examples/*.yaml",
+  "plugins/pydantic/*.yml",
+  "plugins/pydantic/*.yaml",
+]
+
+[tool.setuptools.dynamic]
+dependencies = { file = ["requirements.txt"] }
+
+[tool.setuptools.dynamic.optional-dependencies]
+dev  = { file = ["requirements-dev.txt"] }
+docs = { file = ["requirements-docs.txt"] }
+pandas = { file = ["requirements-pandas.txt"] }
+all = { file = ["requirements-dev.txt", "requirements-docs.txt", "requirements-pandas.txt"] }
+
+[tool.pytest.ini_options]
+addopts = "--basetemp=.pytest_tmp"
+cache_dir = ".pytest_tmp/cache"

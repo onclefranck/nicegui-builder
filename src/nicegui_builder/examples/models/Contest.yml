@@ -1,0 +1,28 @@
+- card.tight:
+    classes: w-full p-4 gap-3
+    children:
+    - label:
+        params:
+          text: Contest Setup
+        classes: text-lg
+    - label:
+        params:
+          text: Organizing chaos is still organizing. The committee insists this is progress.
+        classes: text-caption text-grey-7
+    - grid:
+        params:
+          columns: 12
+        classes: w-full gap-3
+        children:
+        - field__title:
+            classes: col-span-12
+        - field__category:
+            classes: col-span-6
+        - field__starts_at:
+            classes: col-span-12
+        - field__duration_minutes:
+            classes: col-span-6
+        - field__team_event:
+            classes: col-span-6
+        - field__master_of_ceremonies:
+            classes: col-span-12

@@ -1,0 +1,31 @@
+- card.tight:
+    classes: w-full p-4 gap-3
+    children:
+    - label:
+        params:
+          text: Participant Registration
+        classes: text-lg
+    - label:
+        params:
+          text: Every great festival begins with one brave human and two suspicious socks.
+        classes: text-caption text-grey-7
+    - grid:
+        params:
+          columns: 12
+        classes: w-full gap-3
+        children:
+        - field__display_name:
+            classes: col-span-6
+        - field__email:
+            methods: email
+            classes: col-span-6
+        - field__sock_color:
+            methods: radio
+            classes: col-span-12
+        - field__mismatch_level:
+            classes: col-span-6
+        - field__returning_legend:
+            classes: col-span-6
+        - field__emergency_note:
+            methods: textarea
+            classes: col-span-12

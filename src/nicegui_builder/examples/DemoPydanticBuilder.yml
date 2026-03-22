@@ -1,0 +1,29 @@
+# DemoPydanticBuilder.yml
+- card.tight:
+    params:
+    classes:  p-3 gap-3
+    props:
+    children:
+    - label:
+        params:
+            text: Contact info form
+        classes: w-full
+    - grid:
+        params:
+            columns: 12
+        classes: w-full
+        props:
+        children:
+        - field__firstname:
+            params:
+            classes: col-span-6
+            props:
+        - field__lastname:
+            params:
+            classes: col-span-6
+            props:
+    - field__email:
+        methods: email
+        params:
+        classes: w-full
+        props:

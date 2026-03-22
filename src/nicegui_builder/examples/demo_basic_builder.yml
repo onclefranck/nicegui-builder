@@ -1,0 +1,11 @@
+- card:
+    params:
+    classes:
+    props:
+    children:
+    - label:
+        params:
+            text: Hello world 👋 !!!
+        classes:
+        props:
+        

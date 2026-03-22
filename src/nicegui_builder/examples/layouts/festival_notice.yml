@@ -1,0 +1,26 @@
+- card:
+    classes: w-full max-w-2xl mx-auto
+    children:
+    - label:
+        params:
+          text: Festival Notice Board
+        classes: text-h5
+    - markdown:
+        params:
+          content: |
+            ## Mismatched Socks Festival Bulletin
+
+            - The ceremonial whistle has gone missing again.
+            - Please admire the socks respectfully.
+            - Any goose-related incident must be reported in writing.
+    - row:
+        classes: gap-2
+        children:
+        - chip:
+            params:
+              text: Schedule stable-ish
+            props: color=positive
+        - chip:
+            params:
+              text: Biscuit inventory fragile
+            props: color=warning

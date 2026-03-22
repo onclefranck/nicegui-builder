@@ -1,0 +1,122 @@
+from .inspect import build_field_context
+from .mapping import (
+    build_validation_props,
+    get_defaults_from_map,
+    resolve_map_type,
+    select_default_variant,
+)
+
+
+def _build_datetime_split_node(field_ctx: dict, default_info: dict, value: dict | None) -> dict:
+    value = value or {}
+    label = field_ctx.get("attributes_title") or field_ctx["fieldname"]
+    raw_value = field_ctx.get("fieldvalue")
+    date_value = None
+    time_value = None
+
+    if raw_value not in (None, ""):
+        from nicegui_builder.core.form import split_datetime_value
+
+        date_value, time_value = split_datetime_value(raw_value)
+
+    container_methods = value.get("container", default_info.get("methods"))
+    container_params = dict(default_info.get("params", {}))
+    container_params.update(value.get("params") or {})
+    container_classes = " ".join(
+        part
+        for part in [
+            default_info.get("classes", ""),
+            value.get("classes", ""),
+        ]
+        if part
+    )
+    container_props = " ".join(
+        part
+        for part in [
+            default_info.get("props", ""),
+            value.get("props", ""),
+        ]
+        if part
+    )
+
+    return {
+        "methods": container_methods,
+        "params": container_params,
+        "props": container_props,
+        "classes": container_classes,
+        "children": [
+            {
+                "date_input": {
+                    "ref": f"field:{field_ctx['fieldname']}:date",
+                    "params": {
+                        "value": date_value,
+                        "label": f"{label} date",
+                    },
+                    "props": "clearable",
+                    "classes": "col",
+                }
+            },
+            {
+                "time_input": {
+                    "ref": f"field:{field_ctx['fieldname']}:time",
+                    "params": {
+                        "value": time_value,
+                        "label": f"{label} time",
+                    },
+                    "props": "clearable",
+                    "classes": "col",
+                }
+            },
+        ],
+    }
+
+
+def resolve_field_node(model_class, model_instance, fieldname: str, value: dict | None) -> dict:
+    value = value or {}
+
+    field_ctx = build_field_context(model_class, model_instance, fieldname)
+    field_info = field_ctx["field_info"]
+    requested_variant = value.get("methods", "std")
+
+    map_type = resolve_map_type(field_info.annotation)
+    effective_variant = select_default_variant(field_info, map_type, requested_variant)
+    default_info = get_defaults_from_map(map_type, effective_variant)
+    methods = default_info.get("methods")
+    validation_props = build_validation_props(field_info, methods)
+
+    if map_type == "datetime" and effective_variant == "split":
+        return {
+            "field_ctx": field_ctx,
+            "default_info": default_info,
+            "node": _build_datetime_split_node(field_ctx, default_info, value),
+        }
+
+    params = dict(default_info.get("params", {}))
+    params.update(value.get("params") or {})
+
+    props = " ".join(
+        part for part in [
+            default_info.get("props", ""),
+            validation_props,
+            value.get("props", ""),
+        ]
+        if part
+    )
+    classes = " ".join(
+        part for part in [
+            default_info.get("classes", ""),
+            value.get("classes", ""),
+        ]
+        if part
+    )
+
+    return {
+        "field_ctx": field_ctx,
+        "default_info": default_info,
+        "node": {
+            "methods": methods,
+            "params": params,
+            "props": props,
+            "classes": classes,
+        },
+    }
