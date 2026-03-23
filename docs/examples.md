@@ -1,5 +1,9 @@
 # Examples Roadmap
 
+[Home](../README.md)
+
+[Previous: Public API](public-api.md) | [Next: Product Roadmap](product-roadmap.md)
+
 This document proposes a progressive set of examples to document `nicegui-builder`.
 
 The goal is to cover the public API in increasing order of complexity, while keeping each example focused and easy to understand.
@@ -18,7 +22,7 @@ Each example should ideally:
 
 A ready-to-copy VS Code debug template lives at:
 
-- `src/nicegui_builder/examples/vscode/launch.json`
+- [`src/nicegui_builder/examples/vscode/launch.json`](../src/nicegui_builder/examples/vscode/launch.json)
 
 Usage:
 

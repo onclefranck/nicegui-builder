@@ -1,5 +1,7 @@
 # nicegui-builder
 
+[Home](README.md)
+
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12%20%7C%203.13%20%7C%203.14-blue.svg)](pyproject.toml)
 [![CI](https://github.com/onclefranck/nicegui-builder/actions/workflows/ci.yml/badge.svg)](https://github.com/onclefranck/nicegui-builder/actions/workflows/ci.yml)
@@ -7,6 +9,11 @@
 [![Publish PyPI](https://github.com/onclefranck/nicegui-builder/actions/workflows/publish-pypi.yml/badge.svg)](https://github.com/onclefranck/nicegui-builder/actions/workflows/publish-pypi.yml)
 
 `nicegui-builder` is a Python library for building NiceGUI interfaces from declarative layouts and schema-aware plugins.
+
+> [!WARNING]
+> This is an early pre-release published to invite discovery and feedback.
+> The project is not presented as production-ready or fully stabilized yet.
+> Expect API changes, rough edges, and evolving behavior while the library is still taking shape.
 
 It currently provides three main entry points:
 
@@ -37,7 +44,7 @@ nicegui-builder --help
 ## Stable API
 
 Top-level imports from `nicegui_builder` are the supported stable public API.
-See `docs/public-api.md` for the current stable surface.
+See [`docs/public-api.md`](docs/public-api.md) for the current stable surface.
 
 ## Quick Start
 
@@ -319,7 +326,7 @@ The `pydantic` plugin resolves `field__...` nodes using:
 
 - field type
 - field constraints and metadata
-- plugin-local widget mapping in `src/nicegui_builder/plugins/pydantic/pydantic-nicegui.yml`
+- plugin-local widget mapping in [`src/nicegui_builder/plugins/pydantic/pydantic-nicegui.yml`](src/nicegui_builder/plugins/pydantic/pydantic-nicegui.yml)
 
 Example:
 
@@ -351,8 +358,8 @@ Example:
 
 ## More Docs
 
-- `docs/public-api.md`: stable public API
-- `docs/plugin.md`: how to build a new plugin
-- `docs/architecture.md`: architecture and class diagram
-- `docs/publishing.md`: TestPyPI and PyPI publishing guide
-- `docs/product-roadmap.md`: roadmap history
+- [`docs/public-api.md`](docs/public-api.md): stable public API
+- [`docs/plugin.md`](docs/plugin.md): how to build a new plugin
+- [`docs/architecture.md`](docs/architecture.md): architecture and class diagram
+- [`docs/publishing.md`](docs/publishing.md): TestPyPI and PyPI publishing guide
+- [`docs/product-roadmap.md`](docs/product-roadmap.md): roadmap history

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "nicegui-builder"
-version = "0.0.0.dev1"
+version = "0.0.0.dev3"
 description = "Plugin-first NiceGUI builders for declarative layouts, forms, and tables"
 readme = "README.md"
 license = "MIT"

@@ -1,5 +1,9 @@
 # Plugin Development
 
+[Home](../README.md)
+
+[Previous: Publishing](publishing.md) | [Next: Architecture](architecture.md)
+
 This document explains how to add a new source plugin to `nicegui-builder`.
 
 ## Goal
@@ -43,7 +47,7 @@ They typically implement:
 - `resolve_widget(spec, variant="std")`
 - optional `render_form(source, flavor="")`
 
-See `src/nicegui_builder/plugins/base.py`.
+See [`src/nicegui_builder/plugins/base.py`](../src/nicegui_builder/plugins/base.py).
 
 ### Collection Plugins
 
@@ -135,11 +139,11 @@ The `pydantic` plugin is a good reference for form-oriented plugins.
 
 Its code is organized under:
 
-- `src/nicegui_builder/plugins/pydantic/inspect.py`
-- `src/nicegui_builder/plugins/pydantic/mapping.py`
-- `src/nicegui_builder/plugins/pydantic/resolve.py`
-- `src/nicegui_builder/plugins/pydantic/plugin.py`
-- `src/nicegui_builder/plugins/pydantic/pydantic-nicegui.yml`
+- [`src/nicegui_builder/plugins/pydantic/inspect.py`](../src/nicegui_builder/plugins/pydantic/inspect.py)
+- [`src/nicegui_builder/plugins/pydantic/mapping.py`](../src/nicegui_builder/plugins/pydantic/mapping.py)
+- [`src/nicegui_builder/plugins/pydantic/resolve.py`](../src/nicegui_builder/plugins/pydantic/resolve.py)
+- [`src/nicegui_builder/plugins/pydantic/plugin.py`](../src/nicegui_builder/plugins/pydantic/plugin.py)
+- [`src/nicegui_builder/plugins/pydantic/pydantic-nicegui.yml`](../src/nicegui_builder/plugins/pydantic/pydantic-nicegui.yml)
 
 The YAML file is plugin-local on purpose, so the plugin stays self-contained.
 
@@ -169,7 +173,7 @@ It shows how to:
 
 See:
 
-- `src/nicegui_builder/plugins/pandas/plugin.py`
+- [`src/nicegui_builder/plugins/pandas/plugin.py`](../src/nicegui_builder/plugins/pandas/plugin.py)
 
 ## Testing Guidance
 

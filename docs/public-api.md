@@ -1,5 +1,9 @@
 # Public API
 
+[Home](../README.md)
+
+[Previous: Architecture](architecture.md) | [Next: Examples Roadmap](examples.md)
+
 This document defines the supported public API surface for `nicegui-builder`.
 
 ## Stable
