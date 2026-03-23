@@ -11,7 +11,7 @@
 `nicegui-builder` is a Python library for building NiceGUI interfaces from declarative layouts and schema-aware plugins.
 
 > [!WARNING]
-> `0.0.0.dev2` is an early pre-release published to invite discovery and feedback.
+> This is an early pre-release published to invite discovery and feedback.
 > The project is not presented as production-ready or fully stabilized yet.
 > Expect API changes, rough edges, and evolving behavior while the library is still taking shape.
 
