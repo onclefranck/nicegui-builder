@@ -1,5 +1,9 @@
 # Architecture
 
+[Home](../README.md)
+
+[Previous: Plugin Development](plugin.md) | [Next: Public API](public-api.md)
+
 This document describes the current architecture of `nicegui-builder` in a way that is meant to be readable by humans first.
 
 The main idea is simple:
@@ -383,7 +387,7 @@ If someone is new to the project, the best order is:
 
 ## Related Documents
 
-- `README.md` for using the library
-- `docs/plugin.md` for writing plugins
-- `docs/public-api.md` for the stable API surface
-- `docs/examples.md` for the planned example set
+- [`README.md`](../README.md) for using the library
+- [`docs/plugin.md`](plugin.md) for writing plugins
+- [`docs/public-api.md`](public-api.md) for the stable API surface
+- [`docs/examples.md`](examples.md) for the planned example set

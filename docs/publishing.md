@@ -1,5 +1,9 @@
 # Publishing
 
+[Home](../README.md)
+
+[Next: Plugin Development](plugin.md)
+
 This document explains how to publish `nicegui-builder` to TestPyPI and PyPI.
 
 ## Publishing Strategy
@@ -28,7 +32,7 @@ Important:
 - every upload must use a new version
 - TestPyPI also rejects re-uploading the same file/version combination
 
-The version currently lives in `pyproject.toml`.
+The version currently lives in [`pyproject.toml`](../pyproject.toml).
 
 ## One-Time Setup
 
@@ -112,11 +116,11 @@ Preview only the unreleased changes:
 git-cliff --unreleased
 ```
 
-If you later want GitHub-enriched metadata for a private repository, provide a token and disable offline mode in `cliff.toml`.
+If you later want GitHub-enriched metadata for a private repository, provide a token and disable offline mode in [`cliff.toml`](../cliff.toml).
 
 Recommended release habit:
 
-1. update the version in `pyproject.toml`
+1. update the version in [`pyproject.toml`](../pyproject.toml)
 2. run `git-cliff -o CHANGELOG.md`
 3. review the generated changelog
 4. commit the version bump and changelog together
@@ -128,10 +132,10 @@ Use this for development and packaging validation.
 
 ### Recommended steps
 
-1. update the version in `pyproject.toml` to a development version
+1. update the version in [`pyproject.toml`](../pyproject.toml) to a development version
 2. commit the change on `develop`
 3. push the branch
-4. trigger the `Publish TestPyPI` workflow manually in GitHub Actions
+4. trigger the [`Publish TestPyPI`](../.github/workflows/publish-testpypi.yml) workflow manually in GitHub Actions
 5. verify installation from TestPyPI
 
 Example install:
@@ -147,11 +151,11 @@ Use this for stable releases only.
 ### Recommended steps
 
 1. make sure tests pass
-2. update the version in `pyproject.toml` to a stable version
+2. update the version in [`pyproject.toml`](../pyproject.toml) to a stable version
 3. commit the release version
 4. merge the approved release PR into `main`
 5. create and push a git tag like `v0.1.0` from `main`
-6. let the `Publish PyPI` workflow publish the package
+6. let the [`Publish PyPI`](../.github/workflows/publish-pypi.yml) workflow publish the package
 7. verify installation from PyPI
 
 Example:
@@ -171,13 +175,13 @@ pip install nicegui-builder
 
 The repository now includes:
 
-- package metadata in `pyproject.toml`
+- package metadata in [`pyproject.toml`](../pyproject.toml)
 - package-data inclusion for YAML files
-- `MANIFEST.in` for source distribution completeness
-- build tooling in `requirements-dev.txt`
-- `git-cliff` configuration in `cliff.toml`
-- `CHANGELOG.md`
-- GitHub Actions workflows for TestPyPI and PyPI
+- [`MANIFEST.in`](../MANIFEST.in) for source distribution completeness
+- build tooling in [`requirements-dev.txt`](../requirements-dev.txt)
+- `git-cliff` configuration in [`cliff.toml`](../cliff.toml)
+- [`CHANGELOG.md`](../CHANGELOG.md)
+- GitHub Actions workflows in [`publish-testpypi.yml`](../.github/workflows/publish-testpypi.yml) and [`publish-pypi.yml`](../.github/workflows/publish-pypi.yml)
 
 ## Practical Advice
 
