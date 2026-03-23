@@ -19,35 +19,35 @@ class ContactAddress(BaseModel):
         default="",
         title="Full name",
         description="The full name",
-        examples=["Mark Carney", "Keir Starmer", "Alex Morgan"],
+        examples=["Jordan Lee", "Taylor Brooks", "Alex Morgan"],
     )
 
     address: str = Field(
         default="",
         title="Address line",
         description="The door number, the street and the suite",
-        examples=["1 Sussex Drive", "10 Downing Street", "55 Orchard Avenue"],
+        examples=["142 Willow Crest Lane", "27 Maple Court, Suite 4B", "908 Harbor View Avenue"],
     )
 
     city: str = Field(
         default="",
         title="City",
         description="The city",
-        examples=["Ottawa", "London", "Boston"],
+        examples=["North Briar", "Maple Glen", "Harbor Point"],
     )
     
     province: str = Field(
         default="",
         title="Province",
         description="The province",
-        examples=["Quebec", "", ""],
+        examples=["Westfield", "Lake District", "North County"],
     )
 
     postalcode: str = Field(
         default="",
         title="Postal code",
         description="The postal code",
-        examples=["K1A 0A1", "SW1A 2AA", "75008"],
+        examples=["WL3 8QT", "MC4 2LB", "HV7 1RN"],
     )
 
     country: str = Field(
