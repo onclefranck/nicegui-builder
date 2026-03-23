@@ -1,5 +1,9 @@
 # Product Roadmap
 
+[Home](../README.md)
+
+[Previous: Examples Roadmap](examples.md)
+
 This roadmap tracks the next user-facing capabilities for `nicegui-builder`.
 
 ## 1. Rich Form Validation
