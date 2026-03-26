@@ -19,7 +19,7 @@ def _registrations_dataframe() -> pd.DataFrame:
                 "participant_name": "Mira the Unmatched",
                 "contest_title": "Midnight Parade of Respectable Nonsense",
                 "status": "Confirmed",
-                "checked_in_at": datetime(2026, 6, 12, 20, 50).isoformat(timespec="minutes"),
+                "checked_in_at": datetime(2026, 6, 12, 20, 50),
             },
             {
                 "participant_name": "Bernard Two-Left-Socks",
@@ -31,13 +31,13 @@ def _registrations_dataframe() -> pd.DataFrame:
                 "participant_name": "Clara of the Fierce Ankles",
                 "contest_title": "Midnight Parade of Respectable Nonsense",
                 "status": "Confirmed",
-                "checked_in_at": datetime(2026, 6, 12, 20, 58).isoformat(timespec="minutes"),
+                "checked_in_at": datetime(2026, 6, 12, 20, 58),
             },
             {
                 "participant_name": "Lucian the Mildly Dramatic",
                 "contest_title": "Interpretive Heel Rotation",
                 "status": "Dramatically late",
-                "checked_in_at": datetime(2026, 6, 12, 21, 17).isoformat(timespec="minutes"),
+                "checked_in_at": datetime(2026, 6, 12, 21, 17),
             },
         ]
     )
@@ -48,6 +48,12 @@ def build_ui():
     ui.label(
         "Small filters appear automatically so the desk can find people before the ceremonial confusion begins."
     ).classes("text-body2 text-grey-7")
+    ui.label(
+        "Build filters by choosing a field, an operator symbol, and one or more values, then add them to the active list."
+    ).classes("text-body2 text-grey-6")
+    ui.label(
+        "Active filters can be toggled with a checkbox or removed, with comma-separated input for in/not in and two values for between."
+    ).classes("text-body2 text-grey-6")
 
     handle = table(_registrations_dataframe(), variant="filters")
 
@@ -62,8 +68,30 @@ def build_ui():
             ),
         )
         ui.button(
+            "Checked in after 21:00",
+            on_click=lambda: handle.apply_filters(
+                {
+                    "checked_in_at": {
+                        "op": "gte",
+                        "value": "2026-06-12T21:00",
+                    }
+                }
+            ),
+        )
+        ui.button(
+            "Exclude waitlist and late",
+            on_click=lambda: handle.apply_filters(
+                {
+                    "status": {
+                        "op": "notIn",
+                        "value": "Waitlist, Dramatically late",
+                    }
+                }
+            ),
+        )
+        ui.button(
             "Clear filters",
-            on_click=lambda: handle.clear_filters().apply_filters({}),
+            on_click=lambda: handle.clear_filters(),
         )
         ui.button(
             "Show active filters",

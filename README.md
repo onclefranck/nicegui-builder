@@ -150,6 +150,28 @@ For the `pandas` plugin, a richer filtered table variant is also available:
 handle = table(df, variant="filters")
 ```
 
+The built-in filtered table UI exposes operator symbols out of the box:
+
+- `∋` contains
+- `=` equals
+- `≠` not equals
+- `>` greater than
+- `≥` greater than or equal
+- `<` less than
+- `≤` less than or equal
+- `⋖` starts with
+- `⋗` ends with
+- `∈` in
+- `∉` not in
+- `≈` regex
+- `⋯` between
+
+The UI lets you choose a field, an operator, and one or more values, then add that filter to an active filter list.
+Active filters can be enabled or disabled with a checkbox and removed from the list without losing the builder state.
+For `in` and `notIn`, the current UI accepts comma-separated values.
+For numeric and datetime columns, `between` renders two inputs.
+For `datetime` columns, the built-in filter UI uses the same split `date_input + time_input` pattern as the `pydantic` forms.
+
 ## Working With Form Handles
 
 `form(...)` returns a `FormHandle`.
@@ -269,8 +291,9 @@ Filter:
 ```python
 handle.set_filter("name", "ada", op="contains")
 handle.set_filter("score", [10, 20], op="between")
+handle.set_filter("status", "confirmed, waitlist", op="in")
 handle.apply_filters()
-handle.clear_filters().apply_filters()
+handle.clear_filters()
 ```
 
 CRUD-style actions:

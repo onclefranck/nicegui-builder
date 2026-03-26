@@ -196,8 +196,9 @@ Goal:
 Covers:
 
 - rich plugin rendering
-- filter controls
+- a filter builder with an active filter list
 - automatic filter metadata
+- operator symbols, comma-separated `in` / `notIn`, and `between`
 
 Suggested file:
 

@@ -65,6 +65,7 @@ Goals:
 Delivered:
 
 - richer filter operators in the `pandas` plugin
+- filter-builder UI with an active filter list
 - `TableHandle.set_filter(...)`
 - `TableHandle.clear_filters()`
 - stateful `TableHandle.apply_filters(...)`

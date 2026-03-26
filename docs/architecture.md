@@ -364,7 +364,7 @@ Examples of notable behavior:
 
 - sortable table defaults
 - pagination and selection support
-- richer filtering workflow
+- richer filtering workflow with operator-aware filter building and an active filter list
 
 ## Design Principles
 

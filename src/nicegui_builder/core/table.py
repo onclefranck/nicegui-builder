@@ -6,6 +6,7 @@ import io
 from nicegui import ui
 
 from .actions import TABLE_ACTION_SPECS, apply_action_intent, get_action_spec
+from .filter_operators import normalize_filter_operator
 from .models import ActionSpec, TableSpec
 from .view import ViewHandle
 
@@ -29,6 +30,11 @@ class TableHandle(ViewHandle):
             self.filter_values = component_filters
         return self.filter_values
 
+    def _refresh_filter_ui(self) -> None:
+        callback = getattr(self.component, "refresh_filters_ui", None)
+        if callable(callback):
+            callback()
+
     def normalized_filter_values(self) -> dict[str, object]:
         normalized: dict[str, object] = {}
         for field_name, raw_value in self._filter_store().items():
@@ -36,7 +42,9 @@ class TableHandle(ViewHandle):
                 continue
 
             if isinstance(raw_value, dict):
-                operator = raw_value.get("op", "equals")
+                if raw_value.get("enabled") is False:
+                    continue
+                operator = normalize_filter_operator(raw_value.get("op", "equals"))
                 value = raw_value.get("value")
                 if value in (None, "", []):
                     continue
@@ -259,10 +267,14 @@ class TableHandle(ViewHandle):
     def set_filter(self, field_name: str, value, *, op: str | None = None):
         store = self._filter_store()
         store[field_name] = {"op": op, "value": value} if op else value
+        self._refresh_filter_ui()
         return self
 
     def clear_filters(self):
         self._filter_store().clear()
+        self._refresh_filter_ui()
+        if self.plugin is not None and hasattr(self.plugin, "filter_rows"):
+            return self.set_rows(self.filter_rows(self.normalized_filter_values()))
         return self
 
     def apply_filters(self, filter_values: dict[str, object] | None = None):
@@ -270,4 +282,5 @@ class TableHandle(ViewHandle):
             store = self._filter_store()
             store.clear()
             store.update(filter_values)
+            self._refresh_filter_ui()
         return self.set_rows(self.filter_rows(self.normalized_filter_values()))
