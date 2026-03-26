@@ -1,0 +1,199 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://nicegui-builder.local/schemas/layout.schema.json",
+  "title": "nicegui-builder layout schema",
+  "description": "Structural schema for declarative nicegui-builder layouts expressed as YAML or JSON.",
+  "type": "array",
+  "minItems": 1,
+  "items": {
+    "$ref": "#/$defs/layoutEntry"
+  },
+  "examples": [
+    [
+      {
+        "card.tight": {
+          "classes": "w-full p-4 gap-3",
+          "children": [
+            {
+              "label": {
+                "params": {
+                  "text": "Hello world"
+                }
+              }
+            }
+          ]
+        }
+      }
+    ]
+  ],
+  "$defs": {
+    "jsonValue": {
+      "oneOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "integer"
+        },
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        },
+        {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/jsonValue"
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/$defs/jsonValue"
+          }
+        }
+      ]
+    },
+    "paramsObject": {
+      "type": "object",
+      "description": "Keyword arguments passed to the resolved NiceGUI method.",
+      "default": {},
+      "additionalProperties": {
+        "$ref": "#/$defs/jsonValue"
+      }
+    },
+    "contextObject": {
+      "type": "object",
+      "description": "Reserved for future layout-time context metadata.",
+      "default": {},
+      "additionalProperties": {
+        "$ref": "#/$defs/jsonValue"
+      }
+    },
+    "childrenArray": {
+      "type": "array",
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/layoutEntry"
+      }
+    },
+    "baseNodeConfig": {
+      "type": "object",
+      "properties": {
+        "params": {
+          "$ref": "#/$defs/paramsObject"
+        },
+        "props": {
+          "type": "string",
+          "description": "Space-separated NiceGUI/Quasar props string."
+        },
+        "classes": {
+          "type": "string",
+          "description": "Space-separated CSS utility classes."
+        },
+        "ref": {
+          "type": "string",
+          "description": "Optional builder reference name stored in the builder context."
+        },
+        "children": {
+          "$ref": "#/$defs/childrenArray"
+        },
+        "context": {
+          "$ref": "#/$defs/contextObject"
+        }
+      }
+    },
+    "standardNodeConfig": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/baseNodeConfig"
+        },
+        {
+          "type": "object",
+          "additionalProperties": false
+        }
+      ],
+      "description": "Configuration for a standard builder node whose key already names the NiceGUI method."
+    },
+    "expansionNodeConfig": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/baseNodeConfig"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "methods": {
+              "type": "string",
+              "description": "Plugin-specific method or variant override, for example on field__... nodes."
+            },
+            "container": {
+              "type": "string",
+              "description": "Plugin-specific container override, currently used by split datetime field expansion."
+            }
+          },
+          "additionalProperties": false
+        }
+      ],
+      "description": "Configuration for an expansion node such as field__email."
+    },
+    "standardNodeValue": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "#/$defs/standardNodeConfig"
+        }
+      ]
+    },
+    "expansionNodeValue": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "#/$defs/expansionNodeConfig"
+        }
+      ]
+    },
+    "standardLayoutEntry": {
+      "type": "object",
+      "description": "A single layout entry whose key resolves directly to one or more NiceGUI methods, for example label or card.tight.",
+      "minProperties": 1,
+      "maxProperties": 1,
+      "propertyNames": {
+        "pattern": "^[A-Za-z_][A-Za-z0-9_]*(?:\\.[A-Za-z_][A-Za-z0-9_]*)*$"
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/standardNodeValue"
+      }
+    },
+    "expansionLayoutEntry": {
+      "type": "object",
+      "description": "A single layout entry delegated to a registered builder expansion callback, for example field__name.",
+      "minProperties": 1,
+      "maxProperties": 1,
+      "propertyNames": {
+        "pattern": "^[A-Za-z_][A-Za-z0-9_]*__.+$"
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/expansionNodeValue"
+      }
+    },
+    "layoutEntry": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/standardLayoutEntry"
+        },
+        {
+          "$ref": "#/$defs/expansionLayoutEntry"
+        }
+      ]
+    }
+  }
+}

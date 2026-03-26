@@ -67,6 +67,11 @@ builder(layout)
 ui.run()
 ```
 
+For the declarative layout language itself, see:
+
+- [`docs/layout-schema.md`](docs/layout-schema.md)
+- [`schemas/layout.schema.json`](schemas/layout.schema.json)
+
 ### `form(source, flavor="")`
 
 Use `form(...)` when you want a plugin to inspect a supported source and render a form.
