@@ -93,7 +93,10 @@ def visit(components: list):
             ui_component.props(props)
 
         if ref:
-            component_refs(ctx)[ref] = ui_component
+            refs = component_refs(ctx)
+            if ref in refs:
+                raise ValueError(f"duplicate component ref: {ref}")
+            refs[ref] = ui_component
 
         # process children if any
         if children:
@@ -139,5 +142,7 @@ def builder(layout) -> None:
     ctx_token = builder_ctx.set(ctx)
     visit(layout)
     root_component = get_root_component(ctx)
+    if root_component is not None and hasattr(root_component, "__dict__"):
+        root_component.component_refs = dict(component_refs(ctx))
     builder_ctx.reset(ctx_token)
     return root_component

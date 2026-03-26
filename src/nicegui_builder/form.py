@@ -4,6 +4,7 @@ import pathlib as p
 import yaml
 
 from .builder import builder, register, builder_ctx
+from .core.component_refs import DateTimeComponentRef
 from .core.context import component_refs, ensure_builder_runtime
 from .core.form import FormHandle
 from .core.models import FormSpec
@@ -37,7 +38,9 @@ def _resolve_plugin_field(key: str, value: dict):
     )
     ctx.update(resolved["field_ctx"])
     ctx["default_info"] = resolved.get("default_info")
-    resolved["node"]["ref"] = f"field:{fieldname}"
+    logical_ref = value.get("ref") or resolved["node"].get("ref") or f"field:{fieldname}"
+    resolved["node"]["ref"] = logical_ref
+    ctx.setdefault("_field_refs", {})[fieldname] = logical_ref
     return resolved["node"]
 
 
@@ -69,6 +72,7 @@ def form(source, flavor: str = ""):
         source_instance=source_instance,
         field_specs=field_specs,
         layout=layout,
+        _field_refs={},
     )
 
     form_spec = FormSpec(
@@ -81,12 +85,27 @@ def form(source, flavor: str = ""):
     )
 
     root_component = builder(layout)
+    refs = dict(component_refs(ctx))
+    field_refs = dict(ctx.get("_field_refs", {}))
+    for field in field_specs:
+        logical_ref = field_refs.get(field.name, f"field:{field.name}")
+        date_ref = f"{logical_ref}:date"
+        time_ref = f"{logical_ref}:time"
+        if date_ref in refs or time_ref in refs:
+            refs[logical_ref] = DateTimeComponentRef(
+                container=refs.get(logical_ref),
+                date=refs.get(date_ref),
+                time=refs.get(time_ref),
+            )
+    if root_component is not None and hasattr(root_component, "__dict__"):
+        root_component.component_refs = refs
     handle = FormHandle(
         root_component=root_component,
         plugin=plugin,
         source_class=source_class,
         field_specs=field_specs,
-        component_refs=dict(component_refs(ctx)),
+        component_refs=refs,
+        field_refs=field_refs,
         source_instance=source_instance,
         form_spec=form_spec,
     )

@@ -177,3 +177,36 @@ def test_form_uses_source_instance_when_building_handle(monkeypatch):
 
     assert handle.source_instance is instance
     assert calls["kwargs"]["source_instance"] is instance
+
+
+def test_form_exposes_custom_component_refs_and_split_datetime_composites(monkeypatch):
+    class DateTimePlugin(FakePlugin):
+        def __init__(self):
+            self.field_specs = [FieldSpec(name="starts_at", python_type=object)]
+
+    class DummyComponent:
+        def __init__(self):
+            self.component_refs = {}
+
+    monkeypatch.setattr(form_module.plugin_registry, "resolve", lambda source: DateTimePlugin())
+    monkeypatch.setattr(
+        form_module,
+        "_resolve_layout_from_source",
+        lambda source, flavor: [{"field__starts_at": {"ref": "starts_at"}}],
+    )
+
+    def fake_builder(layout):
+        ctx = form_module.builder_ctx.get()
+        refs = form_module.component_refs(ctx)
+        ctx["_field_refs"]["starts_at"] = "starts_at"
+        refs["starts_at"] = object()
+        refs["starts_at:date"] = object()
+        refs["starts_at:time"] = object()
+        return DummyComponent()
+
+    monkeypatch.setattr(form_module, "builder", fake_builder)
+
+    handle = form_module.form(type("Demo", (), {}))
+
+    assert handle.component_refs["starts_at"].date is handle.component_refs["starts_at:date"]
+    assert handle.component_refs["starts_at"].time is handle.component_refs["starts_at:time"]

@@ -382,6 +382,7 @@ class FormHandle(ViewHandle):
     source_class: type
     field_specs: list[FieldSpec]
     component_refs: dict[str, object]
+    field_refs: dict[str, str] = field(default_factory=dict)
     source_instance: object | None = None
     form_spec: FormSpec | None = None
     _state: FormState = field(init=False, repr=False)
@@ -467,13 +468,13 @@ class FormHandle(ViewHandle):
         return binding_type(refresh=refresh, bound_fields=bound, **parts)
 
     def _field_ref(self, field: FieldSpec) -> str:
-        return f"field:{field.name}"
+        return self.field_refs.get(field.name, f"field:{field.name}")
 
     def _field_component(self, field: FieldSpec):
         return self.component(self._field_ref(field))
 
     def _field_part_component(self, field_name: str, part: str):
-        return self.component(f"field:{field_name}:{part}")
+        return self.component(f"{self.field_refs.get(field_name, f'field:{field_name}')}:{part}")
 
     def _has_split_datetime_parts(self, field_name: str) -> bool:
         return (

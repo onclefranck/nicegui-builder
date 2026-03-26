@@ -181,6 +181,16 @@ Example:
 
 This means the plugin can provide a rich field expansion without forcing a single visual wrapper such as `row`.
 
+The `pydantic` form flow also auto-registers field components in `component_refs`.
+Default logical names use the form `field:<fieldname>`.
+For split `datetime` fields, the logical ref resolves to a composite object with:
+
+- `.container`
+- `.date`
+- `.time`
+
+If the layout supplies `ref`, that explicit logical name is used instead.
+
 ## Pandas Plugin Notes
 
 The `pandas` plugin is a good reference for collection-oriented plugins.
