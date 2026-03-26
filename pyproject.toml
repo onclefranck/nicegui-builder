@@ -53,8 +53,9 @@ dependencies = { file = ["requirements.txt"] }
 [tool.setuptools.dynamic.optional-dependencies]
 dev  = { file = ["requirements-dev.txt"] }
 docs = { file = ["requirements-docs.txt"] }
+pydantic = { file = ["requirements-pydantic.txt"] }
 pandas = { file = ["requirements-pandas.txt"] }
-all = { file = ["requirements-dev.txt", "requirements-docs.txt", "requirements-pandas.txt"] }
+all = { file = ["requirements-dev.txt", "requirements-docs.txt", "requirements-pydantic.txt", "requirements-pandas.txt"] }
 
 [tool.pytest.ini_options]
 addopts = "--basetemp=.pytest_tmp"

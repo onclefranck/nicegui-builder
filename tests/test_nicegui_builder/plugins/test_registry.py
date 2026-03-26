@@ -1,6 +1,7 @@
 import pytest
 
 from nicegui_builder.plugins import plugin_registry
+import nicegui_builder.plugins as plugins_module
 from nicegui_builder.plugins.registry import PluginRegistry
 
 
@@ -55,3 +56,23 @@ def test_registry_raises_lookup_error_with_source_instance_and_type():
 
     with pytest.raises(LookupError, match="UnknownSource"):
         registry.resolve(UnknownSource)
+
+
+def test_plugins_module_can_skip_optional_builtin_imports(monkeypatch):
+    imported = []
+
+    def fake_import(name):
+        imported.append(name)
+        if name.endswith(".pydantic"):
+            raise ModuleNotFoundError("No module named 'pydantic'", name="pydantic")
+        return object()
+
+    monkeypatch.setattr(plugins_module, "import_module", fake_import)
+
+    plugins_module._load_optional_builtin("pydantic", missing_dependencies={"pydantic", "pydantic_core"})
+    plugins_module._load_optional_builtin("pandas", missing_dependencies={"pandas"})
+
+    assert imported == [
+        "nicegui_builder.plugins.pydantic",
+        "nicegui_builder.plugins.pandas",
+    ]
