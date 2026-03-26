@@ -39,6 +39,15 @@ Examples:
 - `form(...)` returns a `FormHandle` with `component_refs` and `get_component(ref)`
 - `table(...)` returns a `TableHandle` with the documented handle helpers
 
+The package also re-exports `ui` and patches the imported NiceGUI `ui` object at runtime with:
+
+- `ui.builder(...)`
+- `ui.form(...)`
+- `ui.table(...)`
+
+That behavior is supported by `nicegui-builder`, but it is still a patch-style integration layered on top of NiceGUI's own `ui` module.
+It should be treated as a convenience contract of this package, not as an upstream NiceGUI guarantee.
+
 ## Advanced / Experimental
 
 The following namespaces remain available for advanced use, but are not yet treated as stable contracts:
@@ -57,3 +66,4 @@ Examples:
 - `nicegui_builder.plugins.pydantic.inspect`
 - `nicegui_builder.plugins.pydantic.mapping`
 - `nicegui_builder.plugins.pydantic.resolve`
+- workspace editor stub wiring such as [`typings/nicegui/ui.pyi`](../typings/nicegui/ui.pyi)

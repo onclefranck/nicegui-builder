@@ -21,6 +21,32 @@ It currently provides three main entry points:
 - `form(source, flavor="")` for plugin-driven forms
 - `table(source, variant="std")` for plugin-driven tabular views
 
+When `nicegui_builder` is imported, it also attaches those entry points to NiceGUI's `ui` object at runtime:
+
+- `ui.builder(...)`
+- `ui.form(...)`
+- `ui.table(...)`
+
+This is intentionally a runtime patch of the NiceGUI `ui` object rather than an officially supported NiceGUI extension point.
+It works well in practice, but it should be understood as a convenience layer provided by `nicegui-builder`, not as a contract owned by NiceGUI itself.
+
+If you want editor completion for those extra methods without modifying NiceGUI itself, prefer importing `ui` from `nicegui_builder`:
+
+```python
+from nicegui_builder import ui
+```
+
+That exported `ui` is the same runtime object as `nicegui.ui`, but `nicegui_builder` ships typing metadata for the added methods.
+
+For this workspace, VS Code/Pylance can also enrich `from nicegui import ui` directly through the local stub path configured in [`.vscode/settings.json`](.vscode/settings.json).
+That setup uses [`typings/nicegui/ui.pyi`](typings/nicegui/ui.pyi) to expose `ui.builder(...)`, `ui.form(...)`, and `ui.table(...)` to code completion without modifying NiceGUI itself.
+
+Patch alert:
+
+- the runtime methods are attached dynamically by `nicegui_builder`
+- the editor completion for `from nicegui import ui` comes from local workspace stubs, not from NiceGUI upstream
+- outside a workspace that loads those stubs, code completion may fall back to whatever the editor infers from the installed NiceGUI package alone
+
 ## Install
 
 Base install:

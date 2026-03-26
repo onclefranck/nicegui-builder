@@ -356,7 +356,7 @@ Examples of notable behavior:
 
 - automatic form layouts
 - widget mapping from `pydantic-nicegui.yml`
-- split `datetime` handling as `date + time`
+- split `datetime` handling through the shared `datetime_input` component
 - automatic field refs in `component_refs`, including composite logical refs for split `datetime`
 
 ### `pandas`
@@ -383,6 +383,21 @@ Examples of notable behavior:
 - Use YAML for declarative defaults and Python for heuristics.
 - Separate pure state from UI-bound behavior when possible.
 - Keep the top-level API stable even while internals evolve.
+
+## Patchy Integrations
+
+Some conveniences in the project are intentionally implemented as thin patches rather than as first-class upstream extension points.
+
+Current examples:
+
+- `nicegui_builder` attaches `builder`, `form`, and `table` to NiceGUI's runtime `ui` object
+- the workspace can provide editor completion for those added methods through local stubs in [`typings/nicegui/ui.pyi`](../typings/nicegui/ui.pyi)
+
+These integrations are useful and deliberate, but they should still be understood as package-owned glue:
+
+- runtime behavior is provided by `nicegui-builder`
+- editor behavior depends on the local typing setup
+- neither mechanism implies that NiceGUI itself natively declares those methods
 
 ## Practical Reading Order
 

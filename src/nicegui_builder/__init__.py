@@ -1,3 +1,5 @@
+from nicegui import ui
+
 from .builder import builder
 from .core import (
     ActionSpec,
@@ -16,7 +18,17 @@ from .core import (
 from .form import form
 from .table import table
 
+
+def _attach_to_ui() -> None:
+    ui.builder = builder
+    ui.form = form
+    ui.table = table
+
+
+_attach_to_ui()
+
 STABLE_API = (
+    "ui",
     "builder",
     "form",
     "table",
@@ -40,6 +52,7 @@ EXPERIMENTAL_NAMESPACES = (
 )
 
 __all__ = [
+    "ui",
     "builder",
     "ActionSpec",
     "form",
