@@ -79,6 +79,27 @@ builder(layout)
 ui.run()
 ```
 
+`builder(...)` returns the root NiceGUI component.
+If layout nodes declare `ref`, that root component also exposes a `component_refs` dictionary for later lookup.
+
+Example:
+
+```yaml
+- card:
+    ref: profile_card
+    children:
+      - label:
+          ref: title_label
+          params:
+            text: Profile
+```
+
+```python
+root = builder(layout)
+root.component_refs["profile_card"]
+root.component_refs["title_label"]
+```
+
 For the declarative layout language itself, see:
 
 - [`docs/layout-schema.md`](docs/layout-schema.md)
@@ -138,6 +159,20 @@ Example:
 ```
 
 That lets you keep the date/time pair together while placing it inside a `row`, `column`, `grid`, or another declarative container.
+
+All `pydantic` fields are also exposed through `handle.component_refs`.
+By default, field refs use the logical name `field:<fieldname>`.
+
+For split `datetime` fields, the logical ref resolves to a composite object with `.date` and `.time`.
+
+Example:
+
+```python
+starts_at = handle.component_refs["field:starts_at"]
+starts_at.container
+starts_at.date
+starts_at.time
+```
 
 ### `table(source, variant="std")`
 
@@ -280,6 +315,17 @@ handle.action_bar(
     live_submit_button=True,
     submit_strategy="dirty_and_valid",
 )
+```
+
+Component refs:
+
+```python
+handle.component_refs["field:email"]
+handle.get_component("field:email")
+
+starts_at = handle.component_refs["field:starts_at"]
+starts_at.date
+starts_at.time
 ```
 
 ## Working With Table Handles

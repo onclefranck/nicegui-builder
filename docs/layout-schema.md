@@ -61,7 +61,7 @@ Supported configuration keys:
 - `params`: keyword arguments passed to the resolved method
 - `props`: props string passed to `.props(...)`
 - `classes`: classes string passed to `.classes(...)`
-- `ref`: optional builder reference name
+- `ref`: optional string reference name stored in `component_refs`
 - `children`: nested layout entries
 - `context`: reserved for future layout-time metadata
 
@@ -69,6 +69,7 @@ Example:
 
 ```yaml
 - grid:
+    ref: contact_grid
     params:
       columns: 12
     classes: w-full gap-3
@@ -78,6 +79,9 @@ Example:
             text: Contact form
           classes: text-h6
 ```
+
+If `ref` is present, the rendered component is added to the runtime `component_refs` dictionary under that name.
+Duplicate ref names are rejected.
 
 ## Expansion Nodes
 
@@ -107,6 +111,7 @@ Another example with the split `datetime` widget:
 
 ```yaml
 - field__starts_at:
+    ref: starts_at
     container: grid
     params:
       columns: 2
@@ -116,8 +121,18 @@ Another example with the split `datetime` widget:
 In that case:
 
 - `field__starts_at` selects the field expansion callback
+- `ref` names the logical component ref exposed at runtime
 - `container` overrides the wrapper component used for the split `date_input + time_input`
 - `params` and `classes` apply to that wrapper container
+
+For `pydantic` field expansions:
+
+- every field gets a logical ref even if you do not provide one explicitly
+- the default logical name is `field:<fieldname>`
+- split `datetime` fields also expose child refs with `:date` and `:time` suffixes
+
+So the example above produces a logical ref named `starts_at`, plus child refs `starts_at:date` and `starts_at:time`.
+The form handle then exposes the logical ref as a composite object with `.date` and `.time`.
 
 ## Null Values
 

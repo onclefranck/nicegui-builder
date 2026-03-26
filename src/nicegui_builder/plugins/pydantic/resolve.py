@@ -12,6 +12,7 @@ def _build_datetime_split_node(field_ctx: dict, default_info: dict, value: dict 
     value = value or {}
     label = field_ctx.get("attributes_title") or field_ctx["fieldname"]
     raw_value = field_ctx.get("fieldvalue")
+    logical_ref = value.get("ref") or f"field:{field_ctx['fieldname']}"
     container_methods = value.get("container", default_info.get("methods"))
     container_params = dict(default_info.get("params", {}))
     container_params.update(value.get("params") or {})
@@ -36,6 +37,7 @@ def _build_datetime_split_node(field_ctx: dict, default_info: dict, value: dict 
         field_name=field_ctx["fieldname"],
         label=label,
         raw_value=raw_value,
+        ref=logical_ref,
         container_methods=container_methods,
         container_params=container_params,
         container_props=container_props,

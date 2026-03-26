@@ -1,4 +1,5 @@
 import importlib
+import pytest
 
 builder_module = importlib.import_module("nicegui_builder.builder")
 from nicegui_builder.builder import builder, register, resolve_context_value
@@ -92,3 +93,25 @@ def test_builder_returns_root_component_and_applies_registered_expansion(monkeyp
     assert root.params["text"] == "Resolved name"
     assert root.class_calls == ["resolved-field"]
     assert root.props_calls == ["outlined"]
+    assert root.component_refs["field:name"] is root
+
+
+def test_builder_collects_explicit_component_refs_and_rejects_duplicates(monkeypatch):
+    fake_ui = FakeUI()
+    monkeypatch.setattr(builder_module, "ui", fake_ui)
+
+    root = builder(
+        [
+            {"card": {"ref": "panel"}},
+        ]
+    )
+
+    assert root.component_refs["panel"] is root
+
+    with pytest.raises(ValueError, match="duplicate component ref"):
+        builder(
+            [
+                {"card": {"ref": "dup"}},
+                {"label": {"ref": "dup", "params": {"text": "Hello"}}},
+            ]
+        )

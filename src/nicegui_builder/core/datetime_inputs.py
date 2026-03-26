@@ -118,6 +118,7 @@ def build_split_datetime_node(
     field_name: str,
     label: str,
     raw_value=None,
+    ref: str | None = None,
     container_methods: str = "row",
     container_params: dict | None = None,
     container_props: str = "",
@@ -136,15 +137,18 @@ def build_split_datetime_node(
     if raw_value not in (None, ""):
         date_value, time_value = split_datetime_value(raw_value)
 
+    logical_ref = ref or f"field:{field_name}"
+
     return {
         "methods": container_methods,
+        "ref": logical_ref,
         "params": dict(container_params or {}),
         "props": container_props,
         "classes": container_classes,
         "children": [
             {
                 "date_input": {
-                    "ref": date_ref or f"field:{field_name}:date",
+                    "ref": date_ref or f"{logical_ref}:date",
                     "params": {
                         "value": date_value,
                         "label": date_label or f"{label} date",
@@ -155,7 +159,7 @@ def build_split_datetime_node(
             },
             {
                 "time_input": {
-                    "ref": time_ref or f"field:{field_name}:time",
+                    "ref": time_ref or f"{logical_ref}:time",
                     "params": {
                         "value": time_value,
                         "label": time_label or f"{label} time",

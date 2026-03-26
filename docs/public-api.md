@@ -32,6 +32,13 @@ from nicegui_builder import (
 
 These names are expected to remain importable across normal library evolution.
 
+In addition, the observable behavior of the top-level entry points is part of the stable contract.
+Examples:
+
+- `builder(...)` returns the root component and may attach `component_refs` when layout nodes declare `ref`
+- `form(...)` returns a `FormHandle` with `component_refs` and `get_component(ref)`
+- `table(...)` returns a `TableHandle` with the documented handle helpers
+
 ## Advanced / Experimental
 
 The following namespaces remain available for advanced use, but are not yet treated as stable contracts:

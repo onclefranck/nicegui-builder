@@ -35,6 +35,15 @@ class ViewHandle:
             ),
         }
 
+    def get_component(self, ref: str):
+        refs = getattr(self, "component_refs", None)
+        if isinstance(refs, dict):
+            return refs.get(ref)
+        refs = getattr(self.root_component, "component_refs", None)
+        if isinstance(refs, dict):
+            return refs.get(ref)
+        raise AttributeError("component refs are not available on this handle")
+
     def refresh(self):
         if self.root_component is not None and hasattr(self.root_component, "update"):
             self.root_component.update()

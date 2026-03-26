@@ -93,6 +93,7 @@ Examples:
 - validate and submit a form
 - sort/filter/export a table
 - expose the spec and the root component
+- expose component refs for later component lookup
 
 ## View 1: Core Specs
 
@@ -251,10 +252,12 @@ classDiagram
     class ViewHandle {
         +root_component
         +plugin
+        +component_refs
         +spec
         +plugin_name
         +spec_type
         +describe()
+        +get_component(ref)
         +refresh()
         +show()
         +hide()
@@ -321,6 +324,7 @@ They are lightweight view-oriented facades:
 - `ViewHandle` gives a common base
 - `FormHandle` adds form state, validation, submit, and live helpers
 - `TableHandle` adds rows, filters, selection, export, and table actions
+- handles can also expose `component_refs` for named runtime lookup
 
 ## Builder Role
 
@@ -332,6 +336,7 @@ What matters architecturally is this:
 - it resolves context values
 - it supports plugin-assisted node expansion such as `field__name`
 - it keeps a small explicit runtime context for refs and root-component tracking
+- it collects named refs into `component_refs`
 
 In other words, the builder is the bridge between normalized layout decisions and actual NiceGUI components.
 
@@ -352,6 +357,7 @@ Examples of notable behavior:
 - automatic form layouts
 - widget mapping from `pydantic-nicegui.yml`
 - split `datetime` handling as `date + time`
+- automatic field refs in `component_refs`, including composite logical refs for split `datetime`
 
 ### `pandas`
 
