@@ -147,7 +147,7 @@ def test_table_handle_can_store_and_clear_filter_state(monkeypatch):
     assert handle.filter_values["name"]["op"] == "contains"
     assert [row["name"] for row in handle.get_rows()] == ["Ada", "Grace"]
 
-    handle.clear_filters().apply_filters()
+    handle.clear_filters()
 
     assert handle.filter_values == {}
     assert len(handle.get_rows()) == 3
@@ -179,6 +179,52 @@ def test_table_handle_can_share_filter_state_with_rendered_component(monkeypatch
 
     assert handle.filter_values is fake_component.filter_values
     assert handle.normalized_filter_values() == {"name": {"op": "contains", "value": "ad"}}
+
+
+def test_table_handle_refreshes_filter_ui_when_filters_change():
+    refreshed = []
+    component = type(
+        "Component",
+        (),
+        {
+            "filter_values": {},
+            "refresh_filters_ui": lambda self=None: refreshed.append("refresh"),
+            "rows": [],
+            "update": lambda self=None: None,
+        },
+    )()
+    handle = _make_table_handle(component=component, plugin=type("Plugin", (), {"filter_rows": lambda self, source, values: []})())
+
+    handle.set_filter("name", "Ada", op="equals")
+    handle.apply_filters({"score": {"op": "between", "value": [10, 20]}})
+    handle.clear_filters()
+
+    assert refreshed == ["refresh", "refresh", "refresh"]
+
+
+def test_table_handle_clear_filters_reapplies_unfiltered_rows():
+    class Component:
+        def __init__(self):
+            self.filter_values = {"name": {"op": "equals", "value": "Ada"}}
+            self.rows = [{"name": "Ada"}]
+            self.updated = False
+
+        def update(self):
+            self.updated = True
+
+    component = Component()
+    plugin = type(
+        "Plugin",
+        (),
+        {"filter_rows": lambda self, source, values: [{"name": "Ada"}, {"name": "Grace"}]},
+    )()
+    handle = _make_table_handle(component=component, plugin=plugin)
+
+    result = handle.clear_filters()
+
+    assert result is handle
+    assert component.filter_values == {}
+    assert handle.get_rows() == [{"name": "Ada"}, {"name": "Grace"}]
 
 
 def test_table_handle_supports_sort_pagination_selection_and_csv_export(monkeypatch):
@@ -351,6 +397,8 @@ def test_table_handle_normalized_filter_values_skips_empty_entries():
             "score": {"op": "between", "value": [10, 20]},
             "ignored_dict": {"op": "contains", "value": ""},
             "defaulted_dict": {"value": "Grace"},
+            "legacy_dict": {"op": "ge", "value": 10},
+            "disabled_dict": {"op": "equals", "value": "Ada", "enabled": False},
         }
     )
 
@@ -358,6 +406,7 @@ def test_table_handle_normalized_filter_values_skips_empty_entries():
         "name": "Ada",
         "score": {"op": "between", "value": [10, 20]},
         "defaulted_dict": {"op": "equals", "value": "Grace"},
+        "legacy_dict": {"op": "gte", "value": 10},
     }
 
 

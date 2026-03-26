@@ -2,13 +2,14 @@ from dataclasses import dataclass, field
 from collections.abc import Callable
 from contextlib import nullcontext
 from decimal import Decimal
-from datetime import date as date_type, datetime, time as time_type
+from datetime import datetime
 import enum
 import json
 
 from nicegui import ui
 
 from .actions import FORM_ACTION_SPECS, apply_action_intent, get_action_spec
+from .datetime_inputs import _time_to_string, combine_datetime_value, split_datetime_value
 from .models import ActionSpec, FieldSpec, FormSpec
 from .view import ViewHandle
 
@@ -189,59 +190,6 @@ def resolve_live_strategy(
         "'always', 'never', 'dirty', 'clean', 'valid', 'invalid', "
         "'dirty_and_valid', 'dirty_or_valid'"
     )
-
-
-def _time_to_string(value) -> str:
-    if not isinstance(value, time_type):
-        return str(value)
-
-    if value.microsecond:
-        return value.isoformat(timespec="microseconds")
-    if value.second:
-        return value.isoformat(timespec="seconds")
-    return value.isoformat(timespec="minutes")
-
-
-def split_datetime_value(value) -> tuple[str | None, str | None]:
-    if value in (None, ""):
-        return (None, None)
-
-    if isinstance(value, datetime):
-        return (value.date().isoformat(), _time_to_string(value.time()))
-
-    if isinstance(value, date_type) and not isinstance(value, datetime):
-        return (value.isoformat(), None)
-
-    if isinstance(value, str):
-        text = value.strip()
-        if not text:
-            return (None, None)
-
-        normalized = text.replace("Z", "+00:00")
-        try:
-            parsed = datetime.fromisoformat(normalized)
-        except ValueError:
-            if "T" in text:
-                date_value, time_value = text.split("T", 1)
-                return (date_value or None, time_value or None)
-            if " " in text:
-                date_value, time_value = text.split(" ", 1)
-                return (date_value or None, time_value or None)
-            return (text, None)
-
-        return (parsed.date().isoformat(), _time_to_string(parsed.time()))
-
-    return (str(value), None)
-
-
-def combine_datetime_value(date_value, time_value):
-    if date_value in (None, "") and time_value in (None, ""):
-        return None
-    if date_value in (None, ""):
-        return time_value
-    if time_value in (None, ""):
-        return date_value
-    return f"{date_value}T{time_value}"
 
 
 @dataclass(slots=True)

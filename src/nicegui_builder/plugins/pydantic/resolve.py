@@ -1,4 +1,5 @@
 from .inspect import build_field_context
+from nicegui_builder.core.datetime_inputs import build_split_datetime_node
 from .mapping import (
     build_validation_props,
     get_defaults_from_map,
@@ -11,14 +12,6 @@ def _build_datetime_split_node(field_ctx: dict, default_info: dict, value: dict 
     value = value or {}
     label = field_ctx.get("attributes_title") or field_ctx["fieldname"]
     raw_value = field_ctx.get("fieldvalue")
-    date_value = None
-    time_value = None
-
-    if raw_value not in (None, ""):
-        from nicegui_builder.core.form import split_datetime_value
-
-        date_value, time_value = split_datetime_value(raw_value)
-
     container_methods = value.get("container", default_info.get("methods"))
     container_params = dict(default_info.get("params", {}))
     container_params.update(value.get("params") or {})
@@ -39,36 +32,15 @@ def _build_datetime_split_node(field_ctx: dict, default_info: dict, value: dict 
         if part
     )
 
-    return {
-        "methods": container_methods,
-        "params": container_params,
-        "props": container_props,
-        "classes": container_classes,
-        "children": [
-            {
-                "date_input": {
-                    "ref": f"field:{field_ctx['fieldname']}:date",
-                    "params": {
-                        "value": date_value,
-                        "label": f"{label} date",
-                    },
-                    "props": "clearable",
-                    "classes": "col",
-                }
-            },
-            {
-                "time_input": {
-                    "ref": f"field:{field_ctx['fieldname']}:time",
-                    "params": {
-                        "value": time_value,
-                        "label": f"{label} time",
-                    },
-                    "props": "clearable",
-                    "classes": "col",
-                }
-            },
-        ],
-    }
+    return build_split_datetime_node(
+        field_name=field_ctx["fieldname"],
+        label=label,
+        raw_value=raw_value,
+        container_methods=container_methods,
+        container_params=container_params,
+        container_props=container_props,
+        container_classes=container_classes,
+    )
 
 
 def resolve_field_node(model_class, model_instance, fieldname: str, value: dict | None) -> dict:

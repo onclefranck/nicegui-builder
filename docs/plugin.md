@@ -148,7 +148,8 @@ Its code is organized under:
 The YAML file is plugin-local on purpose, so the plugin stays self-contained.
 
 One useful pattern in the `pydantic` plugin is the `datetime` split field.
-The resolver keeps `date_input` and `time_input` grouped as one logical field, while still allowing the layout node to override the wrapper container.
+That split `date_input + time_input` behavior is now centralized in the core so multiple plugins can reuse the same widget pattern while still treating it as one logical value.
+The `pydantic` resolver keeps those inputs grouped as one logical field while still allowing the layout node to override the wrapper container.
 
 Example:
 
@@ -169,7 +170,7 @@ It shows how to:
 - inspect a `DataFrame`
 - infer column/filter metadata
 - provide default table widgets
-- optionally render a richer filtered table variant
+- optionally render a richer filtered table variant with a filter builder and active filter list
 
 See:
 
