@@ -35,6 +35,18 @@ Optional `pandas` support:
 pip install "nicegui-builder[pandas]"
 ```
 
+Optional `pydantic` support:
+
+```bash
+pip install "nicegui-builder[pydantic]"
+```
+
+Everything included:
+
+```bash
+pip install "nicegui-builder[all]"
+```
+
 CLI entry point:
 
 ```bash

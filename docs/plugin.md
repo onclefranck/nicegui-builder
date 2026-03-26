@@ -20,6 +20,9 @@ Examples already present in the project:
 - `pydantic` for schema-driven forms
 - `pandas` for table-oriented collections
 
+Both built-in source plugins are optional dependencies.
+The base package stays importable without them, and each plugin registers itself only when its dependency is available.
+
 ## Mental Model
 
 The core library should stay source-agnostic.
