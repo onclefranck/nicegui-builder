@@ -8,7 +8,12 @@ from nicegui_builder.core.datetime_inputs import (
     normalize_datetime_input,
     render_split_datetime_inputs,
 )
-from nicegui_builder.core.filter_operators import FILTER_OPERATORS, normalize_filter_operator
+from nicegui_builder.core.filter_operators import (
+    FILTER_OPERATORS,
+    active_filter_clauses,
+    canonical_filter_clause,
+    normalize_filter_operator,
+)
 from nicegui_builder.core.models import CollectionSpec, FieldSpec, TableSpec, WidgetSpec
 
 INTERNAL_ROW_ID = "nicegui_builder_row_id"
@@ -112,20 +117,10 @@ def _build_filter_spec(column: FieldSpec) -> FieldSpec:
 
 
 def _normalize_filter_clause(value, column: FieldSpec):
-    if isinstance(value, dict):
-        return {
-            "op": normalize_filter_operator(value.get("op", "equals")),
-            "value": value.get("value"),
-        }
-
     default_op = column.source_meta.get("filter_default_operator")
     if default_op is None:
         default_op = "contains" if column.source_meta.get("filter_kind") == "text" else "equals"
-
-    return {
-        "op": default_op,
-        "value": value,
-    }
+    return canonical_filter_clause(value, default_op=default_op)
 
 
 def _parse_csv_values(raw_value):
@@ -170,6 +165,27 @@ def _coerce_filter_values(column: FieldSpec, operator: str, raw_value):
         return _coerce_datetime_value(raw_value)
 
     return raw_value
+
+
+def _validated_coerced_clause(column: FieldSpec, clause: dict[str, object]) -> dict[str, object]:
+    operator = normalize_filter_operator(str(clause["op"]))
+    allowed = column.source_meta.get("filter_operators", [])
+    if operator not in allowed:
+        raise ValueError(f"unsupported filter operator for {column.name}: {operator}")
+
+    raw_value = clause["value"]
+    if _is_empty_filter_value(operator, raw_value):
+        return {
+            "op": operator,
+            "value": raw_value,
+            "enabled": clause.get("enabled", True),
+        }
+
+    return {
+        "op": operator,
+        "value": _coerce_filter_values(column, operator, raw_value),
+        "enabled": clause.get("enabled", True),
+    }
 
 
 def _apply_text_filter(filtered, column_name: str, operator: str, raw_value):
@@ -262,15 +278,6 @@ def _build_operator_options(field: FieldSpec) -> dict[str, str]:
         for operator in field.source_meta.get("filter_operators", [])
         if operator in FILTER_OPERATORS
     }
-
-
-def _enabled_filter_values(filter_values: dict[str, object]) -> dict[str, object]:
-    enabled: dict[str, object] = {}
-    for field_name, value in filter_values.items():
-        if isinstance(value, dict) and value.get("enabled") is False:
-            continue
-        enabled[field_name] = value
-    return enabled
 
 
 def _is_empty_filter_value(operator: str, value) -> bool:
@@ -559,22 +566,21 @@ class PandasPlugin:
             if isinstance(value, dict) and value.get("enabled") is False:
                 continue
 
-            clause = _normalize_filter_clause(value, column)
+            clause = _validated_coerced_clause(column, _normalize_filter_clause(value, column))
             operator = clause["op"]
             raw_value = clause["value"]
             if _is_empty_filter_value(operator, raw_value):
                 continue
-            coerced_value = _coerce_filter_values(column, operator, raw_value)
 
             if column.source_meta.get("filter_kind") in {"select", "boolean"}:
-                filtered = _apply_scalar_filter(filtered, column.name, operator, coerced_value)
+                filtered = _apply_scalar_filter(filtered, column.name, operator, raw_value)
                 continue
 
             if column.python_type in {int, float} or column.python_type == "datetime":
-                filtered = _apply_scalar_filter(filtered, column.name, operator, coerced_value)
+                filtered = _apply_scalar_filter(filtered, column.name, operator, raw_value)
                 continue
 
-            filtered = _apply_text_filter(filtered, column.name, operator, coerced_value)
+            filtered = _apply_text_filter(filtered, column.name, operator, raw_value)
 
         return _rows_from_dataframe(filtered)
 
@@ -601,11 +607,8 @@ class PandasPlugin:
         table_component = None
 
         def apply_filters():
-            try:
-                table_component.rows = self.filter_rows(source, _enabled_filter_values(filter_values))
-                table_component.update()
-            except ValueError:
-                return
+            table_component.rows = self.filter_rows(source, active_filter_clauses(filter_values))
+            table_component.update()
 
         builder_state = _default_builder_state(spec)
 
@@ -678,11 +681,10 @@ class PandasPlugin:
                         value = builder_state["value"]
                         if _is_empty_filter_value(operator, value):
                             return
-                        filter_values[field_name] = {
-                            "op": operator,
-                            "value": value,
-                            "enabled": True,
-                        }
+                        filter_values[field_name] = _validated_coerced_clause(
+                            filter_fields[field_name],
+                            {"op": operator, "value": value, "enabled": True},
+                        )
                         render_active_filters()
                         apply_filters()
 
@@ -733,17 +735,8 @@ class PandasPlugin:
                     table_component.props(widget.props)
 
         if table_spec is not None:
-            try:
-                table_component.table_spec = table_spec
-            except Exception:
-                pass
-            try:
-                table_component.filter_values = filter_values
-            except Exception:
-                pass
-            try:
-                table_component.refresh_filters_ui = render_active_filters if spec.filters else (lambda: None)
-            except Exception:
-                pass
+            table_component.table_spec = table_spec
+            table_component.filter_values = filter_values
+            table_component.refresh_filters_ui = render_active_filters if spec.filters else (lambda: None)
 
         return table_component

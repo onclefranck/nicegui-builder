@@ -5,6 +5,20 @@ from typing import Callable
 from nicegui import ui
 
 
+def _coerce_datetime_like(value):
+    if hasattr(value, "to_pydatetime"):
+        return value.to_pydatetime()
+    return value
+
+
+def _parse_datetime_string(value: str):
+    normalized = value.replace("Z", "+00:00")
+    try:
+        return datetime.fromisoformat(normalized)
+    except ValueError:
+        return None
+
+
 def _time_to_string(value) -> str:
     if not isinstance(value, time_type):
         return str(value)
@@ -20,8 +34,7 @@ def split_datetime_value(value) -> tuple[str | None, str | None]:
     if value in (None, ""):
         return (None, None)
 
-    if hasattr(value, "to_pydatetime"):
-        value = value.to_pydatetime()
+    value = _coerce_datetime_like(value)
 
     if isinstance(value, datetime):
         return (value.date().isoformat(), _time_to_string(value.time()))
@@ -34,10 +47,8 @@ def split_datetime_value(value) -> tuple[str | None, str | None]:
         if not text:
             return (None, None)
 
-        normalized = text.replace("Z", "+00:00")
-        try:
-            parsed = datetime.fromisoformat(normalized)
-        except ValueError:
+        parsed = _parse_datetime_string(text)
+        if parsed is None:
             if "T" in text:
                 date_value, time_value = text.split("T", 1)
                 return (date_value or None, time_value or None)
@@ -64,17 +75,16 @@ def combine_datetime_value(date_value, time_value):
 def normalize_datetime_input(raw_value):
     if raw_value in (None, ""):
         return raw_value
-    if hasattr(raw_value, "to_pydatetime"):
-        return raw_value.to_pydatetime()
+    raw_value = _coerce_datetime_like(raw_value)
     if isinstance(raw_value, datetime):
         return raw_value
     if isinstance(raw_value, date_type):
         return datetime.combine(raw_value, datetime.min.time())
     if isinstance(raw_value, str):
-        try:
-            return datetime.fromisoformat(raw_value)
-        except ValueError:
-            return raw_value
+        parsed = _parse_datetime_string(raw_value)
+        if parsed is not None:
+            return parsed
+        return raw_value
     return raw_value
 
 

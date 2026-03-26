@@ -1,6 +1,6 @@
 from nicegui import ui
 from importlib import import_module
-from .core.context import builder_ctx
+from .core.context import builder_ctx, component_refs, ensure_builder_runtime, get_root_component, set_root_component
 
 builder_expansion_registry = {}
 
@@ -19,54 +19,70 @@ def resolve_context_value(value, ctx):
 
     return value
 
+
+def _normalize_layout_entry(component: dict, ctx: dict) -> dict:
+    key, value = next(iter(component.items()))
+    if value is None:
+        value = {}
+
+    if "__" in key:
+        register_key, builder_key = key.split("__", 1)
+        resolved = builder_expansion_registry[register_key](builder_key, value)
+        return {
+            "methods": resolved.get("methods"),
+            "params": resolved.get("params") or {},
+            "classes": resolved.get("classes", ""),
+            "props": resolved.get("props", ""),
+            "ref": resolved.get("ref"),
+            "children": resolved.get("children", value.get("children", [])),
+        }
+
+    return {
+        "methods": key,
+        "params": value.get("params") or {},
+        "classes": value.get("classes", ""),
+        "props": value.get("props", ""),
+        "ref": value.get("ref"),
+        "children": value.get("children", []),
+    }
+
+
+def _render_method_chain(method_chain: str, params: dict):
+    ui_component = None
+    methods = method_chain.split('.')
+    effective_params = {}
+
+    for i, method in enumerate(methods):
+        if i == len(methods) - 1:
+            effective_params = params
+        ui_component = (
+            getattr(ui_component, method)(**effective_params)
+            if ui_component
+            else getattr(ui, method)(**effective_params)
+        )
+
+    return ui_component
+
+
 def visit(components: list):
 
     for component in components:
 
-        key, value = next(iter(component.items()))
-
-        if value is None:
-            value = {}
-
         ctx = dict(builder_ctx.get())
         ctx_token = builder_ctx.set(ctx)
-
-        if "__" in key:
-            register_key, builder_key = key.split("__", 1)
-            resolved = builder_expansion_registry[register_key](builder_key, value)
-            methods = resolved.get("methods")
-            params = resolved.get("params") or {}
-            classes = resolved.get("classes", "")
-            props = resolved.get("props", "")
-            ref = resolved.get("ref")
-            children = resolved.get("children", value.get("children", []))
-
-        else:
-            methods = key
-            params = value.get("params") or {}
-            classes = value.get("classes", "")
-            props = value.get("props", "")
-            ref = value.get("ref")
-            children = value.get("children", [])
-
-        methods = methods.split('.')
+        normalized = _normalize_layout_entry(component, ctx)
+        params = dict(normalized["params"])
+        classes = normalized["classes"]
+        props = normalized["props"]
+        ref = normalized["ref"]
+        children = normalized["children"]
 
         for k, v in params.items():
             params[k] = resolve_context_value(v, ctx)
 
         classes = resolve_context_value(classes, ctx)
         props = resolve_context_value(props, ctx)
-                    
-        ui_component = None
-        effective_params = {}
-        for i, method in enumerate(methods):
-            # params are applied on the last method
-            if i == len(methods) - 1:
-                effective_params = params
-            ui_component = \
-                getattr(ui_component, method)(**effective_params) \
-                if ui_component else \
-                getattr(ui, method)(**effective_params)
+        ui_component = _render_method_chain(normalized["methods"], params)
         
         # apply classes if any
         if classes:
@@ -77,14 +93,14 @@ def visit(components: list):
             ui_component.props(props)
 
         if ref:
-            ctx.setdefault("_component_refs", {})[ref] = ui_component
+            component_refs(ctx)[ref] = ui_component
 
         # process children if any
         if children:
             with ui_component:
                 visit(children)
 
-        ctx.setdefault("_builder_state", {}).setdefault("root_component", ui_component)
+        set_root_component(ctx, ui_component)
 
         builder_ctx.reset(ctx_token)
 
@@ -119,9 +135,9 @@ def register(key, callback):
 
 def builder(layout) -> None:
     ctx = dict(builder_ctx.get())
-    ctx.setdefault("_builder_state", {})
+    ensure_builder_runtime(ctx)
     ctx_token = builder_ctx.set(ctx)
     visit(layout)
-    root_component = ctx["_builder_state"].get("root_component")
+    root_component = get_root_component(ctx)
     builder_ctx.reset(ctx_token)
     return root_component

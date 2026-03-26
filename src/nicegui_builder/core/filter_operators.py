@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import Any
 
 
 @dataclass(frozen=True, slots=True)
@@ -32,3 +33,41 @@ LEGACY_FILTER_OPERATOR_NAMES = {
 
 def normalize_filter_operator(name: str) -> str:
     return LEGACY_FILTER_OPERATOR_NAMES.get(name, name)
+
+
+def canonical_filter_clause(raw_value, *, default_op: str = "equals") -> dict[str, Any]:
+    if isinstance(raw_value, dict):
+        operator = raw_value.get("op", default_op)
+        value = raw_value.get("value")
+        enabled = raw_value.get("enabled", True)
+    else:
+        operator = default_op
+        value = raw_value
+        enabled = True
+
+    return {
+        "op": normalize_filter_operator(operator),
+        "value": value,
+        "enabled": bool(enabled),
+    }
+
+
+def canonical_filter_store(
+    filter_values: dict[str, object],
+    *,
+    default_op: str = "equals",
+) -> dict[str, dict[str, Any]]:
+    return {
+        field_name: canonical_filter_clause(raw_value, default_op=default_op)
+        for field_name, raw_value in filter_values.items()
+    }
+
+
+def active_filter_clauses(
+    filter_values: dict[str, dict[str, Any]],
+) -> dict[str, dict[str, Any]]:
+    return {
+        field_name: clause
+        for field_name, clause in filter_values.items()
+        if clause.get("enabled", True)
+    }

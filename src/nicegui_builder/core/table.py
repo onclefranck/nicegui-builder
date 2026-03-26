@@ -6,8 +6,9 @@ import io
 from nicegui import ui
 
 from .actions import TABLE_ACTION_SPECS, apply_action_intent, get_action_spec
-from .filter_operators import normalize_filter_operator
+from .filter_operators import canonical_filter_clause, canonical_filter_store, normalize_filter_operator
 from .models import ActionSpec, TableSpec
+from ..plugins.registry import filter_collection_rows
 from .view import ViewHandle
 
 
@@ -27,7 +28,14 @@ class TableHandle(ViewHandle):
     def _filter_store(self) -> dict[str, object]:
         component_filters = getattr(self.component, "filter_values", None)
         if isinstance(component_filters, dict):
+            if component_filters:
+                canonicalized = canonical_filter_store(component_filters)
+                if canonicalized != component_filters:
+                    component_filters.clear()
+                    component_filters.update(canonicalized)
             self.filter_values = component_filters
+        elif self.filter_values:
+            self.filter_values = canonical_filter_store(self.filter_values)
         return self.filter_values
 
     def _refresh_filter_ui(self) -> None:
@@ -37,21 +45,16 @@ class TableHandle(ViewHandle):
 
     def normalized_filter_values(self) -> dict[str, object]:
         normalized: dict[str, object] = {}
-        for field_name, raw_value in self._filter_store().items():
-            if raw_value in (None, "", []):
+        for field_name, clause in self._filter_store().items():
+            value = clause["value"]
+            if value in (None, "", []):
                 continue
-
-            if isinstance(raw_value, dict):
-                if raw_value.get("enabled") is False:
-                    continue
-                operator = normalize_filter_operator(raw_value.get("op", "equals"))
-                value = raw_value.get("value")
-                if value in (None, "", []):
-                    continue
-                normalized[field_name] = {"op": operator, "value": value}
+            if clause["enabled"] is False:
                 continue
-
-            normalized[field_name] = raw_value
+            normalized[field_name] = {
+                "op": normalize_filter_operator(clause["op"]),
+                "value": value,
+            }
 
         return normalized
 
@@ -259,21 +262,22 @@ class TableHandle(ViewHandle):
         return parts
 
     def filter_rows(self, filter_values: dict[str, object]) -> list[dict]:
-        if self.plugin is None or not hasattr(self.plugin, "filter_rows"):
+        if self.plugin is None:
             raise TypeError("filter_rows() is not supported for this table handle")
-
-        return self.plugin.filter_rows(self.table_spec.source, filter_values)
+        return filter_collection_rows(self.plugin, self.table_spec.source, filter_values)
 
     def set_filter(self, field_name: str, value, *, op: str | None = None):
         store = self._filter_store()
-        store[field_name] = {"op": op, "value": value} if op else value
+        store[field_name] = canonical_filter_clause(
+            {"op": op, "value": value} if op else value
+        )
         self._refresh_filter_ui()
         return self
 
     def clear_filters(self):
         self._filter_store().clear()
         self._refresh_filter_ui()
-        if self.plugin is not None and hasattr(self.plugin, "filter_rows"):
+        if self.plugin is not None:
             return self.set_rows(self.filter_rows(self.normalized_filter_values()))
         return self
 
@@ -281,6 +285,6 @@ class TableHandle(ViewHandle):
         if filter_values is not None:
             store = self._filter_store()
             store.clear()
-            store.update(filter_values)
+            store.update(canonical_filter_store(filter_values))
             self._refresh_filter_ui()
         return self.set_rows(self.filter_rows(self.normalized_filter_values()))

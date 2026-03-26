@@ -37,15 +37,18 @@ There are currently two practical plugin families.
 
 Field plugins power `form(...)`.
 
-They typically implement:
+Required entry-point methods:
 
 - `supports(source)`
 - `inspect_fields(source)`
+- `resolve_field_node(model_class, model_instance, fieldname, value)`
+
+Common but optional extension points:
+
 - `build_layout(source, flavor="")`
 - `build_field_context(model_class, model_instance, fieldname)`
-- `resolve_field_node(model_class, model_instance, fieldname, value)`
 - `resolve_widget(spec, variant="std")`
-- optional `render_form(source, flavor="")`
+- `render_form(source, flavor="")`
 
 See [`src/nicegui_builder/plugins/base.py`](../src/nicegui_builder/plugins/base.py).
 
@@ -53,12 +56,17 @@ See [`src/nicegui_builder/plugins/base.py`](../src/nicegui_builder/plugins/base.
 
 Collection plugins power `table(...)`.
 
-They typically implement:
+Required entry-point methods:
 
 - `supports(source)`
 - `inspect_collection(source)`
 - `resolve_collection_widget(spec, variant="std")`
-- optional `render_collection(source, spec, variant="std")`
+
+Common but optional extension points:
+
+- `prepare_rows(source)`
+- `filter_rows(source, filter_values)`
+- `render_collection(source, spec, variant="std")`
 
 ## Registration
 
@@ -133,6 +141,15 @@ Current example:
 
 - the `pandas` plugin uses `render_collection(..., variant="filters")` for a richer filter UI
 
+### 5. Normalize early
+
+If a plugin accepts multiple convenient input shapes at its public boundary, prefer normalizing them early into one internal form.
+
+Current examples:
+
+- table filter clauses are normalized into a canonical internal shape before filtering
+- builder nodes are normalized before method-chain rendering
+
 ## Pydantic Plugin Notes
 
 The `pydantic` plugin is a good reference for form-oriented plugins.
@@ -171,6 +188,11 @@ It shows how to:
 - infer column/filter metadata
 - provide default table widgets
 - optionally render a richer filtered table variant with a filter builder and active filter list
+
+It is also a good reference for:
+
+- canonical filter clause handling
+- validating/coercing filter values before applying them to the dataframe
 
 See:
 

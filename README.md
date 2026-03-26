@@ -298,7 +298,17 @@ handle.set_filter("name", "ada", op="contains")
 handle.set_filter("score", [10, 20], op="between")
 handle.set_filter("status", "confirmed, waitlist", op="in")
 handle.apply_filters()
+handle.normalized_filter_values()
 handle.clear_filters()
+```
+
+`normalized_filter_values()` returns the active filter clauses in normalized form:
+
+```python
+{
+    "name": {"op": "contains", "value": "ada"},
+    "score": {"op": "between", "value": [10, 20]},
+}
 ```
 
 CRUD-style actions:
