@@ -2,7 +2,7 @@
 
 [Home](../README.md)
 
-[Previous: Public API](public-api.md) | [Next: Product Roadmap](product-roadmap.md)
+[Previous: Layout Schema](layout-schema.md) | [Next: Product Roadmap](product-roadmap.md)
 
 This document proposes a progressive set of examples to document `nicegui-builder`.
 

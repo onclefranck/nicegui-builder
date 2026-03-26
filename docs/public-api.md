@@ -2,7 +2,7 @@
 
 [Home](../README.md)
 
-[Previous: Architecture](architecture.md) | [Next: Examples Roadmap](examples.md)
+[Previous: Architecture](architecture.md) | [Next: Layout Schema](layout-schema.md)
 
 This document defines the supported public API surface for `nicegui-builder`.
 
