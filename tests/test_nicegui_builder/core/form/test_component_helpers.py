@@ -1,13 +1,11 @@
 from datetime import date, datetime, time
 
+from nicegui_builder.core.datetime_inputs import DateTimeInput
 from nicegui_builder.core.form import (
     bind_component_event,
-    combine_datetime_value,
     clear_component_error,
     get_component_value,
     resolve_live_strategy,
-    split_datetime_value,
-    _time_to_string,
     set_component_color,
     set_component_enabled,
     set_component_error,
@@ -250,25 +248,25 @@ def test_resolve_live_strategy_supports_validation_modes_and_errors():
 
 
 def test_datetime_helpers_cover_string_parsing_and_formatting():
-    assert _time_to_string("14:30") == "14:30"
-    assert _time_to_string(time(14, 30)) == "14:30"
-    assert _time_to_string(time(14, 30, 45)) == "14:30:45"
-    assert _time_to_string(time(14, 30, 45, 123456)) == "14:30:45.123456"
+    assert DateTimeInput.time_to_string("14:30") == "14:30"
+    assert DateTimeInput.time_to_string(time(14, 30)) == "14:30"
+    assert DateTimeInput.time_to_string(time(14, 30, 45)) == "14:30:45"
+    assert DateTimeInput.time_to_string(time(14, 30, 45, 123456)) == "14:30:45.123456"
 
-    assert split_datetime_value(None) == (None, None)
-    assert split_datetime_value("") == (None, None)
-    assert split_datetime_value(datetime(2026, 3, 21, 14, 30)) == ("2026-03-21", "14:30")
-    assert split_datetime_value(date(2026, 3, 21)) == ("2026-03-21", None)
-    assert split_datetime_value("2026-03-21T14:30") == ("2026-03-21", "14:30")
-    assert split_datetime_value("2026-03-21 14:30") == ("2026-03-21", "14:30")
-    assert split_datetime_value("   ") == (None, None)
-    assert split_datetime_value("2026-03-21Tparty-time") == ("2026-03-21", "party-time")
-    assert split_datetime_value("2026-03-21T14:30Z") == ("2026-03-21", "14:30")
-    assert split_datetime_value("2026-03-21 only-date") == ("2026-03-21", "only-date")
-    assert split_datetime_value("nonsense") == ("nonsense", None)
-    assert split_datetime_value(123) == ("123", None)
+    assert DateTimeInput.split_value(None) == (None, None)
+    assert DateTimeInput.split_value("") == (None, None)
+    assert DateTimeInput.split_value(datetime(2026, 3, 21, 14, 30)) == ("2026-03-21", "14:30")
+    assert DateTimeInput.split_value(date(2026, 3, 21)) == ("2026-03-21", None)
+    assert DateTimeInput.split_value("2026-03-21T14:30") == ("2026-03-21", "14:30")
+    assert DateTimeInput.split_value("2026-03-21 14:30") == ("2026-03-21", "14:30")
+    assert DateTimeInput.split_value("   ") == (None, None)
+    assert DateTimeInput.split_value("2026-03-21Tparty-time") == ("2026-03-21", "party-time")
+    assert DateTimeInput.split_value("2026-03-21T14:30Z") == ("2026-03-21", "14:30")
+    assert DateTimeInput.split_value("2026-03-21 only-date") == ("2026-03-21", "only-date")
+    assert DateTimeInput.split_value("nonsense") == ("nonsense", None)
+    assert DateTimeInput.split_value(123) == ("123", None)
 
-    assert combine_datetime_value(None, None) is None
-    assert combine_datetime_value(None, "14:30") == "14:30"
-    assert combine_datetime_value("2026-03-21", None) == "2026-03-21"
-    assert combine_datetime_value("2026-03-21", "14:30") == "2026-03-21T14:30"
+    assert DateTimeInput.combine_value(None, None) is None
+    assert DateTimeInput.combine_value(None, "14:30") == "14:30"
+    assert DateTimeInput.combine_value("2026-03-21", None) == "2026-03-21"
+    assert DateTimeInput.combine_value("2026-03-21", "14:30") == "2026-03-21T14:30"

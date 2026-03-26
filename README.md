@@ -145,20 +145,23 @@ form(Contact, flavor="filters")
 handle = form(Contact, flavor="actionable")
 ```
 
-For `datetime` fields, the built-in `pydantic` plugin uses a split `date_input + time_input` widget by default.
-That split stays grouped as one logical field, but the layout can choose its wrapper container.
+For `datetime` fields, the built-in `pydantic` plugin uses a dedicated `datetime_input` component.
+That component internally renders a coordinated `date_input + time_input` pair as one logical field, and the layout can choose its wrapper container.
 
 Example:
 
 ```yaml
 - field__starts_at:
-    container: grid
     params:
-      columns: 2
+      container:
+        methods: grid
+        params:
+          columns: 2
+        classes: gap-2
     classes: col-span-12 gap-2
 ```
 
-That lets you keep the date/time pair together while placing it inside a `row`, `column`, `grid`, or another declarative container.
+That lets you keep the internal date/time pair together while placing it inside a `row`, `column`, `grid`, or another declarative container.
 
 All `pydantic` fields are also exposed through `handle.component_refs`.
 By default, field refs use the logical name `field:<fieldname>`.
@@ -222,7 +225,7 @@ The UI lets you choose a field, an operator, and one or more values, then add th
 Active filters can be enabled or disabled with a checkbox and removed from the list without losing the builder state.
 For `in` and `notIn`, the current UI accepts comma-separated values.
 For numeric and datetime columns, `between` renders two inputs.
-For `datetime` columns, the built-in filter UI uses the same split `date_input + time_input` pattern as the `pydantic` forms.
+For `datetime` columns, the built-in filter UI reuses the same `datetime_input` component as the `pydantic` forms.
 
 ## Working With Form Handles
 
@@ -446,9 +449,12 @@ Example:
             methods: email
             classes: w-full
         - field__starts_at:
-            container: grid
             params:
-              columns: 2
+              container:
+                methods: grid
+                params:
+                  columns: 2
+                classes: gap-2
             classes: col-span-12 gap-2
 ```
 

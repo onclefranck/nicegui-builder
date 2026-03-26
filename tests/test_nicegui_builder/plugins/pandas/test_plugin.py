@@ -3,6 +3,7 @@ from datetime import datetime
 
 import pytest
 
+from nicegui_builder.core.datetime_inputs import DateTimeInput
 from nicegui_builder.core.models import CollectionSpec, FieldSpec, TableSpec, WidgetSpec
 from nicegui_builder.plugins.pandas import pandas_plugin
 from nicegui_builder.plugins.pandas import plugin as pandas_module
@@ -216,10 +217,11 @@ def test_rows_from_dataframe_serializes_datetime_values_for_ui():
 def test_datetime_helpers_keep_internal_datetime_and_ui_friendly_values():
     field = FieldSpec(name="starts_at", python_type="datetime", source_meta={"filter_kind": "datetime"})
 
-    normalized = pandas_module.normalize_datetime_input("2026-03-21T10:15")
+    normalized = DateTimeInput.normalize_value("2026-03-21T10:15")
 
     assert isinstance(normalized, datetime)
-    assert pandas_module.datetime_to_input_value(normalized) == "2026-03-21T10:15"
+    date_value, time_value = DateTimeInput.split_value(normalized)
+    assert DateTimeInput.combine_value(date_value, time_value) == "2026-03-21T10:15"
     assert "T" not in pandas_module._format_filter_value(field, normalized)
 
 
@@ -452,6 +454,7 @@ def test_pandas_plugin_render_collection_builds_filter_ui_and_binds_state(monkey
     monkeypatch.setattr(pandas_module.ui, "input", lambda **kwargs: FakeControl("input", **kwargs))
     monkeypatch.setattr(pandas_module.ui, "number", lambda **kwargs: FakeControl("number", **kwargs))
     monkeypatch.setattr(pandas_module.ui, "select", lambda **kwargs: FakeControl("select", **kwargs))
+    monkeypatch.setattr(pandas_module, "DateTimeInput", lambda **kwargs: FakeControl("datetime_input", **kwargs))
     monkeypatch.setattr(pandas_module.ui, "date_input", lambda **kwargs: FakeControl("date_input", **kwargs))
     monkeypatch.setattr(pandas_module.ui, "time_input", lambda **kwargs: FakeControl("time_input", **kwargs))
     monkeypatch.setattr(pandas_module.ui, "label", lambda text: FakeControl("label", text=text))
@@ -651,6 +654,7 @@ def test_pandas_plugin_render_collection_uses_select_controls_and_requires_attac
     monkeypatch.setattr(pandas_module.ui, "input", lambda **kwargs: FakeControl("input", **kwargs))
     monkeypatch.setattr(pandas_module.ui, "number", lambda **kwargs: FakeControl("number", **kwargs))
     monkeypatch.setattr(pandas_module.ui, "select", lambda **kwargs: FakeControl("select", **kwargs))
+    monkeypatch.setattr(pandas_module, "DateTimeInput", lambda **kwargs: FakeControl("datetime_input", **kwargs))
     monkeypatch.setattr(pandas_module.ui, "date_input", lambda **kwargs: FakeControl("date_input", **kwargs))
     monkeypatch.setattr(pandas_module.ui, "time_input", lambda **kwargs: FakeControl("time_input", **kwargs))
     monkeypatch.setattr(pandas_module.ui, "label", lambda text: FakeControl("label", text=text))
@@ -804,6 +808,7 @@ def test_pandas_plugin_render_collection_avoids_recursive_operator_updates(monke
     monkeypatch.setattr(pandas_module.ui, "input", lambda **kwargs: ReactiveControl("input", **kwargs))
     monkeypatch.setattr(pandas_module.ui, "number", lambda **kwargs: ReactiveControl("number", **kwargs))
     monkeypatch.setattr(pandas_module.ui, "select", lambda **kwargs: ReactiveControl("select", **kwargs))
+    monkeypatch.setattr(pandas_module, "DateTimeInput", lambda **kwargs: ReactiveControl("datetime_input", **kwargs))
     monkeypatch.setattr(pandas_module.ui, "date_input", lambda **kwargs: ReactiveControl("date_input", **kwargs))
     monkeypatch.setattr(pandas_module.ui, "time_input", lambda **kwargs: ReactiveControl("time_input", **kwargs))
     monkeypatch.setattr(pandas_module.ui, "label", lambda text: ReactiveControl("label", text=text))

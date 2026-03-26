@@ -168,15 +168,17 @@ Its code is organized under:
 The YAML file is plugin-local on purpose, so the plugin stays self-contained.
 
 One useful pattern in the `pydantic` plugin is the `datetime` split field.
-That split `date_input + time_input` behavior is now centralized in the core so multiple plugins can reuse the same widget pattern while still treating it as one logical value.
-The `pydantic` resolver keeps those inputs grouped as one logical field while still allowing the layout node to override the wrapper container.
+That behavior is now centralized in the core as a dedicated `datetime_input` component so multiple plugins can reuse the same widget while still treating it as one logical value.
+The `pydantic` resolver keeps the internal date/time inputs grouped as one logical field while still allowing the layout node to override the wrapper container.
 
 Example:
 
 ```yaml
 - field__starts_at:
-    container: column
-    classes: gap-2
+    params:
+      container:
+        methods: column
+        classes: gap-2
 ```
 
 This means the plugin can provide a rich field expansion without forcing a single visual wrapper such as `row`.

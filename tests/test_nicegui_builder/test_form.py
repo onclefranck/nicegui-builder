@@ -188,6 +188,13 @@ def test_form_exposes_custom_component_refs_and_split_datetime_composites(monkey
         def __init__(self):
             self.component_refs = {}
 
+    class FakeDateTimeInput:
+        def __init__(self):
+            self.date = object()
+            self.time = object()
+            self.date_ref = "starts_at:date"
+            self.time_ref = "starts_at:time"
+
     monkeypatch.setattr(form_module.plugin_registry, "resolve", lambda source: DateTimePlugin())
     monkeypatch.setattr(
         form_module,
@@ -199,14 +206,12 @@ def test_form_exposes_custom_component_refs_and_split_datetime_composites(monkey
         ctx = form_module.builder_ctx.get()
         refs = form_module.component_refs(ctx)
         ctx["_field_refs"]["starts_at"] = "starts_at"
-        refs["starts_at"] = object()
-        refs["starts_at:date"] = object()
-        refs["starts_at:time"] = object()
+        refs["starts_at"] = FakeDateTimeInput()
         return DummyComponent()
 
     monkeypatch.setattr(form_module, "builder", fake_builder)
 
     handle = form_module.form(type("Demo", (), {}))
 
-    assert handle.component_refs["starts_at"].date is handle.component_refs["starts_at:date"]
-    assert handle.component_refs["starts_at"].time is handle.component_refs["starts_at:time"]
+    assert handle.component_refs["starts_at:date"] is handle.component_refs["starts_at"].date
+    assert handle.component_refs["starts_at:time"] is handle.component_refs["starts_at"].time

@@ -97,7 +97,6 @@ Examples:
 Expansion nodes support the same common keys as standard nodes, plus plugin-specific overrides such as:
 
 - `methods`
-- `container`
 
 Example:
 
@@ -112,9 +111,12 @@ Another example with the split `datetime` widget:
 ```yaml
 - field__starts_at:
     ref: starts_at
-    container: grid
     params:
-      columns: 2
+      container:
+        methods: grid
+        params:
+          columns: 2
+        classes: gap-2
     classes: col-span-12 gap-2
 ```
 
@@ -122,8 +124,8 @@ In that case:
 
 - `field__starts_at` selects the field expansion callback
 - `ref` names the logical component ref exposed at runtime
-- `container` overrides the wrapper component used for the split `date_input + time_input`
-- `params` and `classes` apply to that wrapper container
+- `params.container` configures the internal wrapper component used by `datetime_input`
+- node-level `classes` still apply to the `datetime_input` component itself
 
 For `pydantic` field expansions:
 
@@ -198,7 +200,7 @@ The shipped schema is strong at validating:
 - one-entry-per-node objects
 - standard vs expansion node shapes
 - the presence and type of `params`, `props`, `classes`, `ref`, `children`, and `context`
-- plugin override keys currently used in layouts such as `methods` and `container`
+- plugin override keys currently used in layouts such as `methods`
 
 ## What The Schema Does Not Fully Validate
 
@@ -207,7 +209,8 @@ Some things are outside the reach of a practical static schema:
 - whether `card.tight` or another method chain exists in NiceGUI
 - whether a specific `field__name` actually exists on your model
 - whether a plugin accepts a given `methods` override such as `email` or `textarea`
-- whether a `container` override is meaningful for a given field/plugin
+- whether a `params.container` override is meaningful for a given field/plugin
+- whether a specialized component such as `datetime_input` imposes additional runtime invariants on that container config
 - semantic correctness of runtime context expressions in `_...` or `$module:function` strings
 
 So the schema should be treated as a strong structural guardrail, not as a complete semantic type system.
