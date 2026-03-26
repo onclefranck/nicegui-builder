@@ -41,6 +41,8 @@ include-package-data = true
 
 [tool.setuptools.package-data]
 nicegui_builder = [
+  "py.typed",
+  "*.pyi",
   "examples/*.yml",
   "examples/*.yaml",
   "plugins/pydantic/*.yml",
