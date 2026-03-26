@@ -3,10 +3,7 @@ from datetime import date, datetime
 from nicegui import ui
 
 from nicegui_builder.core.datetime_inputs import (
-    datetime_to_input_value,
-    format_datetime_for_display,
-    normalize_datetime_input,
-    render_split_datetime_inputs,
+    DateTimeInput,
 )
 from nicegui_builder.core.filter_operators import (
     FILTER_OPERATORS,
@@ -293,8 +290,8 @@ def _format_filter_value(field: FieldSpec, value) -> str:
     filter_kind = field.source_meta.get("filter_kind")
     if filter_kind == "datetime":
         if isinstance(value, (list, tuple)):
-            return " .. ".join(format_datetime_for_display(item) for item in value)
-        return format_datetime_for_display(value)
+            return " .. ".join(DateTimeInput.format_for_display(item) for item in value)
+        return DateTimeInput.format_for_display(value)
     if isinstance(value, (list, tuple)):
         return " .. ".join(str(item) for item in value)
     return str(value)
@@ -367,18 +364,18 @@ def _render_between_value_controls(filter_kind: str, state: dict[str, object], s
             return
 
         with ui.column().classes("gap-2"):
-            render_split_datetime_inputs(
+            DateTimeInput(
                 value=left_value,
-                on_change=lambda new_value: _set_range_item(state, state_key, 0, new_value),
-                date_label="From date",
-                time_label="From time",
+                on_value_change=lambda event: _set_range_item(state, state_key, 0, event.value),
+                date_options={"label": "From date"},
+                time_options={"label": "From time"},
             )
         with ui.column().classes("gap-2"):
-            render_split_datetime_inputs(
+            DateTimeInput(
                 value=right_value,
-                on_change=lambda new_value: _set_range_item(state, state_key, 1, new_value),
-                date_label="To date",
-                time_label="To time",
+                on_value_change=lambda event: _set_range_item(state, state_key, 1, event.value),
+                date_options={"label": "To date"},
+                time_options={"label": "To time"},
             )
 
 
@@ -412,11 +409,9 @@ def _render_single_value_control(field: FieldSpec, operator: str, state: dict[st
         return
 
     if filter_kind == "datetime":
-        render_split_datetime_inputs(
+        DateTimeInput(
             value=state.get(state_key, ""),
-            on_change=lambda new_value: state.__setitem__(state_key, new_value),
-            date_label="Date",
-            time_label="Time",
+            on_value_change=lambda event: state.__setitem__(state_key, event.value),
         )
         return
 

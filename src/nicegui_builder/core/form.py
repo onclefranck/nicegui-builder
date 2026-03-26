@@ -9,7 +9,7 @@ import json
 from nicegui import ui
 
 from .actions import FORM_ACTION_SPECS, apply_action_intent, get_action_spec
-from .datetime_inputs import _time_to_string, combine_datetime_value, split_datetime_value
+from .datetime_inputs import DateTimeInput
 from .models import ActionSpec, FieldSpec, FormSpec
 from .view import ViewHandle
 
@@ -486,14 +486,14 @@ class FormHandle(ViewHandle):
         if self._has_split_datetime_parts(field.name):
             date_value = get_component_value(self._field_part_component(field.name, "date"))
             time_value = get_component_value(self._field_part_component(field.name, "time"))
-            return combine_datetime_value(date_value, time_value)
+            return DateTimeInput.combine_value(date_value, time_value)
 
         component = self._field_component(field)
         return get_component_value(component) if component else None
 
     def _set_field_value(self, field: FieldSpec, value):
         if self._has_split_datetime_parts(field.name):
-            date_value, time_value = split_datetime_value(value)
+            date_value, time_value = DateTimeInput.split_value(value)
             set_component_value(self._field_part_component(field.name, "date"), date_value)
             set_component_value(self._field_part_component(field.name, "time"), time_value)
             return value

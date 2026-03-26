@@ -179,9 +179,9 @@ Goal:
 Covers:
 
 - default `datetime` resolution
-- split widgets
+- the shared `datetime_input` component
 - collected combined value
-- choosing a wrapper container from the layout when desired
+- choosing a wrapper container through `params.container` when desired
 
 Suggested file:
 

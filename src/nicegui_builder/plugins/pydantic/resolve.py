@@ -1,5 +1,5 @@
 from .inspect import build_field_context
-from nicegui_builder.core.datetime_inputs import build_split_datetime_node
+from nicegui_builder.core.datetime_inputs import DateTimeInput, build_split_datetime_node
 from .mapping import (
     build_validation_props,
     get_defaults_from_map,
@@ -13,35 +13,29 @@ def _build_datetime_split_node(field_ctx: dict, default_info: dict, value: dict 
     label = field_ctx.get("attributes_title") or field_ctx["fieldname"]
     raw_value = field_ctx.get("fieldvalue")
     logical_ref = value.get("ref") or f"field:{field_ctx['fieldname']}"
-    container_methods = value.get("container", default_info.get("methods"))
-    container_params = dict(default_info.get("params", {}))
-    container_params.update(value.get("params") or {})
-    container_classes = " ".join(
-        part
-        for part in [
-            default_info.get("classes", ""),
-            value.get("classes", ""),
-        ]
-        if part
-    )
-    container_props = " ".join(
-        part
-        for part in [
-            default_info.get("props", ""),
-            value.get("props", ""),
-        ]
-        if part
-    )
+    raw_params = dict(value.get("params") or {})
+    raw_container = raw_params.pop("container", None)
+    container = DateTimeInput.normalize_container(raw_container)
+    if raw_container is None or "methods" not in raw_container:
+        container["methods"] = default_info.get("methods", container["methods"])
+    default_params = dict(default_info.get("params", {}))
+    container["params"] = {
+        **default_params,
+        **dict(container.get("params") or {}),
+    }
+    if raw_container is None or "classes" not in raw_container:
+        container["classes"] = default_info.get("classes", container.get("classes", ""))
+    if raw_container is None or "props" not in raw_container:
+        container["props"] = default_info.get("props", container.get("props", ""))
 
     return build_split_datetime_node(
         field_name=field_ctx["fieldname"],
         label=label,
         raw_value=raw_value,
         ref=logical_ref,
-        container_methods=container_methods,
-        container_params=container_params,
-        container_props=container_props,
-        container_classes=container_classes,
+        container=container,
+        component_props=value.get("props", ""),
+        component_classes=value.get("classes", ""),
     )
 
 

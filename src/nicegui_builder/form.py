@@ -4,7 +4,6 @@ import pathlib as p
 import yaml
 
 from .builder import builder, register, builder_ctx
-from .core.component_refs import DateTimeComponentRef
 from .core.context import component_refs, ensure_builder_runtime
 from .core.form import FormHandle
 from .core.models import FormSpec
@@ -89,14 +88,18 @@ def form(source, flavor: str = ""):
     field_refs = dict(ctx.get("_field_refs", {}))
     for field in field_specs:
         logical_ref = field_refs.get(field.name, f"field:{field.name}")
-        date_ref = f"{logical_ref}:date"
-        time_ref = f"{logical_ref}:time"
-        if date_ref in refs or time_ref in refs:
-            refs[logical_ref] = DateTimeComponentRef(
-                container=refs.get(logical_ref),
-                date=refs.get(date_ref),
-                time=refs.get(time_ref),
-            )
+        logical_component = refs.get(logical_ref)
+        if logical_component is None:
+            continue
+
+        date_component = getattr(logical_component, "date", None)
+        time_component = getattr(logical_component, "time", None)
+        date_ref = getattr(logical_component, "date_ref", None) or f"{logical_ref}:date"
+        time_ref = getattr(logical_component, "time_ref", None) or f"{logical_ref}:time"
+        if date_component is not None:
+            refs[date_ref] = date_component
+        if time_component is not None:
+            refs[time_ref] = time_component
     if root_component is not None and hasattr(root_component, "__dict__"):
         root_component.component_refs = refs
     handle = FormHandle(
