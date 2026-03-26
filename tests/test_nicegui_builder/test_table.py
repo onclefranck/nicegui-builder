@@ -38,7 +38,7 @@ def test_build_table_handle_returns_none_for_missing_component():
     assert table_module._build_table_handle(None, table_spec) is None
 
 
-def test_build_table_handle_tolerates_failing_component_attribute_assignment():
+def test_build_table_handle_requires_component_metadata_attachment():
     class FragileComponent:
         def __init__(self) -> None:
             object.__setattr__(self, "filter_values", {"name": "ada"})
@@ -52,11 +52,8 @@ def test_build_table_handle_tolerates_failing_component_attribute_assignment():
     collection_spec = CollectionSpec(name="DemoRows")
     table_spec = table_module.TableSpec(source_class=list, collection_spec=collection_spec, plugin_name="fake")
 
-    handle = table_module._build_table_handle(component, table_spec, plugin="plugin")
-
-    assert handle.component is component
-    assert handle.table_spec is table_spec
-    assert handle.filter_values == {"name": "ada"}
+    with pytest.raises(RuntimeError, match="read-only test component"):
+        table_module._build_table_handle(component, table_spec, plugin="plugin")
 
 
 def test_table_returns_plugin_rendered_collection_when_available(monkeypatch):

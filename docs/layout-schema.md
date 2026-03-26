@@ -172,6 +172,9 @@ Examples:
 The schema intentionally allows those values as ordinary strings.
 Their runtime meaning is documented here because JSON Schema cannot validate the import target itself.
 
+The runtime context is intentionally small and operational.
+In practice, layouts should treat it as helper data for formatting and callbacks, not as a place to depend on large amounts of implicit mutable state.
+
 ## What The Schema Validates Well
 
 The shipped schema is strong at validating:

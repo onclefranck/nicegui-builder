@@ -2,6 +2,11 @@ from .builder import builder
 from .core.table import TableHandle
 from .core.models import TableSpec
 from .plugins import plugin_registry
+from .plugins.registry import (
+    maybe_render_collection,
+    prepare_collection_rows,
+    resolve_collection_plugin,
+)
 from .plugins import pandas as _pandas_plugin  # ensure builtin plugin registration
 
 
@@ -9,10 +14,7 @@ def _build_table_handle(component, table_spec: TableSpec, plugin=None):
     if component is None:
         return None
 
-    try:
-        setattr(component, "table_spec", table_spec)
-    except Exception:
-        pass
+    setattr(component, "table_spec", table_spec)
 
     handle = TableHandle(table_spec=table_spec, root_component=component, plugin=plugin)
 
@@ -20,18 +22,13 @@ def _build_table_handle(component, table_spec: TableSpec, plugin=None):
     if isinstance(component_filters, dict):
         handle.filter_values = component_filters
 
-    try:
-        setattr(component, "table_handle", handle)
-    except Exception:
-        pass
+    setattr(component, "table_handle", handle)
 
     return handle
 
 
 def table(source, variant: str = "std"):
-    plugin = plugin_registry.resolve(source)
-    if not hasattr(plugin, "inspect_collection") or not hasattr(plugin, "resolve_collection_widget"):
-        raise TypeError(f"plugin '{plugin.name}' does not support table(...)")
+    plugin = resolve_collection_plugin(source)
 
     collection_spec = plugin.inspect_collection(source)
     source_class = source if isinstance(source, type) else source.__class__
@@ -45,12 +42,11 @@ def table(source, variant: str = "std"):
         plugin_name=plugin.name,
     )
 
-    if hasattr(plugin, "render_collection"):
-        rendered = plugin.render_collection(source, collection_spec, variant=variant, table_spec=table_spec)
-        if rendered is not None:
-            return _build_table_handle(rendered, table_spec, plugin=plugin)
+    rendered = maybe_render_collection(plugin, source, collection_spec, variant=variant, table_spec=table_spec)
+    if rendered is not None:
+        return _build_table_handle(rendered, table_spec, plugin=plugin)
 
-    rows = plugin.prepare_rows(source) if hasattr(plugin, "prepare_rows") else source.to_dict(orient="records")
+    rows = prepare_collection_rows(plugin, source)
 
     layout = [
         {

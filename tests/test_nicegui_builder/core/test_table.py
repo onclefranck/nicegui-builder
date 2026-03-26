@@ -116,6 +116,7 @@ def test_table_handle_can_proxy_component_and_apply_filters(monkeypatch):
     assert fake_component.updated is True
     assert handle.describe()["handle_type"] == "TableHandle"
     assert handle.describe()["spec_type"] == "TableSpec"
+    assert handle.filter_values["name"] == {"op": "equals", "value": "ada", "enabled": True}
 
 
 def test_table_handle_can_store_and_clear_filter_state(monkeypatch):
@@ -179,6 +180,23 @@ def test_table_handle_can_share_filter_state_with_rendered_component(monkeypatch
 
     assert handle.filter_values is fake_component.filter_values
     assert handle.normalized_filter_values() == {"name": {"op": "contains", "value": "ad"}}
+    assert handle.filter_values["name"] == {"op": "contains", "value": "ad", "enabled": True}
+
+
+def test_table_handle_canonicalizes_partial_filter_values_on_apply():
+    handle = _make_table_handle(component=type("Component", (), {"rows": [], "update": lambda self=None: None})(), plugin=type("Plugin", (), {"filter_rows": lambda self, source, values: []})())
+
+    handle.apply_filters(
+        {
+            "name": {"value": "Ada"},
+            "score": 10,
+        }
+    )
+
+    assert handle.filter_values == {
+        "name": {"op": "equals", "value": "Ada", "enabled": True},
+        "score": {"op": "equals", "value": 10, "enabled": True},
+    }
 
 
 def test_table_handle_refreshes_filter_ui_when_filters_change():
@@ -225,6 +243,19 @@ def test_table_handle_clear_filters_reapplies_unfiltered_rows():
     assert result is handle
     assert component.filter_values == {}
     assert handle.get_rows() == [{"name": "Ada"}, {"name": "Grace"}]
+
+
+def test_table_handle_apply_filters_propagates_plugin_validation_errors():
+    component = type("Component", (), {"rows": [], "update": lambda self=None: None})()
+    plugin = type(
+        "Plugin",
+        (),
+        {"filter_rows": lambda self, source, values: (_ for _ in ()).throw(ValueError("invalid filter"))},
+    )()
+    handle = _make_table_handle(component=component, plugin=plugin)
+
+    with pytest.raises(ValueError, match="invalid filter"):
+        handle.apply_filters({"name": {"op": "equals", "value": "Ada"}})
 
 
 def test_table_handle_supports_sort_pagination_selection_and_csv_export(monkeypatch):
@@ -403,7 +434,7 @@ def test_table_handle_normalized_filter_values_skips_empty_entries():
     )
 
     assert handle.normalized_filter_values() == {
-        "name": "Ada",
+        "name": {"op": "equals", "value": "Ada"},
         "score": {"op": "between", "value": [10, 20]},
         "defaulted_dict": {"op": "equals", "value": "Grace"},
         "legacy_dict": {"op": "gte", "value": 10},

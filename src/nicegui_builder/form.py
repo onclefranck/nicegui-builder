@@ -4,9 +4,11 @@ import pathlib as p
 import yaml
 
 from .builder import builder, register, builder_ctx
+from .core.context import component_refs, ensure_builder_runtime
 from .core.form import FormHandle
 from .core.models import FormSpec
 from .plugins import plugin_registry
+from .plugins.registry import build_form_layout, maybe_render_form, resolve_field_plugin
 
 
 def _resolve_layout_from_source(source, flavor: str):
@@ -43,30 +45,24 @@ register("field", _resolve_plugin_field)
 
 
 def form(source, flavor: str = ""):
-    plugin = plugin_registry.resolve(source)
-    if not hasattr(plugin, "inspect_fields") or not hasattr(plugin, "resolve_field_node"):
-        raise TypeError(f"plugin '{plugin.name}' does not support form(...)")
+    plugin = resolve_field_plugin(source)
 
     source_class = source if isinstance(source, type) else source.__class__
     source_instance = None if isinstance(source, type) else source
-    if hasattr(plugin, "render_form"):
-        rendered = plugin.render_form(source, flavor=flavor)
-        if rendered is not None:
-            return rendered
+    rendered = maybe_render_form(plugin, source, flavor=flavor)
+    if rendered is not None:
+        return rendered
 
     field_specs = plugin.inspect_fields(source)
     try:
         layout = _resolve_layout_from_source(source, flavor)
     except FileNotFoundError:
-        if hasattr(plugin, "build_layout"):
-            layout = plugin.build_layout(source, flavor=flavor)
-        else:
-            raise
+        layout = build_form_layout(plugin, source, flavor=flavor)
 
     ctx = dict(builder_ctx.get())
     ctx_token = builder_ctx.set(ctx)
+    ensure_builder_runtime(ctx)
     ctx.update(
-        _component_refs={},
         plugin=plugin,
         source=source,
         source_class=source_class,
@@ -90,7 +86,7 @@ def form(source, flavor: str = ""):
         plugin=plugin,
         source_class=source_class,
         field_specs=field_specs,
-        component_refs=dict(ctx.get("_component_refs", {})),
+        component_refs=dict(component_refs(ctx)),
         source_instance=source_instance,
         form_spec=form_spec,
     )

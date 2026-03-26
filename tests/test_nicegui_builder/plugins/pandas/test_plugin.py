@@ -1,6 +1,8 @@
 import builtins
 from datetime import datetime
 
+import pytest
+
 from nicegui_builder.core.models import CollectionSpec, FieldSpec, TableSpec, WidgetSpec
 from nicegui_builder.plugins.pandas import pandas_plugin
 from nicegui_builder.plugins.pandas import plugin as pandas_module
@@ -72,14 +74,25 @@ def test_normalize_and_apply_text_filters_cover_all_operators():
     )
     text_column = FieldSpec(name="name", python_type=str, source_meta={"filter_kind": "text"})
 
-    assert pandas_module._normalize_filter_clause("Ada", text_column) == {"op": "contains", "value": "Ada"}
-    assert pandas_module._normalize_filter_clause({"value": "Ada"}, text_column) == {
-        "op": "equals",
+    assert pandas_module._normalize_filter_clause("Ada", text_column) == {
+        "op": "contains",
         "value": "Ada",
+        "enabled": True,
+    }
+    assert pandas_module._normalize_filter_clause({"value": "Ada"}, text_column) == {
+        "op": "contains",
+        "value": "Ada",
+        "enabled": True,
     }
     assert pandas_module._normalize_filter_clause({"op": "ge", "value": "Ada"}, text_column) == {
         "op": "gte",
         "value": "Ada",
+        "enabled": True,
+    }
+    assert pandas_module._normalize_filter_clause("Ada", text_column) == {
+        "op": "contains",
+        "value": "Ada",
+        "enabled": True,
     }
 
     assert [row["name"] for row in pandas_module._apply_text_filter(df, "name", "contains", "a").to_dict("records")] == [
@@ -156,6 +169,31 @@ def test_apply_scalar_filter_covers_all_operators_and_errors():
         assert "unsupported scalar filter operator" in str(exc)
     else:
         raise AssertionError("_apply_scalar_filter should reject unsupported operators")
+
+
+def test_validated_coerced_clause_rejects_invalid_operator_and_coerces_values():
+    datetime_column = FieldSpec(
+        name="starts_at",
+        python_type="datetime",
+        source_meta={
+            "filter_kind": "datetime",
+            "filter_operators": ["equals", "between"],
+        },
+    )
+
+    clause = pandas_module._validated_coerced_clause(
+        datetime_column,
+        {"op": "between", "value": ["2026-03-21T10:00", "2026-03-21T12:00"], "enabled": True},
+    )
+
+    assert isinstance(clause["value"][0], pandas.Timestamp)
+    assert isinstance(clause["value"][1], pandas.Timestamp)
+
+    with pytest.raises(ValueError, match="unsupported filter operator"):
+        pandas_module._validated_coerced_clause(
+            datetime_column,
+            {"op": "contains", "value": "2026-03-21T10:00", "enabled": True},
+        )
 
 
 def test_rows_from_dataframe_adds_internal_row_ids():
@@ -467,7 +505,7 @@ def test_pandas_plugin_render_collection_builds_filter_ui_and_binds_state(monkey
     assert rendered.filter_values == {}
 
 
-def test_pandas_plugin_render_collection_uses_select_controls_and_tolerates_attachment_failures(monkeypatch):
+def test_pandas_plugin_render_collection_uses_select_controls_and_requires_attachment_support(monkeypatch):
     df = pandas.DataFrame(
         [
             {"state": "queued", "active": True},
@@ -619,6 +657,26 @@ def test_pandas_plugin_render_collection_uses_select_controls_and_tolerates_atta
     monkeypatch.setattr(pandas_module.ui, "button", lambda label=None, on_click=None, **kwargs: FakeButton(label, on_click=on_click, **kwargs))
     monkeypatch.setattr(pandas_module.ui, "checkbox", lambda value=False, on_change=None, **kwargs: FakeCheckbox(value=value, on_change=on_change, **kwargs))
     monkeypatch.setattr(pandas_module.ui, "table", lambda **kwargs: FragileTable(**kwargs))
+
+    with pytest.raises(RuntimeError, match="read-only attachment"):
+        pandas_plugin.render_collection(df, spec, variant="filters", table_spec=table_spec)
+
+    monkeypatch.setattr(
+        pandas_module.ui,
+        "table",
+        lambda **kwargs: type(
+            "WritableTable",
+            (),
+            {
+                "__init__": lambda self: None,
+                "rows": kwargs["rows"],
+                "updated": False,
+                "classes": lambda self, value: self,
+                "props": lambda self, value: self,
+                "update": lambda self: setattr(self, "updated", True),
+            },
+        )(),
+    )
 
     rendered = pandas_plugin.render_collection(df, spec, variant="filters", table_spec=table_spec)
 

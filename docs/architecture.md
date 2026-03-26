@@ -195,9 +195,9 @@ classDiagram
     class FieldPlugin {
         <<protocol>>
         +inspect_fields(source)
+        +resolve_field_node(model_class, model_instance, fieldname, value)
         +build_layout(source, flavor)
         +build_field_context(model_class, model_instance, fieldname)
-        +resolve_field_node(model_class, model_instance, fieldname, value)
         +resolve_widget(spec, variant)
         +render_form(source, flavor)
     }
@@ -206,6 +206,8 @@ classDiagram
         <<protocol>>
         +inspect_collection(source)
         +resolve_collection_widget(spec, variant)
+        +prepare_rows(source)
+        +filter_rows(source, filter_values)
         +render_collection(source, spec, variant)
     }
 
@@ -238,7 +240,7 @@ classDiagram
 ### Important idea
 
 The registry resolves the right plugin for a source.
-After that, the rest of the pipeline works through plugin capabilities rather than source-specific conditionals spread across the codebase.
+After that, the rest of the pipeline works through an explicit contract for that plugin family rather than repeating capability checks at every call site.
 
 ## View 3: Runtime Handles
 
@@ -329,7 +331,7 @@ What matters architecturally is this:
 - it renders normalized declarative nodes
 - it resolves context values
 - it supports plugin-assisted node expansion such as `field__name`
-- it registers refs so runtime handles can interact with rendered components
+- it keeps a small explicit runtime context for refs and root-component tracking
 
 In other words, the builder is the bridge between normalized layout decisions and actual NiceGUI components.
 
@@ -365,6 +367,7 @@ Examples of notable behavior:
 - sortable table defaults
 - pagination and selection support
 - richer filtering workflow with operator-aware filter building and an active filter list
+- canonical filter clauses normalized before filtering
 
 ## Design Principles
 
