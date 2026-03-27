@@ -80,14 +80,14 @@ def test_plugins_module_can_skip_optional_builtin_imports(monkeypatch):
     ]
 
 
-def test_package_attaches_builder_form_and_table_to_ui():
+def test_package_attaches_builder_form_and_table_builders_to_ui():
     assert ui.builder is nicegui_builder.builder
-    assert ui.form is nicegui_builder.form
-    assert ui.table is nicegui_builder.table
+    assert ui.form_builder is nicegui_builder.form
+    assert ui.table_builder is nicegui_builder.table
 
 
 def test_package_exports_nicegui_ui_with_builder_extensions():
     assert nicegui_builder.ui is ui
     assert nicegui_builder.ui.builder is nicegui_builder.builder
-    assert nicegui_builder.ui.form is nicegui_builder.form
-    assert nicegui_builder.ui.table is nicegui_builder.table
+    assert nicegui_builder.ui.form_builder is nicegui_builder.form
+    assert nicegui_builder.ui.table_builder is nicegui_builder.table
