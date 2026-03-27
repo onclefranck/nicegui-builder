@@ -7,7 +7,7 @@ change values, reset values, and pretend this was always the plan.
 from nicegui import ui
 
 import nicegui_builder
-from nicegui_builder.examples.models import Participant, SockColor
+from nicegui_builder.example_models import Participant, SockColor
 
 
 def build_ui():
@@ -64,3 +64,4 @@ def main(*, port: int = 8080, host: str | None = None, reload: bool = False):
 
 if __name__ in {"__main__", "__mp_main__"}:
     main()
+

@@ -14,8 +14,8 @@ def build_ui():
 You can ask the CLI to render a plugin-supported source directly:
 
 ```bash
-nicegui-builder form run nicegui_builder.examples.models:Participant
-nicegui-builder form run nicegui_builder.examples.models:Contest --flavor actionable
+nicegui-builder form run nicegui_builder.example_models:Participant
+nicegui-builder form run nicegui_builder.example_models:Contest --flavor actionable
 ```
 
 This is ideal for trying a model quickly,
@@ -30,3 +30,4 @@ def main(*, port: int = 8080, host: str | None = None, reload: bool = False):
 
 if __name__ in {"__main__", "__mp_main__"}:
     main()
+

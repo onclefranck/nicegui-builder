@@ -6,7 +6,7 @@ This is where a `datetime` quietly becomes two inputs and nobody panics. Much.
 
 from nicegui import ui
 
-from nicegui_builder.examples.models import Contest, Participant, Registration
+from nicegui_builder.example_models import Contest, Participant, Registration
 from nicegui_builder.plugins.pydantic.mapping import (
     get_defaults_from_map,
     resolve_map_type,
@@ -73,3 +73,4 @@ def main(*, port: int = 8080, host: str | None = None, reload: bool = False):
 
 if __name__ in {"__main__", "__mp_main__"}:
     main()
+

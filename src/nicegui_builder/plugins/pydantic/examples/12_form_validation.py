@@ -8,7 +8,7 @@ The participants remain gloriously unpredictable.
 from nicegui import ui
 
 import nicegui_builder
-from nicegui_builder.examples.models import Participant
+from nicegui_builder.example_models import Participant
 
 
 def _apply_errors(handle):
@@ -64,3 +64,4 @@ def main(*, port: int = 8080, host: str | None = None, reload: bool = False):
 
 if __name__ in {"__main__", "__mp_main__"}:
     main()
+
