@@ -6,7 +6,7 @@ which is a surprisingly philosophical sentence for a sock festival.
 
 from nicegui import ui
 
-from nicegui_builder import form
+import nicegui_builder
 from nicegui_builder.examples.models import Registration
 
 
@@ -24,7 +24,7 @@ def build_ui():
         "The same form can submit plain values or a reconstructed Pydantic model, depending on the desk's mood."
     ).classes("text-body2 text-grey-7")
 
-    handle = form(
+    handle = ui.form_builder(
         Registration(
             participant_name="Odette of the Triumphant Heel",
             contest_title="Midnight Parade of Respectable Nonsense",

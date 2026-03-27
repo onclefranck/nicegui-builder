@@ -9,7 +9,7 @@ from datetime import datetime
 from nicegui import ui
 import pandas as pd
 
-from nicegui_builder import table
+import nicegui_builder
 
 
 def _registrations_dataframe() -> pd.DataFrame:
@@ -55,7 +55,7 @@ def build_ui():
         "Active filters can be toggled with a checkbox or removed, with comma-separated input for in/not in and two values for between."
     ).classes("text-body2 text-grey-6")
 
-    handle = table(_registrations_dataframe(), variant="filters")
+    handle = ui.table_builder(_registrations_dataframe(), variant="filters")
 
     with ui.row().classes("gap-2"):
         ui.button(

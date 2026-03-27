@@ -7,7 +7,7 @@ The participants remain gloriously unpredictable.
 
 from nicegui import ui
 
-from nicegui_builder import form
+import nicegui_builder
 from nicegui_builder.examples.models import Participant
 
 
@@ -22,7 +22,7 @@ def build_ui():
         "Try clearing the required fields, then use the controls below to inspect and display validation errors."
     ).classes("text-body2 text-grey-7")
 
-    handle = form(Participant, flavor="actionable")
+    handle = ui.form_builder(Participant, flavor="actionable")
     handle.action_bar(
         "Validate gently",
         lambda values: ui.notify(f"Looks valid enough for a sock festival: {values['display_name']}"),

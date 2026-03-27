@@ -6,7 +6,7 @@ change values, reset values, and pretend this was always the plan.
 
 from nicegui import ui
 
-from nicegui_builder import form
+import nicegui_builder
 from nicegui_builder.examples.models import Participant, SockColor
 
 
@@ -16,7 +16,7 @@ def build_ui():
         "A few runtime helpers are enough to make the registration desk feel improbably organized."
     ).classes("text-body2 text-grey-7")
 
-    handle = form(
+    handle = ui.form_builder(
         Participant(
             display_name="Bernice Freeheel",
             email="bernice@example.com",

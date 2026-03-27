@@ -8,7 +8,7 @@ from datetime import datetime
 from nicegui import ui
 import pandas as pd
 
-from nicegui_builder import table
+import nicegui_builder
 
 
 def _registration_rows() -> pd.DataFrame:
@@ -54,7 +54,7 @@ def build_ui():
         "A few runtime helpers turn the registration board into a surprisingly capable little control panel."
     ).classes("text-body2 text-grey-7")
 
-    handle = table(_registration_rows())
+    handle = ui.table_builder(_registration_rows())
 
     with ui.row().classes("gap-2"):
         ui.button(

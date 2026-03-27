@@ -2,7 +2,6 @@ from datetime import date as date_type, datetime, time as time_type
 import locale
 from typing import Callable
 
-from nicegui import ui
 from nicegui.elements.mixins.value_element import ValueElement
 
 from .context import builder_ctx, component_refs, ensure_builder_runtime
@@ -368,6 +367,3 @@ def build_split_datetime_node(
         "children": [],
     }
 
-
-if not hasattr(ui, "datetime_input"):
-    ui.datetime_input = DateTimeInput

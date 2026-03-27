@@ -28,6 +28,11 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install -e ".[all]"
 
+      - name: Verify NiceGUI ui stub is up to date
+        run: |
+          python scripts/generate_nicegui_ui_stub.py
+          git diff --exit-code -- typings/nicegui/ui.pyi
+
       - name: Run tests
         run: python -m pytest tests
 

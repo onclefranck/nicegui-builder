@@ -390,13 +390,14 @@ Some conveniences in the project are intentionally implemented as thin patches r
 
 Current examples:
 
-- `nicegui_builder` attaches `builder`, `form`, and `table` to NiceGUI's runtime `ui` object
-- the workspace can provide editor completion for those added methods through local stubs in [`typings/nicegui/ui.pyi`](../typings/nicegui/ui.pyi)
+- `nicegui_builder` attaches `builder`, `datetime_input`, `form_builder`, and `table_builder` to NiceGUI's runtime `ui` object
+- the workspace can provide editor completion for those added methods through local partial stubs in [`typings/nicegui/ui.pyi`](../typings/nicegui/ui.pyi)
+- those stubs are generated from NiceGUI's own `ui` module by [`scripts/generate_nicegui_ui_stub.py`](../scripts/generate_nicegui_ui_stub.py)
 
 These integrations are useful and deliberate, but they should still be understood as package-owned glue:
 
 - runtime behavior is provided by `nicegui-builder`
-- editor behavior depends on the local typing setup
+- editor behavior depends on the local typing setup and generated stub
 - neither mechanism implies that NiceGUI itself natively declares those methods
 
 ## Practical Reading Order

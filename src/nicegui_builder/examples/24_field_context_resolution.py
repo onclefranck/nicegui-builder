@@ -9,7 +9,7 @@ import json
 
 from nicegui import ui
 
-from nicegui_builder import form
+import nicegui_builder
 from nicegui_builder.examples.models import Participant
 from nicegui_builder.plugins import plugin_registry
 
@@ -62,7 +62,7 @@ def build_ui():
         ui.label("Declarative layout snippet").classes("text-subtitle1")
         ui.markdown(f"```yaml\n{LAYOUT_SNIPPET}\n```").classes("w-full")
 
-    form(sample)
+    ui.form_builder(sample)
 
     with ui.grid(columns=2).classes("w-full max-w-4xl mx-auto gap-4"):
         with ui.card().classes("gap-2"):

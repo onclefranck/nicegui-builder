@@ -8,7 +8,7 @@ from datetime import datetime
 
 from nicegui import ui
 
-from nicegui_builder import form
+import nicegui_builder
 from nicegui_builder.examples.models import Contest, Participant, Registration
 
 
@@ -57,31 +57,31 @@ def build_ui():
             "Standard flavor",
             "The default layout is calm, practical, and only mildly suspicious.",
         ):
-            form(Participant)
+            ui.form_builder(Participant)
 
         with _section(
             "Compact flavor",
             "Useful when the registration desk is small and the gossip is large.",
         ):
-            form(Participant, flavor="compact")
+            ui.form_builder(Participant, flavor="compact")
 
         with _section(
             "Detail flavor",
             "A read-only view for moments when the committee wants facts, not improvisation.",
         ):
-            form(_sample_contest(), flavor="detail")
+            ui.form_builder(_sample_contest(), flavor="detail")
 
         with _section(
             "Filters flavor",
             "For when the desk staff wants search boxes instead of philosophical commitment.",
         ):
-            form(Registration, flavor="filters")
+            ui.form_builder(Registration, flavor="filters")
 
         with _section(
             "Actionable flavor",
             "Built-in status, actions, and a pleasant sense of administrative authority.",
         ):
-            handle = form(_sample_participant(), flavor="actionable")
+            handle = ui.form_builder(_sample_participant(), flavor="actionable")
             handle.action_bar(
                 "Save participant",
                 lambda model: ui.notify(f"Saved {model.display_name}"),

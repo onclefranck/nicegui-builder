@@ -10,7 +10,7 @@ from typing import Literal
 from nicegui import ui
 from pydantic import BaseModel, Field
 
-from nicegui_builder import form
+import nicegui_builder
 
 
 class SockMood(str, Enum):
@@ -53,7 +53,7 @@ def build_ui():
         "Here the layout explicitly requests widget variants instead of relying on the plugin defaults."
     ).classes("text-body2 text-grey-7")
 
-    handle = form(VariantShowcase, flavor="actionable")
+    handle = ui.form_builder(VariantShowcase, flavor="actionable")
     handle.set_values(
         {
             "secret_code": "velvet-ankle-42",
