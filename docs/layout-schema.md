@@ -286,4 +286,4 @@ Reach for expansion nodes when a plugin should resolve the final widget for you.
 - [`src/nicegui_builder/builder.py`](../src/nicegui_builder/builder.py)
 - [`src/nicegui_builder/core/models.py`](../src/nicegui_builder/core/models.py)
 - [`src/nicegui_builder/examples/demo_basic_builder.yml`](../src/nicegui_builder/examples/demo_basic_builder.yml)
-- [`src/nicegui_builder/examples/24_field_context_resolution.py`](../src/nicegui_builder/examples/24_field_context_resolution.py)
+- [`src/nicegui_builder/plugins/pydantic/examples/24_field_context_resolution.py`](../src/nicegui_builder/plugins/pydantic/examples/24_field_context_resolution.py)

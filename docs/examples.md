@@ -87,7 +87,7 @@ Covers:
 
 Suggested file:
 
-- `examples/03_pydantic_form_basic.py`
+- `plugins/pydantic/examples/03_pydantic_form_basic.py`
 
 ### 4. First automatic Pandas table
 
@@ -102,7 +102,7 @@ Covers:
 
 Suggested file:
 
-- `examples/04_pandas_table_basic.py`
+- `plugins/pandas/examples/04_pandas_table_basic.py`
 
 ## Phase 2: Core Usage Patterns
 
@@ -122,7 +122,7 @@ Covers:
 
 Suggested file:
 
-- `examples/05_pydantic_form_yaml.py`
+- `plugins/pydantic/examples/05_pydantic_form_yaml.py`
 
 ### 6. Pydantic automatic flavors
 
@@ -137,7 +137,7 @@ Covers:
 
 Suggested file:
 
-- `examples/06_pydantic_form_flavors.py`
+- `plugins/pydantic/examples/06_pydantic_form_flavors.py`
 
 ### 7. Pydantic field mapping variants
 
@@ -152,7 +152,7 @@ Covers:
 
 Suggested file:
 
-- `examples/07_pydantic_field_variants.py`
+- `plugins/pydantic/examples/07_pydantic_field_variants.py`
 
 ### 8. Pydantic structured fields
 
@@ -168,7 +168,7 @@ Covers:
 
 Suggested file:
 
-- `examples/08_pydantic_structured_fields.py`
+- `plugins/pydantic/examples/08_pydantic_structured_fields.py`
 
 ### 9. Datetime split input
 
@@ -185,7 +185,7 @@ Covers:
 
 Suggested file:
 
-- `examples/09_pydantic_datetime_split.py`
+- `plugins/pydantic/examples/09_pydantic_datetime_split.py`
 
 ### 10. Filtered Pandas table
 
@@ -202,7 +202,7 @@ Covers:
 
 Suggested file:
 
-- `examples/10_pandas_table_filters.py`
+- `plugins/pandas/examples/10_pandas_table_filters.py`
 
 ## Phase 3: Handles And Runtime Interaction
 
@@ -221,7 +221,7 @@ Covers:
 
 Suggested file:
 
-- `examples/11_form_handle_basics.py`
+- `plugins/pydantic/examples/11_form_handle_basics.py`
 
 ### 12. Form validation and error handling
 
@@ -237,7 +237,7 @@ Covers:
 
 Suggested file:
 
-- `examples/12_form_validation.py`
+- `plugins/pydantic/examples/12_form_validation.py`
 
 ### 13. Form submit and model reconstruction
 
@@ -252,7 +252,7 @@ Covers:
 
 Suggested file:
 
-- `examples/13_form_submit.py`
+- `plugins/pydantic/examples/13_form_submit.py`
 
 ### 14. Dirty tracking
 
@@ -267,7 +267,7 @@ Covers:
 
 Suggested file:
 
-- `examples/14_form_dirty_state.py`
+- `plugins/pydantic/examples/14_form_dirty_state.py`
 
 ### 15. Live form helpers
 
@@ -282,7 +282,7 @@ Covers:
 
 Suggested file:
 
-- `examples/15_form_live_helpers.py`
+- `plugins/pydantic/examples/15_form_live_helpers.py`
 
 ### 16. Action bar and actionable flavor
 
@@ -297,7 +297,7 @@ Covers:
 
 Suggested file:
 
-- `examples/16_form_actionable.py`
+- `plugins/pydantic/examples/16_form_actionable.py`
 
 ### 17. CRUD-ready form actions
 
@@ -312,7 +312,7 @@ Covers:
 
 Suggested file:
 
-- `examples/17_form_crud.py`
+- `plugins/pydantic/examples/17_form_crud.py`
 
 ### 18. TableHandle basics
 
@@ -327,7 +327,7 @@ Covers:
 
 Suggested file:
 
-- `examples/18_table_handle_basics.py`
+- `plugins/pandas/examples/18_table_handle_basics.py`
 
 ### 19. Table pagination, selection, and export
 
@@ -343,7 +343,7 @@ Covers:
 
 Suggested file:
 
-- `examples/19_table_pagination_selection_export.py`
+- `plugins/pandas/examples/19_table_pagination_selection_export.py`
 
 ### 20. CRUD-ready table actions
 
@@ -359,7 +359,7 @@ Covers:
 
 Suggested file:
 
-- `examples/20_table_crud.py`
+- `plugins/pandas/examples/20_table_crud.py`
 
 ## Phase 4: CLI Examples
 
@@ -430,7 +430,7 @@ Covers:
 
 Suggested file:
 
-- `examples/24_field_context_resolution.py`
+- `plugins/pydantic/examples/24_field_context_resolution.py`
 
 ### 25. Plugin-local map customization
 
@@ -445,7 +445,7 @@ Covers:
 
 Suggested file:
 
-- `examples/25_plugin_mapping_customization.py`
+- `plugins/pydantic/examples/25_plugin_mapping_customization.py`
 
 ### 26. Writing a minimal custom plugin
 
@@ -462,6 +462,22 @@ Covers:
 Suggested file:
 
 - `examples/26_custom_plugin_minimal.py`
+
+### 27. Direct datetime_input component
+
+Goal:
+
+- show `ui.datetime_input(...)` without going through a plugin entry point
+
+Covers:
+
+- direct component usage
+- one logical datetime value with internal date/time controls
+- structured `container` configuration
+
+Suggested file:
+
+- `examples/27_datetime_input_direct.py`
 
 ## Recommended Initial Implementation Order
 
@@ -496,3 +512,4 @@ This proposed set covers:
 - CRUD helpers
 - CLI usage
 - plugin-oriented extension concepts
+

@@ -5,7 +5,7 @@ from fastapi.testclient import TestClient
 from nicegui import app
 from nicegui import ui
 
-from nicegui_builder.cli import list_examples
+from nicegui_builder.cli import list_example_specs
 
 
 def _configure_test_app() -> None:
@@ -27,18 +27,18 @@ def _configure_test_app() -> None:
     )
 
 
-@pytest.mark.parametrize("example_name", list_examples())
-def test_example_build_ui_returns_http_200(example_name: str) -> None:
+@pytest.mark.parametrize("example_spec", list_example_specs())
+def test_example_build_ui_returns_http_200(example_spec) -> None:
     _configure_test_app()
 
-    module = import_module(f"nicegui_builder.examples.{example_name}")
+    module = import_module(example_spec.module)
     build_ui = getattr(module, "build_ui", None)
 
-    assert build_ui is not None, f"{example_name} must expose build_ui()"
+    assert build_ui is not None, f"{example_spec.name} must expose build_ui()"
 
     ui.page("/")(build_ui)
 
     with TestClient(app) as client:
         response = client.get("/")
 
-    assert response.status_code == 200, example_name
+    assert response.status_code == 200, example_spec.name
