@@ -11,17 +11,27 @@ def test_list_examples_includes_known_examples():
 
     assert "demo_basic_builder" in examples
     assert "demo_pydantic_builder" in examples
+    assert "04_pandas_table_basic" in examples
+
+
+def test_list_example_specs_include_plugin_groups():
+    specs = cli.list_example_specs()
+    grouped = {spec.name: spec.group for spec in specs}
+
+    assert grouped["01_basic_builder"] == "core"
+    assert grouped["03_pydantic_form_basic"] == "pydantic"
+    assert grouped["04_pandas_table_basic"] == "pandas"
 
 
 def test_load_object_resolves_module_paths():
-    target = cli.load_object("nicegui_builder.examples.demo_pydantic_builder:DemoPydanticBuilder")
+    target = cli.load_object("nicegui_builder.plugins.pydantic.examples.demo_pydantic_builder:DemoPydanticBuilder")
 
     assert target.__name__ == "DemoPydanticBuilder"
 
 
 def test_load_object_rejects_invalid_path():
     try:
-        cli.load_object("nicegui_builder.examples.demo_pydantic_builder")
+        cli.load_object("nicegui_builder.plugins.pydantic.examples.demo_pydantic_builder")
     except ValueError as exc:
         assert "module:object" in str(exc)
     else:
@@ -29,32 +39,64 @@ def test_load_object_rejects_invalid_path():
 
 
 def test_resolve_example_name_accepts_full_name(monkeypatch):
-    monkeypatch.setattr(cli, "list_examples", lambda: ["01_basic_builder", "03_pydantic_form_basic"])
+    monkeypatch.setattr(
+        cli,
+        "list_example_specs",
+        lambda: [
+            cli.ExampleSpec("01_basic_builder", "pkg.core.01_basic_builder", "core"),
+            cli.ExampleSpec("03_pydantic_form_basic", "pkg.pydantic.03_pydantic_form_basic", "pydantic"),
+        ],
+    )
 
     assert cli.resolve_example_name("01_basic_builder") == "01_basic_builder"
 
 
 def test_resolve_example_name_accepts_numeric_shortcut(monkeypatch):
-    monkeypatch.setattr(cli, "list_examples", lambda: ["01_basic_builder", "03_pydantic_form_basic"])
+    monkeypatch.setattr(
+        cli,
+        "list_example_specs",
+        lambda: [
+            cli.ExampleSpec("01_basic_builder", "pkg.core.01_basic_builder", "core"),
+            cli.ExampleSpec("03_pydantic_form_basic", "pkg.pydantic.03_pydantic_form_basic", "pydantic"),
+        ],
+    )
 
     assert cli.resolve_example_name("01") == "01_basic_builder"
 
 
 def test_resolve_example_name_accepts_partial_prefix(monkeypatch):
-    monkeypatch.setattr(cli, "list_examples", lambda: ["01_basic_builder", "03_pydantic_form_basic"])
+    monkeypatch.setattr(
+        cli,
+        "list_example_specs",
+        lambda: [
+            cli.ExampleSpec("01_basic_builder", "pkg.core.01_basic_builder", "core"),
+            cli.ExampleSpec("03_pydantic_form_basic", "pkg.pydantic.03_pydantic_form_basic", "pydantic"),
+        ],
+    )
 
     assert cli.resolve_example_name("01_") == "01_basic_builder"
     assert cli.resolve_example_name("01_basic") == "01_basic_builder"
 
 
 def test_resolve_example_name_returns_first_match_for_ambiguous_shortcut(monkeypatch):
-    monkeypatch.setattr(cli, "list_examples", lambda: ["01_alpha", "01_beta"])
+    monkeypatch.setattr(
+        cli,
+        "list_example_specs",
+        lambda: [
+            cli.ExampleSpec("01_alpha", "pkg.core.01_alpha", "core"),
+            cli.ExampleSpec("01_beta", "pkg.pydantic.01_beta", "pydantic"),
+        ],
+    )
 
     assert cli.resolve_example_name("01") == "01_alpha"
 
 
 def test_resolve_example_name_raises_for_unknown_example(monkeypatch):
-    monkeypatch.setattr(cli, "list_examples", lambda: ["01_basic_builder"])
+    monkeypatch.setattr(
+        cli,
+        "list_example_specs",
+        lambda: [cli.ExampleSpec("01_basic_builder", "pkg.core.01_basic_builder", "core")],
+    )
 
     try:
         cli.resolve_example_name("99")
@@ -115,7 +157,7 @@ def test_run_form_loads_source_and_starts_ui(monkeypatch):
     monkeypatch.setattr(cli.ui, "run", fake_run)
 
     result = cli.run_form(
-        "nicegui_builder.examples.demo_pydantic_builder:DemoPydanticBuilder",
+        "nicegui_builder.plugins.pydantic.examples.demo_pydantic_builder:DemoPydanticBuilder",
         flavor="compact",
         port=8081,
     )
@@ -209,7 +251,7 @@ def test_run_example_invokes_example_main(monkeypatch):
             calls["stopped"] = True
 
     monkeypatch.setattr(cli, "enable_any_key_shutdown", lambda *args, **kwargs: DummyEvent())
-    monkeypatch.setattr(cli, "resolve_example_name", lambda name: "demo")
+    monkeypatch.setattr(cli, "resolve_example_spec", lambda name: cli.ExampleSpec("demo", "pkg.demo", "core"))
     monkeypatch.setattr(cli, "import_module", lambda name: module)
     def fake_run(**kwargs):
         calls["run_kwargs"] = kwargs
@@ -239,7 +281,7 @@ def test_run_example_falls_back_to_main_when_build_ui_is_missing(monkeypatch):
 
     module = types.SimpleNamespace(main=fake_main)
 
-    monkeypatch.setattr(cli, "resolve_example_name", lambda name: "demo")
+    monkeypatch.setattr(cli, "resolve_example_spec", lambda name: cli.ExampleSpec("demo", "pkg.demo", "core"))
     monkeypatch.setattr(cli, "import_module", lambda name: module)
 
     result = cli.run_example("demo", port=9002, host="127.0.0.1", reload=True)
@@ -255,7 +297,7 @@ def test_run_example_falls_back_to_main_when_build_ui_is_missing(monkeypatch):
 def test_run_example_raises_when_example_exposes_no_entrypoint(monkeypatch):
     module = types.SimpleNamespace()
 
-    monkeypatch.setattr(cli, "resolve_example_name", lambda name: "demo")
+    monkeypatch.setattr(cli, "resolve_example_spec", lambda name: cli.ExampleSpec("demo", "pkg.demo", "core"))
     monkeypatch.setattr(cli, "import_module", lambda name: module)
 
     try:
@@ -576,12 +618,19 @@ def test_build_posix_keypress_watcher_handles_read_error(monkeypatch, capsys):
 
 
 def test_cli_main_lists_examples(monkeypatch, capsys):
-    monkeypatch.setattr(cli, "list_examples", lambda: ["alpha", "beta"])
+    monkeypatch.setattr(
+        cli,
+        "list_examples_grouped",
+        lambda: [
+            ("core", [cli.ExampleSpec("alpha", "pkg.alpha", "core")]),
+            ("pydantic", [cli.ExampleSpec("beta", "pkg.beta", "pydantic")]),
+        ],
+    )
 
     result = cli.main(["examples", "list"])
 
     assert result == 0
-    assert capsys.readouterr().out.splitlines() == ["alpha", "beta"]
+    assert capsys.readouterr().out.splitlines() == ["[core]", "alpha", "[pydantic]", "beta"]
 
 
 def test_cli_main_runs_example(monkeypatch):

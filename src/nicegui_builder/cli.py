@@ -1,4 +1,5 @@
 import argparse
+from dataclasses import dataclass
 from importlib import import_module
 from pathlib import Path
 import sys
@@ -11,6 +12,13 @@ from nicegui import ui
 
 from .builder import builder
 from .form import form
+
+
+@dataclass(frozen=True)
+class ExampleSpec:
+    name: str
+    module: str
+    group: str
 
 
 def _build_windows_keypress_watcher(stop_event: threading.Event, message: str):
@@ -105,25 +113,75 @@ def run_ui_app(root, *, port: int = 8080, host: str | None = None, reload: bool 
             keyboard_shutdown.set()
 
 
+def _example_group_sort_key(group: str) -> tuple[int, str]:
+    if group == "core":
+        return (0, group)
+    return (1, group)
+
+
+def _iter_example_packages() -> list[tuple[str, str, Path]]:
+    root = Path(__file__).parent
+    packages = [("core", "nicegui_builder.examples", root / "examples")]
+
+    plugins_dir = root / "plugins"
+    for plugin_dir in sorted(path for path in plugins_dir.iterdir() if path.is_dir() and not path.name.startswith("__")):
+        examples_dir = plugin_dir / "examples"
+        if examples_dir.is_dir():
+            packages.append(
+                (
+                    plugin_dir.name,
+                    f"nicegui_builder.plugins.{plugin_dir.name}.examples",
+                    examples_dir,
+                )
+            )
+    return packages
+
+
+def list_example_specs() -> list[ExampleSpec]:
+    specs = []
+    for group, package_name, examples_dir in _iter_example_packages():
+        for path in sorted(examples_dir.glob("*.py")):
+            if path.name == "__init__.py" or path.name.startswith("_"):
+                continue
+            specs.append(
+                ExampleSpec(
+                    name=path.stem,
+                    module=f"{package_name}.{path.stem}",
+                    group=group,
+                )
+            )
+    return sorted(specs, key=lambda spec: (_example_group_sort_key(spec.group), spec.name))
+
+
 def list_examples() -> list[str]:
-    examples_dir = Path(__file__).parent / "examples"
-    return sorted(
-        path.stem
-        for path in examples_dir.glob("*.py")
-        if path.name != "__init__.py" and not path.name.startswith("_")
-    )
+    return [spec.name for spec in list_example_specs()]
 
 
-def resolve_example_name(name: str) -> str:
-    examples = list_examples()
-    if name in examples:
-        return name
+def list_examples_grouped() -> list[tuple[str, list[ExampleSpec]]]:
+    grouped: dict[str, list[ExampleSpec]] = {}
+    for spec in list_example_specs():
+        grouped.setdefault(spec.group, []).append(spec)
+    return [
+        (group, grouped[group])
+        for group in sorted(grouped, key=lambda group: _example_group_sort_key(group))
+    ]
+
+
+def resolve_example_spec(name: str) -> ExampleSpec:
+    examples = list_example_specs()
+    exact = next((spec for spec in examples if spec.name == name), None)
+    if exact is not None:
+        return exact
 
     for example in examples:
-        if example.startswith(name):
+        if example.name.startswith(name):
             return example
 
     raise LookupError(f"unknown example: {name}")
+
+
+def resolve_example_name(name: str) -> str:
+    return resolve_example_spec(name).name
 
 
 def load_object(dotted_path: str):
@@ -139,9 +197,9 @@ def load_object(dotted_path: str):
 
 
 def run_example(name: str, *, port: int = 8080, host: str | None = None, reload: bool = False):
-    resolved_name = resolve_example_name(name)
+    resolved = resolve_example_spec(name)
 
-    module = import_module(f"nicegui_builder.examples.{resolved_name}")
+    module = import_module(resolved.module)
     build_ui = getattr(module, "build_ui", None)
     if build_ui is not None:
         return run_ui_app(build_ui, port=port, host=host, reload=reload)
@@ -227,8 +285,10 @@ def main(argv: list[str] | None = None):
 
     if args.command == "examples":
         if args.examples_command == "list":
-            for example in list_examples():
-                print(example)
+            for group, examples in list_examples_grouped():
+                print(f"[{group}]")
+                for example in examples:
+                    print(example.name)
             return 0
 
         if args.examples_command == "run":

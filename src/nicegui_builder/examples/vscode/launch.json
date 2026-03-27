@@ -23,7 +23,7 @@
       "name": "Example 03: First Pydantic Form",
       "type": "debugpy",
       "request": "launch",
-      "module": "nicegui_builder.examples.03_pydantic_form_basic",
+      "module": "nicegui_builder.plugins.pydantic.examples.03_pydantic_form_basic",
       "cwd": "${workspaceFolder}",
       "console": "integratedTerminal",
       "justMyCode": false
@@ -32,7 +32,7 @@
       "name": "Example 04: First Pandas Table",
       "type": "debugpy",
       "request": "launch",
-      "module": "nicegui_builder.examples.04_pandas_table_basic",
+      "module": "nicegui_builder.plugins.pandas.examples.04_pandas_table_basic",
       "cwd": "${workspaceFolder}",
       "console": "integratedTerminal",
       "justMyCode": false
@@ -41,7 +41,7 @@
       "name": "Example 05: Pydantic Form with YAML",
       "type": "debugpy",
       "request": "launch",
-      "module": "nicegui_builder.examples.05_pydantic_form_yaml",
+      "module": "nicegui_builder.plugins.pydantic.examples.05_pydantic_form_yaml",
       "cwd": "${workspaceFolder}",
       "console": "integratedTerminal",
       "justMyCode": false
@@ -50,7 +50,7 @@
       "name": "Example 06: Pydantic Form Flavors",
       "type": "debugpy",
       "request": "launch",
-      "module": "nicegui_builder.examples.06_pydantic_form_flavors",
+      "module": "nicegui_builder.plugins.pydantic.examples.06_pydantic_form_flavors",
       "cwd": "${workspaceFolder}",
       "console": "integratedTerminal",
       "justMyCode": false
@@ -59,7 +59,7 @@
       "name": "Example 07: Pydantic Field Variants",
       "type": "debugpy",
       "request": "launch",
-      "module": "nicegui_builder.examples.07_pydantic_field_variants",
+      "module": "nicegui_builder.plugins.pydantic.examples.07_pydantic_field_variants",
       "cwd": "${workspaceFolder}",
       "console": "integratedTerminal",
       "justMyCode": false
@@ -68,7 +68,7 @@
       "name": "Example 08: Pydantic Structured Fields",
       "type": "debugpy",
       "request": "launch",
-      "module": "nicegui_builder.examples.08_pydantic_structured_fields",
+      "module": "nicegui_builder.plugins.pydantic.examples.08_pydantic_structured_fields",
       "cwd": "${workspaceFolder}",
       "console": "integratedTerminal",
       "justMyCode": false
@@ -77,7 +77,7 @@
       "name": "Example 09: Datetime Split",
       "type": "debugpy",
       "request": "launch",
-      "module": "nicegui_builder.examples.09_pydantic_datetime_split",
+      "module": "nicegui_builder.plugins.pydantic.examples.09_pydantic_datetime_split",
       "cwd": "${workspaceFolder}",
       "console": "integratedTerminal",
       "justMyCode": false
@@ -86,7 +86,7 @@
       "name": "Example 10: Pandas Table Filters",
       "type": "debugpy",
       "request": "launch",
-      "module": "nicegui_builder.examples.10_pandas_table_filters",
+      "module": "nicegui_builder.plugins.pandas.examples.10_pandas_table_filters",
       "cwd": "${workspaceFolder}",
       "console": "integratedTerminal",
       "justMyCode": false
@@ -95,7 +95,7 @@
       "name": "Example 11: FormHandle Basics",
       "type": "debugpy",
       "request": "launch",
-      "module": "nicegui_builder.examples.11_form_handle_basics",
+      "module": "nicegui_builder.plugins.pydantic.examples.11_form_handle_basics",
       "cwd": "${workspaceFolder}",
       "console": "integratedTerminal",
       "justMyCode": false
@@ -104,7 +104,7 @@
       "name": "Example 12: Form Validation",
       "type": "debugpy",
       "request": "launch",
-      "module": "nicegui_builder.examples.12_form_validation",
+      "module": "nicegui_builder.plugins.pydantic.examples.12_form_validation",
       "cwd": "${workspaceFolder}",
       "console": "integratedTerminal",
       "justMyCode": false
@@ -113,7 +113,7 @@
       "name": "Example 13: Form Submit",
       "type": "debugpy",
       "request": "launch",
-      "module": "nicegui_builder.examples.13_form_submit",
+      "module": "nicegui_builder.plugins.pydantic.examples.13_form_submit",
       "cwd": "${workspaceFolder}",
       "console": "integratedTerminal",
       "justMyCode": false
@@ -122,7 +122,7 @@
       "name": "Example 14: Dirty State",
       "type": "debugpy",
       "request": "launch",
-      "module": "nicegui_builder.examples.14_form_dirty_state",
+      "module": "nicegui_builder.plugins.pydantic.examples.14_form_dirty_state",
       "cwd": "${workspaceFolder}",
       "console": "integratedTerminal",
       "justMyCode": false
@@ -131,7 +131,7 @@
       "name": "Example 15: Live Helpers",
       "type": "debugpy",
       "request": "launch",
-      "module": "nicegui_builder.examples.15_form_live_helpers",
+      "module": "nicegui_builder.plugins.pydantic.examples.15_form_live_helpers",
       "cwd": "${workspaceFolder}",
       "console": "integratedTerminal",
       "justMyCode": false
@@ -140,7 +140,7 @@
       "name": "Example 16: Actionable Form",
       "type": "debugpy",
       "request": "launch",
-      "module": "nicegui_builder.examples.16_form_actionable",
+      "module": "nicegui_builder.plugins.pydantic.examples.16_form_actionable",
       "cwd": "${workspaceFolder}",
       "console": "integratedTerminal",
       "justMyCode": false
@@ -149,7 +149,7 @@
       "name": "Example 17: Form CRUD",
       "type": "debugpy",
       "request": "launch",
-      "module": "nicegui_builder.examples.17_form_crud",
+      "module": "nicegui_builder.plugins.pydantic.examples.17_form_crud",
       "cwd": "${workspaceFolder}",
       "console": "integratedTerminal",
       "justMyCode": false
@@ -158,7 +158,7 @@
       "name": "Example 18: TableHandle Basics",
       "type": "debugpy",
       "request": "launch",
-      "module": "nicegui_builder.examples.18_table_handle_basics",
+      "module": "nicegui_builder.plugins.pandas.examples.18_table_handle_basics",
       "cwd": "${workspaceFolder}",
       "console": "integratedTerminal",
       "justMyCode": false
@@ -167,7 +167,7 @@
       "name": "Example 19: Table Pagination Selection Export",
       "type": "debugpy",
       "request": "launch",
-      "module": "nicegui_builder.examples.19_table_pagination_selection_export",
+      "module": "nicegui_builder.plugins.pandas.examples.19_table_pagination_selection_export",
       "cwd": "${workspaceFolder}",
       "console": "integratedTerminal",
       "justMyCode": false
@@ -176,7 +176,7 @@
       "name": "Example 20: Table CRUD",
       "type": "debugpy",
       "request": "launch",
-      "module": "nicegui_builder.examples.20_table_crud",
+      "module": "nicegui_builder.plugins.pandas.examples.20_table_crud",
       "cwd": "${workspaceFolder}",
       "console": "integratedTerminal",
       "justMyCode": false
@@ -212,7 +212,7 @@
       "name": "Example 24: Field Context Resolution",
       "type": "debugpy",
       "request": "launch",
-      "module": "nicegui_builder.examples.24_field_context_resolution",
+      "module": "nicegui_builder.plugins.pydantic.examples.24_field_context_resolution",
       "cwd": "${workspaceFolder}",
       "console": "integratedTerminal",
       "justMyCode": false
@@ -221,7 +221,7 @@
       "name": "Example 25: Plugin Mapping Customization",
       "type": "debugpy",
       "request": "launch",
-      "module": "nicegui_builder.examples.25_plugin_mapping_customization",
+      "module": "nicegui_builder.plugins.pydantic.examples.25_plugin_mapping_customization",
       "cwd": "${workspaceFolder}",
       "console": "integratedTerminal",
       "justMyCode": false
@@ -248,7 +248,7 @@
       "name": "Example Demo: Pydantic Builder",
       "type": "debugpy",
       "request": "launch",
-      "module": "nicegui_builder.examples.demo_pydantic_builder",
+      "module": "nicegui_builder.plugins.pydantic.examples.demo_pydantic_builder",
       "cwd": "${workspaceFolder}",
       "console": "integratedTerminal",
       "justMyCode": false
@@ -257,10 +257,11 @@
       "name": "Example Demo: Contact Address",
       "type": "debugpy",
       "request": "launch",
-      "module": "nicegui_builder.examples.example_contact_address",
+      "module": "nicegui_builder.plugins.pydantic.examples.example_contact_address",
       "cwd": "${workspaceFolder}",
       "console": "integratedTerminal",
       "justMyCode": false
     }
   ]
 }
+
