@@ -7,7 +7,7 @@ This is the closest the festival gets to executive polish.
 
 from nicegui import ui
 
-from nicegui_builder import form
+import nicegui_builder
 from nicegui_builder.examples.models import Contest
 
 
@@ -21,7 +21,7 @@ def build_ui():
         "This layout exposes built-in status, action, and error areas so the handle can do more of the stage work."
     ).classes("text-body2 text-grey-7")
 
-    handle = form(Contest, flavor="actionable")
+    handle = ui.form_builder(Contest, flavor="actionable")
 
     handle.action_bar(
         "Save contest",

@@ -8,7 +8,7 @@ from dataclasses import dataclass
 
 from nicegui import ui
 
-from nicegui_builder import form
+import nicegui_builder
 from nicegui_builder.core.models import FieldSpec, WidgetSpec
 from nicegui_builder.plugins import plugin_registry
 
@@ -117,7 +117,7 @@ def build_ui():
         "This tiny plugin handles one whimsical source type and proves the extension point can stay approachable."
     ).classes("text-body2 text-grey-7")
 
-    handle = form(LostSockPass())
+    handle = ui.form_builder(LostSockPass())
 
     with ui.row().classes("gap-2"):
         ui.button(

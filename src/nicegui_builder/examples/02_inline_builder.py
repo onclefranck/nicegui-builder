@@ -6,7 +6,7 @@ but also wants it immediately and with suspicious confidence.
 
 from nicegui import ui
 
-from nicegui_builder import builder
+import nicegui_builder
 
 
 LAYOUT = [
@@ -54,7 +54,7 @@ LAYOUT = [
 
 
 def build_ui():
-    builder(LAYOUT)
+    ui.builder(LAYOUT)
 
 
 def main(*, port: int = 8080, host: str | None = None, reload: bool = False):

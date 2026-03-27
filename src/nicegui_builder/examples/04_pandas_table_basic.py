@@ -9,7 +9,7 @@ from datetime import datetime
 from nicegui import ui
 import pandas as pd
 
-from nicegui_builder import table
+import nicegui_builder
 
 
 def build_ui():
@@ -37,7 +37,7 @@ def build_ui():
     )
 
     ui.label("Today's contests").classes("text-h6")
-    table(contests)
+    ui.table_builder(contests)
 
 
 def main(*, port: int = 8080, host: str | None = None, reload: bool = False):

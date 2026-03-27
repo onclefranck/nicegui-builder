@@ -8,7 +8,7 @@ from datetime import datetime
 
 from nicegui import ui
 
-from nicegui_builder import form
+import nicegui_builder
 from nicegui_builder.examples.models import Contest
 
 
@@ -28,7 +28,7 @@ def build_ui():
     ).classes("text-body2 text-grey-7")
 
     with ui.card().classes("w-full max-w-3xl mx-auto gap-3"):
-        handle = form(_sample_contest())
+        handle = ui.form_builder(_sample_contest())
 
         with ui.row().classes("gap-2"):
             ui.button(

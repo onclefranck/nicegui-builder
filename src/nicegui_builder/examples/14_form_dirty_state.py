@@ -6,7 +6,7 @@ This example celebrates the exact moment it stops being one.
 
 from nicegui import ui
 
-from nicegui_builder import form
+import nicegui_builder
 from nicegui_builder.examples.models import Participant
 
 
@@ -24,7 +24,7 @@ def build_ui():
         "Change a field, and the form will cheerfully admit that it is no longer in its original state."
     ).classes("text-body2 text-grey-7")
 
-    handle = form(
+    handle = ui.form_builder(
         Participant(
             display_name="Marshall Greatdisagreement",
             email="marshall@example.com",

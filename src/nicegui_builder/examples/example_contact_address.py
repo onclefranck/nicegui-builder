@@ -1,6 +1,6 @@
 from nicegui import ui
 from pydantic import BaseModel, Field
-from nicegui_builder import form
+import nicegui_builder
 import typing as t
 
 Civility = t.Literal["Mr.", "Miss", "Ms.", "Sir"]
@@ -63,7 +63,7 @@ contact_address = ContactAddress()
 
 def build_ui():
     ui.label("Hello from NiceGUI 👋")
-    form(contact_address)
+    ui.form_builder(contact_address)
 
 
 def main(*, port: int = 8080, host: str | None = None, reload: bool = True):

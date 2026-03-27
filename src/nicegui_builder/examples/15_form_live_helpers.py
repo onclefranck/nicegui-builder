@@ -6,7 +6,7 @@ It is the closest thing this festival has to a reliable chaperone.
 
 from nicegui import ui
 
-from nicegui_builder import form
+import nicegui_builder
 from nicegui_builder.examples.models import Participant
 
 
@@ -16,7 +16,7 @@ def build_ui():
         "Dirty tracking, live validation, and strategic buttons all reacting as the form changes."
     ).classes("text-body2 text-grey-7")
 
-    handle = form(Participant, flavor="actionable")
+    handle = ui.form_builder(Participant, flavor="actionable")
     handle.live_validation(as_model=True, mode="change")
 
     with ui.row().classes("gap-2 items-center"):

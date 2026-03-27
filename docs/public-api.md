@@ -42,11 +42,16 @@ Examples:
 The package also re-exports `ui` and patches the imported NiceGUI `ui` object at runtime with:
 
 - `ui.builder(...)`
+- `ui.datetime_input(...)`
 - `ui.form_builder(...)`
 - `ui.table_builder(...)`
 
 That behavior is supported by `nicegui-builder`, but it is still a patch-style integration layered on top of NiceGUI's own `ui` module.
 It should be treated as a convenience contract of this package, not as an upstream NiceGUI guarantee.
+
+For editor completion in this repository, the package also ships local partial stubs under [`typings/nicegui`](../typings/nicegui).
+Those stubs are intentionally marked `partial` so they extend NiceGUI's own type information rather than replacing the native signatures.
+The main workspace stub [`typings/nicegui/ui.pyi`](../typings/nicegui/ui.pyi) is generated from NiceGUI's own `ui` module by [`scripts/generate_nicegui_ui_stub.py`](../scripts/generate_nicegui_ui_stub.py) and is checked by CI to avoid drift.
 
 ## Advanced / Experimental
 

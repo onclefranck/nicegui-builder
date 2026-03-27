@@ -7,7 +7,7 @@ This example documents the evidence to the contrary.
 from nicegui import ui
 from pydantic import BaseModel, Field
 
-from nicegui_builder import form
+import nicegui_builder
 
 
 class SupplyCrate(BaseModel):
@@ -43,7 +43,7 @@ def build_ui():
         "Nested models, lists, and dict-like values are grouped into their own generated sections."
     ).classes("text-body2 text-grey-7")
 
-    handle = form(ParadePlan())
+    handle = ui.form_builder(ParadePlan())
 
     with ui.row().classes("gap-2"):
         ui.button(

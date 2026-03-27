@@ -7,13 +7,13 @@ The digital future has rarely felt so necessary.
 
 from nicegui import ui
 
-from nicegui_builder import form
+import nicegui_builder
 from nicegui_builder.examples.models import Participant
 
 
 def build_ui():
     ui.label("New participant intake").classes("text-h6")
-    form(Participant)
+    ui.form_builder(Participant)
 
 
 def main(*, port: int = 8080, host: str | None = None, reload: bool = False):

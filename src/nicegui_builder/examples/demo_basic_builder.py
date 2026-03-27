@@ -2,14 +2,14 @@ import pathlib as p
 import yaml
 
 from nicegui import ui
-from nicegui_builder import builder
+import nicegui_builder
 
 
 def build_ui():
     with p.Path("src/nicegui_builder/examples/demo_basic_builder.yml").open(encoding="utf-8") as file:
         layout = yaml.safe_load(file)
 
-    builder(layout)
+    ui.builder(layout)
 
 
 def main(*, port: int = 8080, host: str | None = None, reload: bool = False):

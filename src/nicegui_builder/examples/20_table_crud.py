@@ -9,7 +9,7 @@ from datetime import datetime
 from nicegui import ui
 import pandas as pd
 
-from nicegui_builder import table
+import nicegui_builder
 
 
 def _contest_rows() -> pd.DataFrame:
@@ -106,7 +106,7 @@ def build_ui():
         "Selection is used by 'Delete selected'. 'Export CSV' previews the full current table."
     ).classes("text-body2 text-grey-7")
 
-    handle = table(_contest_rows())
+    handle = ui.table_builder(_contest_rows())
 
     with ui.row().classes("gap-2"):
         ui.button(

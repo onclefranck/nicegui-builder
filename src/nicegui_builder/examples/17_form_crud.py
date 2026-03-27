@@ -6,7 +6,7 @@ This is how bureaucracy starts to feel dangerously confident.
 
 from nicegui import ui
 
-from nicegui_builder import form
+import nicegui_builder
 from nicegui_builder.examples.models import Registration
 
 
@@ -29,7 +29,7 @@ def build_ui():
         "The registration desk has discovered buttons that sound official and therefore improve morale."
     ).classes("text-body2 text-grey-7")
 
-    handle = form(
+    handle = ui.form_builder(
         Registration(
             participant_name="Alice Two-Left-Socks",
             contest_title="Interpretive Heel Rotation",

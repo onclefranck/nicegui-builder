@@ -15,12 +15,14 @@ from .core import (
     TableSpec,
     ViewHandle,
 )
+from .core.datetime_inputs import DateTimeInput
 from .form import form
 from .table import table
 
 
 def _attach_to_ui() -> None:
     ui.builder = builder
+    ui.datetime_input = DateTimeInput
     ui.form_builder = form
     ui.table_builder = table
 
