@@ -42,8 +42,8 @@ Examples:
 The package also re-exports `ui` and patches the imported NiceGUI `ui` object at runtime with:
 
 - `ui.builder(...)`
-- `ui.form(...)`
-- `ui.table(...)`
+- `ui.form_builder(...)`
+- `ui.table_builder(...)`
 
 That behavior is supported by `nicegui-builder`, but it is still a patch-style integration layered on top of NiceGUI's own `ui` module.
 It should be treated as a convenience contract of this package, not as an upstream NiceGUI guarantee.

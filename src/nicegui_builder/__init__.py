@@ -21,8 +21,8 @@ from .table import table
 
 def _attach_to_ui() -> None:
     ui.builder = builder
-    ui.form = form
-    ui.table = table
+    ui.form_builder = form
+    ui.table_builder = table
 
 
 _attach_to_ui()
