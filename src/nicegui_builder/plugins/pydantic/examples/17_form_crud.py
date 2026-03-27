@@ -7,7 +7,7 @@ This is how bureaucracy starts to feel dangerously confident.
 from nicegui import ui
 
 import nicegui_builder
-from nicegui_builder.examples.models import Registration
+from nicegui_builder.example_models import Registration
 
 
 def _create_registration(model: Registration):
@@ -63,3 +63,4 @@ def main(*, port: int = 8080, host: str | None = None, reload: bool = False):
 
 if __name__ in {"__main__", "__mp_main__"}:
     main()
+

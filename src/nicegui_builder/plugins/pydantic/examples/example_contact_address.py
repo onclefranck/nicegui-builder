@@ -72,3 +72,4 @@ def main(*, port: int = 8080, host: str | None = None, reload: bool = True):
 
 if __name__ in {"__main__", "__mp_main__"}:
     main()
+

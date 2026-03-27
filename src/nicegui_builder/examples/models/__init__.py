@@ -1,6 +1,11 @@
-from .contest import Contest, ContestCategory
-from .participant import Participant, SockColor
-from .registration import Registration, RegistrationStatus
+from nicegui_builder.example_models import (
+    Contest,
+    ContestCategory,
+    Participant,
+    Registration,
+    RegistrationStatus,
+    SockColor,
+)
 
 __all__ = [
     "Contest",

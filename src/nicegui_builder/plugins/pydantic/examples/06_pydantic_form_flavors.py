@@ -9,7 +9,7 @@ from datetime import datetime
 from nicegui import ui
 
 import nicegui_builder
-from nicegui_builder.examples.models import Contest, Participant, Registration
+from nicegui_builder.example_models import Contest, Participant, Registration
 
 
 def _sample_participant() -> Participant:
@@ -100,3 +100,4 @@ def main(*, port: int = 8080, host: str | None = None, reload: bool = False):
 
 if __name__ in {"__main__", "__mp_main__"}:
     main()
+

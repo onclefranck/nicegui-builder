@@ -196,7 +196,7 @@ def test_run_form_actionable_builds_default_action_bar(monkeypatch):
     monkeypatch.setattr(cli.ui, "run", fake_run)
 
     result = cli.run_form(
-        "nicegui_builder.examples.models:Contest",
+        "nicegui_builder.example_models:Contest",
         flavor="actionable",
         port=8082,
     )
@@ -228,7 +228,7 @@ def test_run_form_actionable_skips_action_bar_when_handle_does_not_support_it(mo
     monkeypatch.setattr(cli.ui, "run", fake_run)
 
     result = cli.run_form(
-        "nicegui_builder.examples.models:Contest",
+        "nicegui_builder.example_models:Contest",
         flavor="actionable",
         port=8083,
     )
@@ -684,3 +684,4 @@ def test_cli_main_unknown_command_path(monkeypatch):
 
     assert parser.message == "unknown command"
     assert result == 2
+
