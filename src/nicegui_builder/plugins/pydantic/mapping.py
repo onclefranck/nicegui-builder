@@ -189,6 +189,24 @@ def resolve_widget_spec(field_info, python_type, variant: str = "std") -> tuple[
     effective_variant = select_default_variant(field_info, map_type, variant)
     default_info = get_defaults_from_map(map_type, effective_variant)
     methods = default_info.get("methods")
+
+    if map_type == "datetime" and effective_variant == "split":
+        return (
+            WidgetSpec(
+                component="datetime_input",
+                variant=effective_variant,
+                params={
+                    "container": {
+                        "methods": methods,
+                        "params": dict(default_info.get("params", {})),
+                        "classes": default_info.get("classes", ""),
+                        "props": default_info.get("props", ""),
+                    }
+                },
+            ),
+            default_info,
+        )
+
     validation_props = build_validation_props(field_info, methods)
     props = " ".join(
         part for part in [default_info.get("props", ""), validation_props] if part

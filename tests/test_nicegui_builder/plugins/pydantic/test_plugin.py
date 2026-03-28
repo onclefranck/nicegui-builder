@@ -130,8 +130,9 @@ def test_pydantic_plugin_resolves_datetime_to_split_widget():
 
     widget = pydantic_plugin.resolve_widget(field)
 
-    assert widget.component == "row"
+    assert widget.component == "datetime_input"
     assert widget.variant == "split"
+    assert widget.params["container"]["methods"] == "row"
 
 
 def test_pydantic_plugin_supports_model_types_and_instances_but_not_other_values():
