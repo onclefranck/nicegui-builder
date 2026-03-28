@@ -7,6 +7,7 @@ from nicegui_builder.plugins.pydantic.layout import (
     filters_field_classes,
     group_fields_by_section,
 )
+from nicegui_builder.plugins.pydantic.mapping import resolve_widget_spec
 import nicegui_builder.plugins.pydantic.plugin as plugin_module
 from nicegui_builder.core.models import FieldSpec, LayoutNode, WidgetSpec
 
@@ -23,7 +24,11 @@ def test_pydantic_plugin_resolves_literal_to_radio():
     fields = pydantic_plugin.inspect_fields(DemoModel)
     role_field = next(field for field in fields if field.name == "role")
 
-    widget = pydantic_plugin.resolve_widget(role_field)
+    widget = resolve_widget_spec(
+        role_field.source_meta["field_info"],
+        role_field.python_type,
+        map_type=role_field.source_meta["map_type"],
+    )
 
     assert widget.component == "radio"
     assert widget.variant == "radio"
@@ -114,8 +119,16 @@ def test_pydantic_plugin_resolves_nested_models_and_collections_as_structured_wi
     fields = pydantic_plugin.inspect_fields(DemoStructuredModel)
     by_name = {field.name: field for field in fields}
 
-    address_widget = pydantic_plugin.resolve_widget(by_name["address"])
-    tags_widget = pydantic_plugin.resolve_widget(by_name["tags"])
+    address_widget = resolve_widget_spec(
+        by_name["address"].source_meta["field_info"],
+        by_name["address"].python_type,
+        map_type=by_name["address"].source_meta["map_type"],
+    )
+    tags_widget = resolve_widget_spec(
+        by_name["tags"].source_meta["field_info"],
+        by_name["tags"].python_type,
+        map_type=by_name["tags"].source_meta["map_type"],
+    )
 
     assert address_widget.component == "textarea"
     assert "font-mono" in address_widget.classes
@@ -130,7 +143,11 @@ def test_pydantic_plugin_resolves_datetime_to_split_widget():
         field for field in pydantic_plugin.inspect_fields(DemoDateTimeModel) if field.name == "starts_at"
     )
 
-    widget = pydantic_plugin.resolve_widget(field)
+    widget = resolve_widget_spec(
+        field.source_meta["field_info"],
+        field.python_type,
+        map_type=field.source_meta["map_type"],
+    )
 
     assert widget.component == "datetime_input"
     assert widget.variant == "split"
@@ -184,31 +201,34 @@ def test_pydantic_plugin_build_section_node_returns_column_wrapper():
     assert node.children[0].classes == "text-subtitle2 text-primary"
 
 
-def test_pydantic_plugin_build_field_context_and_resolve_field_node_delegate(monkeypatch):
+def test_pydantic_plugin_build_field_context_and_resolve_field_node(monkeypatch):
     calls = {}
 
     def fake_build_field_context(model_class, model_instance, fieldname):
         calls["context"] = (model_class, model_instance, fieldname)
-        return {"field": fieldname}
+        return {"fieldname": fieldname, "field_info": type("FieldInfo", (), {"annotation": str})()}
 
-    def fake_resolve_field_node(model_class, model_instance, fieldname, value):
-        calls["node"] = (model_class, model_instance, fieldname, value)
-        return {"node": fieldname}
+    def fake_resolve_widget_spec(field_info, python_type, variant="std"):
+        calls["widget"] = (field_info, python_type, variant)
+        return WidgetSpec(component="input")
+
+    def fake_build_layout_node(field_ctx, widget, value):
+        calls["node"] = (field_ctx, widget, value)
+        return LayoutNode(methods="input")
 
     monkeypatch.setattr("nicegui_builder.plugins.pydantic.plugin.build_field_context", fake_build_field_context)
-    monkeypatch.setattr(
-        "nicegui_builder.plugins.pydantic.plugin.resolve_pydantic_field_node",
-        fake_resolve_field_node,
-    )
+    monkeypatch.setattr("nicegui_builder.plugins.pydantic.plugin.resolve_widget_spec", fake_resolve_widget_spec)
+    monkeypatch.setattr("nicegui_builder.plugins.pydantic.plugin.build_layout_node", fake_build_layout_node)
 
     instance = DemoModel(name="Ada", age=12, active=True, role="user")
 
-    assert pydantic_plugin.build_field_context(DemoModel, instance, "name") == {"field": "name"}
-    assert pydantic_plugin.resolve_field_node(DemoModel, instance, "name", {"classes": "w-full"}) == {
-        "node": "name"
-    }
+    assert pydantic_plugin.build_field_context(DemoModel, instance, "name")["fieldname"] == "name"
+    resolved = pydantic_plugin.resolve_field_node(DemoModel, instance, "name", {"classes": "w-full"})
+
+    assert resolved.node.methods == "input"
     assert calls["context"] == (DemoModel, instance, "name")
-    assert calls["node"] == (DemoModel, instance, "name", {"classes": "w-full"})
+    assert calls["widget"][1:] == (str, "std")
+    assert calls["node"][2] == {"classes": "w-full"}
 
 
 def test_pydantic_plugin_render_form_returns_none():

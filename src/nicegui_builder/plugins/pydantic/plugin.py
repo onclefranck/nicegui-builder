@@ -2,7 +2,7 @@ import typing as t
 
 from pydantic import BaseModel
 
-from nicegui_builder.core.models import FieldSpec, LayoutNode, WidgetSpec
+from nicegui_builder.core.models import FieldSpec, LayoutNode, ResolvedFieldNode, WidgetSpec
 
 from .inspect import build_field_context
 from .layout import (
@@ -12,11 +12,11 @@ from .layout import (
     group_fields_by_section,
 )
 from .mapping import (
+    build_layout_node,
     extract_options,
     resolve_map_type,
     resolve_widget_spec,
 )
-from .resolve import resolve_field_node as resolve_pydantic_field_node
 
 
 def _extract_constraints(field_info) -> dict:
@@ -156,7 +156,12 @@ class PydanticPlugin:
                 build_section_node(
                     section_title,
                     section_fields,
-                    self.resolve_widget,
+                    lambda field, variant="std": resolve_widget_spec(
+                        field.source_meta["field_info"],
+                        field.python_type,
+                        variant,
+                        map_type=field.source_meta.get("map_type"),
+                    ),
                     field_classes_resolver,
                     flavor=flavor,
                 )
@@ -198,22 +203,24 @@ class PydanticPlugin:
             )
         ]
 
-    def resolve_widget(self, spec: FieldSpec, variant: str = "std") -> WidgetSpec:
-        field_info = spec.source_meta["field_info"]
-        return resolve_widget_spec(
-            field_info,
-            spec.python_type,
-            variant,
-            map_type=spec.source_meta.get("map_type"),
-        )
-
     def build_field_context(self, model_class, model_instance, fieldname: str) -> dict:
         return build_field_context(model_class, model_instance, fieldname)
 
     def resolve_field_node(
         self, model_class, model_instance, fieldname: str, value: dict | None
-    ) -> dict:
-        return resolve_pydantic_field_node(model_class, model_instance, fieldname, value)
+    ) -> ResolvedFieldNode:
+        value = value or {}
+        field_ctx = build_field_context(model_class, model_instance, fieldname)
+        field_info = field_ctx["field_info"]
+        widget = resolve_widget_spec(
+            field_info,
+            field_info.annotation,
+            value.get("methods", "std"),
+        )
+        return ResolvedFieldNode(
+            field_ctx=field_ctx,
+            node=build_layout_node(field_ctx, widget, value),
+        )
 
     def render_form(self, source, flavor: str = ""):
         return None

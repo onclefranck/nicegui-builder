@@ -31,112 +31,83 @@ def set_select_options(control, options: dict[str, str]) -> None:
         control.update()
 
 
-def _normalize_range_value(value) -> list[object]:
-    if not isinstance(value, (list, tuple)) or len(value) != 2:
-        return ["", ""]
-    return list(value)
+def render_filter_value_controls(ui_module, datetime_input_factory, field: FieldSpec, operator: str, state: dict[str, object], state_key: str) -> None:
+    def set_state_value(value) -> None:
+        state[state_key] = value
 
+    if operator == "between":
+        values = state.get(state_key)
+        if not isinstance(values, (list, tuple)) or len(values) != 2:
+            values = ["", ""]
+        left_value, right_value = list(values)
 
-def _set_range_item(state: dict[str, object], state_key: str, index: int, value) -> None:
-    values = _normalize_range_value(state.get(state_key))
-    values[index] = value
-    state[state_key] = values
+        def set_range_item(index: int, value) -> None:
+            next_values = [left_value, right_value]
+            current = state.get(state_key)
+            if isinstance(current, (list, tuple)) and len(current) == 2:
+                next_values = list(current)
+            next_values[index] = value
+            state[state_key] = next_values
 
+        with ui_module.row().classes("items-end gap-2"):
+            if field.source_meta.get("filter_kind", "text") == "number":
+                left_control = ui_module.number(label="From")
+                right_control = ui_module.number(label="To")
+                if left_value not in (None, "") and hasattr(left_control, "value"):
+                    left_control.value = left_value
+                if right_value not in (None, "") and hasattr(right_control, "value"):
+                    right_control.value = right_value
+                left_control.on_value_change(lambda event: set_range_item(0, event.value))
+                right_control.on_value_change(lambda event: set_range_item(1, event.value))
+                return
 
-def _bind_textual_value_control(control, state: dict[str, object], state_key: str) -> None:
-    current_value = state.get(state_key, "")
-    if current_value not in (None, "") and hasattr(control, "value"):
-        control.value = current_value
+            with ui_module.column().classes("gap-2"):
+                datetime_input_factory(
+                    value=left_value,
+                    on_value_change=lambda event: set_range_item(0, event.value),
+                    date_options={"label": "From date"},
+                    time_options={"label": "From time"},
+                )
+            with ui_module.column().classes("gap-2"):
+                datetime_input_factory(
+                    value=right_value,
+                    on_value_change=lambda event: set_range_item(1, event.value),
+                    date_options={"label": "To date"},
+                    time_options={"label": "To time"},
+                )
+        return
 
-    def _on_change(event):
-        state[state_key] = event.value
-
-    control.on_value_change(_on_change)
-
-
-def _render_between_value_controls(ui_module, datetime_input_factory, filter_kind: str, state: dict[str, object], state_key: str) -> None:
-    left_value, right_value = _normalize_range_value(state.get(state_key))
-
-    with ui_module.row().classes("items-end gap-2"):
-        if filter_kind == "number":
-            left_control = ui_module.number(label="From")
-            right_control = ui_module.number(label="To")
-            if left_value not in (None, "") and hasattr(left_control, "value"):
-                left_control.value = left_value
-            if right_value not in (None, "") and hasattr(right_control, "value"):
-                right_control.value = right_value
-
-            left_control.on_value_change(lambda event: _set_range_item(state, state_key, 0, event.value))
-            right_control.on_value_change(lambda event: _set_range_item(state, state_key, 1, event.value))
-            return
-
-        with ui_module.column().classes("gap-2"):
-            datetime_input_factory(
-                value=left_value,
-                on_value_change=lambda event: _set_range_item(state, state_key, 0, event.value),
-                date_options={"label": "From date"},
-                time_options={"label": "From time"},
-            )
-        with ui_module.column().classes("gap-2"):
-            datetime_input_factory(
-                value=right_value,
-                on_value_change=lambda event: _set_range_item(state, state_key, 1, event.value),
-                date_options={"label": "To date"},
-                time_options={"label": "To time"},
-            )
-
-
-def _render_single_value_control(ui_module, datetime_input_factory, field: FieldSpec, operator: str, state: dict[str, object], state_key: str) -> None:
     filter_kind = field.source_meta.get("filter_kind", "text")
 
     if operator in {"in", "notIn"}:
-        _bind_textual_value_control(ui_module.input(label="Values").props("clearable"), state, state_key)
-        return
-
-    if filter_kind == "select" and operator in {"equals", "notEquals"}:
+        control = ui_module.input(label="Values").props("clearable")
+    elif filter_kind == "select" and operator in {"equals", "notEquals"}:
         control = ui_module.select(
             options=field.choices,
             label="Value",
             clearable=True,
         )
-        _bind_textual_value_control(control, state, state_key)
-        return
-
-    if filter_kind == "number":
-        _bind_textual_value_control(ui_module.number(label="Value"), state, state_key)
-        return
-
-    if filter_kind == "boolean":
+    elif filter_kind == "number":
+        control = ui_module.number(label="Value")
+    elif filter_kind == "boolean":
         control = ui_module.select(
             options=[True, False],
             label="Value",
             clearable=True,
         )
-        _bind_textual_value_control(control, state, state_key)
-        return
-
-    if filter_kind == "datetime":
+    elif filter_kind == "datetime":
         datetime_input_factory(
             value=state.get(state_key, ""),
-            on_value_change=lambda event: state.__setitem__(state_key, event.value),
+            on_value_change=lambda event: set_state_value(event.value),
         )
         return
+    else:
+        control = ui_module.input(label="Value").props("clearable")
 
-    _bind_textual_value_control(ui_module.input(label="Value").props("clearable"), state, state_key)
-
-
-def render_filter_value_controls(ui_module, datetime_input_factory, field: FieldSpec, operator: str, state: dict[str, object], state_key: str) -> None:
-    if operator == "between":
-        _render_between_value_controls(
-            ui_module,
-            datetime_input_factory,
-            field.source_meta.get("filter_kind", "text"),
-            state,
-            state_key,
-        )
-        return
-
-    _render_single_value_control(ui_module, datetime_input_factory, field, operator, state, state_key)
+    current_value = state.get(state_key, "")
+    if current_value not in (None, "") and hasattr(control, "value"):
+        control.value = current_value
+    control.on_value_change(lambda event: set_state_value(event.value))
 
 
 def render_active_filters_list(

@@ -4,7 +4,7 @@ import types
 import typing as t
 
 from pydantic import BaseModel
-from nicegui_builder.core.datetime_inputs import DateTimeInput, build_split_datetime_node
+from nicegui_builder.core.datetime_inputs import DateTimeInput
 from nicegui_builder.core.models import LayoutNode, WidgetSpec
 
 from ...utils import load_layout
@@ -232,19 +232,36 @@ def build_layout_node(field_ctx: dict, widget: WidgetSpec, value: dict | None = 
         raw_params = dict(params)
         raw_container = raw_params.pop("container", None)
         container = DateTimeInput.normalize_container(raw_container)
+        normalized_date_options = DateTimeInput.normalize_part_options(
+            raw_params.pop("date_options", None),
+            defaults={
+                **DateTimeInput.DEFAULT_DATE_OPTIONS,
+                "label": f"{label} date",
+                "classes": "col",
+            },
+        )
+        normalized_time_options = DateTimeInput.normalize_part_options(
+            raw_params.pop("time_options", None),
+            defaults={
+                **DateTimeInput.DEFAULT_TIME_OPTIONS,
+                "label": f"{label} time",
+                "classes": "col",
+            },
+        )
 
-        return build_split_datetime_node(
-            field_name=field_ctx["fieldname"],
-            label=label,
-            raw_value=raw_value,
+        return LayoutNode(
+            methods="datetime_input",
             ref=logical_ref,
-            container=container,
-            component_props=props,
-            component_classes=classes,
-            date_ref=raw_params.pop("date_ref", None),
-            time_ref=raw_params.pop("time_ref", None),
-            date_options=raw_params.pop("date_options", None),
-            time_options=raw_params.pop("time_options", None),
+            params={
+                "value": raw_value,
+                "container": container,
+                "date_ref": raw_params.pop("date_ref", None) or f"{logical_ref}:date",
+                "time_ref": raw_params.pop("time_ref", None) or f"{logical_ref}:time",
+                "date_options": normalized_date_options,
+                "time_options": normalized_time_options,
+            },
+            props=props,
+            classes=classes,
         )
 
     return LayoutNode(

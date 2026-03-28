@@ -255,13 +255,13 @@ Literal|std:
   params:
     value: _{fieldvalue}
     label: _{attributes_title}
-    options: $nicegui_builder.plugins.pydantic:extract_options
+    options: $nicegui_builder.plugins.pydantic.mapping:extract_options
   props: clearable
 Literal|radio:
   methods: radio
   params:
     value: _{fieldvalue}
-    options: $nicegui_builder.plugins.pydantic:extract_options
+    options: $nicegui_builder.plugins.pydantic.mapping:extract_options
 Literal|label:
   methods: label
   params:
@@ -272,13 +272,13 @@ Enum|std:
   params:
     value: _{fieldvalue}
     label: _{attributes_title}
-    options: $nicegui_builder.plugins.pydantic:extract_options
+    options: $nicegui_builder.plugins.pydantic.mapping:extract_options
   props: clearable
 Enum|radio:
   methods: radio
   params:
     value: _{fieldvalue}
-    options: $nicegui_builder.plugins.pydantic:extract_options
+    options: $nicegui_builder.plugins.pydantic.mapping:extract_options
 Enum|label:
   methods: label
   params:
