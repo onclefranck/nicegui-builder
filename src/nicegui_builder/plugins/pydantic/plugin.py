@@ -6,11 +6,9 @@ from nicegui_builder.core.models import FieldSpec, WidgetSpec
 
 from .inspect import build_field_context
 from .mapping import (
-    build_validation_props,
     extract_options,
-    get_defaults_from_map,
     resolve_map_type,
-    select_default_variant,
+    resolve_widget_spec,
 )
 from .resolve import resolve_field_node as resolve_pydantic_field_node
 
@@ -314,22 +312,8 @@ class PydanticPlugin:
 
     def resolve_widget(self, spec: FieldSpec, variant: str = "std") -> WidgetSpec:
         field_info = spec.source_meta["field_info"]
-        map_type = resolve_map_type(spec.python_type)
-        effective_variant = select_default_variant(field_info, map_type, variant)
-        default_info = get_defaults_from_map(map_type, effective_variant)
-        methods = default_info.get("methods")
-        validation_props = build_validation_props(field_info, methods)
-        props = " ".join(
-            part for part in [default_info.get("props", ""), validation_props] if part
-        )
-
-        return WidgetSpec(
-            component=methods,
-            variant=effective_variant,
-            params=dict(default_info.get("params", {})),
-            props=props,
-            classes=default_info.get("classes", ""),
-        )
+        widget, _default_info = resolve_widget_spec(field_info, spec.python_type, variant)
+        return widget
 
     def build_field_context(self, model_class, model_instance, fieldname: str) -> dict:
         return build_field_context(model_class, model_instance, fieldname)

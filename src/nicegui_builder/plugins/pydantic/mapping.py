@@ -4,6 +4,7 @@ import types
 import typing as t
 
 from pydantic import BaseModel
+from nicegui_builder.core.models import WidgetSpec
 
 from ...utils import load_layout
 
@@ -181,3 +182,25 @@ def get_defaults_from_map(str1: str, str2: str = "std"):
         "to handle pydantic-nicegui.yml"
     )
     raise KeyError(error)
+
+
+def resolve_widget_spec(field_info, python_type, variant: str = "std") -> tuple[WidgetSpec, dict]:
+    map_type = resolve_map_type(python_type)
+    effective_variant = select_default_variant(field_info, map_type, variant)
+    default_info = get_defaults_from_map(map_type, effective_variant)
+    methods = default_info.get("methods")
+    validation_props = build_validation_props(field_info, methods)
+    props = " ".join(
+        part for part in [default_info.get("props", ""), validation_props] if part
+    )
+
+    return (
+        WidgetSpec(
+            component=methods,
+            variant=effective_variant,
+            params=dict(default_info.get("params", {})),
+            props=props,
+            classes=default_info.get("classes", ""),
+        ),
+        default_info,
+    )

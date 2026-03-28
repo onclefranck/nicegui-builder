@@ -1,10 +1,8 @@
 from .inspect import build_field_context
 from nicegui_builder.core.datetime_inputs import DateTimeInput, build_split_datetime_node
 from .mapping import (
-    build_validation_props,
-    get_defaults_from_map,
     resolve_map_type,
-    select_default_variant,
+    resolve_widget_spec,
 )
 
 
@@ -47,32 +45,30 @@ def resolve_field_node(model_class, model_instance, fieldname: str, value: dict 
     requested_variant = value.get("methods", "std")
 
     map_type = resolve_map_type(field_info.annotation)
-    effective_variant = select_default_variant(field_info, map_type, requested_variant)
-    default_info = get_defaults_from_map(map_type, effective_variant)
-    methods = default_info.get("methods")
-    validation_props = build_validation_props(field_info, methods)
+    widget, default_info = resolve_widget_spec(
+        field_info, field_info.annotation, requested_variant
+    )
 
-    if map_type == "datetime" and effective_variant == "split":
+    if map_type == "datetime" and widget.variant == "split":
         return {
             "field_ctx": field_ctx,
             "default_info": default_info,
             "node": _build_datetime_split_node(field_ctx, default_info, value),
         }
 
-    params = dict(default_info.get("params", {}))
+    params = dict(widget.params)
     params.update(value.get("params") or {})
 
     props = " ".join(
         part for part in [
-            default_info.get("props", ""),
-            validation_props,
+            widget.props,
             value.get("props", ""),
         ]
         if part
     )
     classes = " ".join(
         part for part in [
-            default_info.get("classes", ""),
+            widget.classes,
             value.get("classes", ""),
         ]
         if part
@@ -82,7 +78,7 @@ def resolve_field_node(model_class, model_instance, fieldname: str, value: dict 
         "field_ctx": field_ctx,
         "default_info": default_info,
         "node": {
-            "methods": methods,
+            "methods": widget.component,
             "params": params,
             "props": props,
             "classes": classes,
