@@ -4,6 +4,7 @@ import pytest
 builder_module = importlib.import_module("nicegui_builder.builder")
 from nicegui_builder.builder import builder, register, resolve_context_value
 from nicegui_builder.core.context import builder_ctx
+from nicegui_builder.core.models import LayoutNode
 
 
 def _format_greeting(**ctx):
@@ -115,3 +116,14 @@ def test_builder_collects_explicit_component_refs_and_rejects_duplicates(monkeyp
                 {"label": {"ref": "dup", "params": {"text": "Hello"}}},
             ]
         )
+
+
+def test_builder_normalizes_layout_entries_to_layout_nodes():
+    node = builder_module._normalize_layout_entry(
+        {"label": {"params": {"text": "Hello"}}},
+        {},
+    )
+
+    assert isinstance(node, LayoutNode)
+    assert node.methods == "label"
+    assert node.params == {"text": "Hello"}

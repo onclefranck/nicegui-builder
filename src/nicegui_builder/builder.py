@@ -23,7 +23,7 @@ def resolve_context_value(value, ctx):
 
 def _normalize_layout_entry(component: dict, ctx: dict) -> dict:
     if isinstance(component, LayoutNode):
-        return component.to_builder_dict()
+        return component
 
     key, value = next(iter(component.items()))
     if value is None:
@@ -33,24 +33,19 @@ def _normalize_layout_entry(component: dict, ctx: dict) -> dict:
         register_key, builder_key = key.split("__", 1)
         resolved = builder_expansion_registry[register_key](builder_key, value)
         if isinstance(resolved, LayoutNode):
-            return resolved.to_builder_dict()
-        return {
-            "methods": resolved.get("methods"),
-            "params": resolved.get("params") or {},
-            "classes": resolved.get("classes", ""),
-            "props": resolved.get("props", ""),
-            "ref": resolved.get("ref"),
-            "children": resolved.get("children", value.get("children", [])),
-        }
+            return resolved
+        return LayoutNode.from_dict(
+            {
+                "methods": resolved.get("methods"),
+                "params": resolved.get("params") or {},
+                "classes": resolved.get("classes", ""),
+                "props": resolved.get("props", ""),
+                "ref": resolved.get("ref"),
+                "children": resolved.get("children", value.get("children", [])),
+            }
+        )
 
-    return {
-        "methods": key,
-        "params": value.get("params") or {},
-        "classes": value.get("classes", ""),
-        "props": value.get("props", ""),
-        "ref": value.get("ref"),
-        "children": value.get("children", []),
-    }
+    return LayoutNode.from_layout_entry(component)
 
 
 def _render_method_chain(method_chain: str, params: dict):
@@ -77,18 +72,18 @@ def visit(components: list):
         ctx = dict(builder_ctx.get())
         ctx_token = builder_ctx.set(ctx)
         normalized = _normalize_layout_entry(component, ctx)
-        params = dict(normalized["params"])
-        classes = normalized["classes"]
-        props = normalized["props"]
-        ref = normalized["ref"]
-        children = normalized["children"]
+        params = dict(normalized.params)
+        classes = normalized.classes
+        props = normalized.props
+        ref = normalized.ref
+        children = normalized.children
 
         for k, v in params.items():
             params[k] = resolve_context_value(v, ctx)
 
         classes = resolve_context_value(classes, ctx)
         props = resolve_context_value(props, ctx)
-        ui_component = _render_method_chain(normalized["methods"], params)
+        ui_component = _render_method_chain(normalized.methods, params)
         
         # apply classes if any
         if classes:

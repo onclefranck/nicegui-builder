@@ -50,6 +50,26 @@ class LayoutNode:
     context: JsonDict = field(default_factory=dict)
 
     @classmethod
+    def from_layout_entry(cls, component: JsonDict) -> "LayoutNode":
+        key, value = next(iter(component.items()))
+        if value is None:
+            value = {}
+
+        return cls(
+            methods=key,
+            params=dict(value.get("params") or {}),
+            props=value.get("props", ""),
+            classes=value.get("classes", ""),
+            ref=value.get("ref"),
+            children=[
+                cls.from_layout_entry(child)
+                if isinstance(child, dict) and "__" not in next(iter(child.keys()))
+                else child
+                for child in (value.get("children") or [])
+            ],
+        )
+
+    @classmethod
     def from_dict(cls, data: JsonDict) -> "LayoutNode":
         return cls(
             methods=data["methods"],
@@ -75,6 +95,20 @@ class LayoutNode:
                 child.to_builder_dict() if isinstance(child, LayoutNode) else child
                 for child in self.children
             ],
+        }
+
+    def to_layout_entry(self) -> JsonDict:
+        return {
+            self.methods: {
+                "params": dict(self.params),
+                "props": self.props,
+                "classes": self.classes,
+                "ref": self.ref,
+                "children": [
+                    child.to_layout_entry() if isinstance(child, LayoutNode) else child
+                    for child in self.children
+                ],
+            }
         }
 
 

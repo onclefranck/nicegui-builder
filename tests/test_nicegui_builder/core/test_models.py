@@ -21,6 +21,24 @@ def test_layout_node_can_reference_nested_children():
     assert parent.children[0].params["text"] == "Hello"
 
 
+def test_layout_node_can_convert_from_and_to_layout_entries():
+    entry = {
+        "column": {
+            "classes": "w-full",
+            "children": [
+                {"label": {"params": {"text": "Hello"}}},
+            ],
+        }
+    }
+
+    node = LayoutNode.from_layout_entry(entry)
+
+    assert node.methods == "column"
+    assert node.classes == "w-full"
+    assert node.children[0].methods == "label"
+    assert node.to_layout_entry()["column"]["children"][0]["label"]["params"]["text"] == "Hello"
+
+
 def test_form_and_table_specs_hold_expected_shapes():
     field = FieldSpec(name="name", python_type=str)
     collection = CollectionSpec(name="rows", columns=[field])
