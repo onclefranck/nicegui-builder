@@ -24,11 +24,19 @@ def resolve_context_value(value, ctx):
 
 def _normalize_layout_entry(component: dict, ctx: dict) -> LayoutNode:
     if isinstance(component, LayoutNode):
-        return component
-
-    key, value = next(iter(component.items()))
-    if value is None:
-        value = {}
+        if "__" not in component.methods:
+            return component
+        key = component.methods
+        value = dict(component.context.get("builder_value") or {})
+        value.setdefault("params", dict(component.params))
+        value.setdefault("classes", component.classes)
+        value.setdefault("props", component.props)
+        value.setdefault("ref", component.ref)
+        value.setdefault("children", list(component.children))
+    else:
+        key, value = next(iter(component.items()))
+        if value is None:
+            value = {}
 
     if "__" in key:
         register_key, builder_key = key.split("__", 1)

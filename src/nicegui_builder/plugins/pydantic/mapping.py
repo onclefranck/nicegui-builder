@@ -241,20 +241,18 @@ def build_layout_node(field_ctx: dict, widget: WidgetSpec, value: dict | None = 
         raw_container = raw_params.pop("container", None)
         container = DateTimeInput.normalize_container(raw_container)
 
-        return LayoutNode.from_dict(
-            build_split_datetime_node(
-                field_name=field_ctx["fieldname"],
-                label=label,
-                raw_value=raw_value,
-                ref=logical_ref,
-                container=container,
-                component_props=props,
-                component_classes=classes,
-                date_ref=raw_params.pop("date_ref", None),
-                time_ref=raw_params.pop("time_ref", None),
-                date_options=raw_params.pop("date_options", None),
-                time_options=raw_params.pop("time_options", None),
-            )
+        return build_split_datetime_node(
+            field_name=field_ctx["fieldname"],
+            label=label,
+            raw_value=raw_value,
+            ref=logical_ref,
+            container=container,
+            component_props=props,
+            component_classes=classes,
+            date_ref=raw_params.pop("date_ref", None),
+            time_ref=raw_params.pop("time_ref", None),
+            date_options=raw_params.pop("date_options", None),
+            time_options=raw_params.pop("time_options", None),
         )
 
     return LayoutNode(

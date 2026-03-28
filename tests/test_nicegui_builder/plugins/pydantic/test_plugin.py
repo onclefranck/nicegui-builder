@@ -11,7 +11,7 @@ from nicegui_builder.plugins.pydantic.plugin import (
     _filters_field_classes,
     _group_fields_by_section,
 )
-from nicegui_builder.core.models import FieldSpec, WidgetSpec
+from nicegui_builder.core.models import FieldSpec, LayoutNode, WidgetSpec
 
 from .support import (
     DemoDateTimeModel,
@@ -35,27 +35,29 @@ def test_pydantic_plugin_resolves_literal_to_radio():
 def test_pydantic_plugin_builds_default_layout():
     layout = pydantic_plugin.build_layout(DemoModel)
 
-    assert layout[0]["card.tight"]["children"][0]["label"]["params"]["text"] == "DemoModel"
+    assert layout[0].methods == "card.tight"
+    assert layout[0].children[0].methods == "label"
+    assert layout[0].children[0].params["text"] == "DemoModel"
     general_section = extract_section(layout, "General")
     by_key = extract_section_fields(general_section)
 
-    assert by_key["field__name"]["classes"] == "col-span-6"
-    assert by_key["field__age"]["classes"] == "col-span-6"
-    assert by_key["field__active"]["classes"] == "col-span-12"
-    assert by_key["field__role"]["classes"] == "col-span-12"
+    assert by_key["field__name"].classes == "col-span-6"
+    assert by_key["field__age"].classes == "col-span-6"
+    assert by_key["field__active"].classes == "col-span-12"
+    assert by_key["field__role"].classes == "col-span-12"
 
 
 def test_pydantic_plugin_builds_compact_layout():
     layout = pydantic_plugin.build_layout(DemoModel, flavor="compact")
 
-    children = layout[0]["card.tight"]["children"]
-    general_section = next(child["column"] for child in children[1:] if next(iter(child.keys())) == "column")
+    children = layout[0].children
+    general_section = next(child for child in children[1:] if child.methods == "column")
     by_key = {
-        next(iter(child.keys())): next(iter(child.values()))
-        for child in general_section["children"][1:]
+        child.methods: child
+        for child in general_section.children[1:]
     }
-    assert by_key["field__name"]["classes"] == "w-full"
-    assert by_key["field__role"]["classes"] == "w-full"
+    assert by_key["field__name"].classes == "w-full"
+    assert by_key["field__role"].classes == "w-full"
 
 
 def test_pydantic_plugin_builds_detail_layout():
@@ -64,11 +66,11 @@ def test_pydantic_plugin_builds_detail_layout():
     general_section = extract_section(layout, "General")
     by_key = extract_section_fields(general_section)
 
-    assert by_key["field__name"]["methods"] == "label"
-    assert by_key["field__age"]["methods"] == "label"
-    assert by_key["field__active"]["methods"] == "label"
-    assert by_key["field__role"]["methods"] == "label"
-    assert by_key["field__name"]["classes"] == "col-span-12"
+    assert by_key["field__name"].context["builder_value"]["methods"] == "label"
+    assert by_key["field__age"].context["builder_value"]["methods"] == "label"
+    assert by_key["field__active"].context["builder_value"]["methods"] == "label"
+    assert by_key["field__role"].context["builder_value"]["methods"] == "label"
+    assert by_key["field__name"].classes == "col-span-12"
 
 
 def test_pydantic_plugin_builds_filters_layout():
@@ -77,26 +79,26 @@ def test_pydantic_plugin_builds_filters_layout():
     general_section = extract_section(layout, "General")
     by_key = extract_section_fields(general_section)
 
-    assert by_key["field__name"]["methods"] == "search"
-    assert by_key["field__age"]["methods"] == "std"
-    assert by_key["field__active"]["methods"] == "select"
-    assert by_key["field__role"]["methods"] == "std"
-    assert by_key["field__name"]["classes"] == "col-span-6"
-    assert by_key["field__active"]["classes"] == "col-span-6"
+    assert by_key["field__name"].context["builder_value"]["methods"] == "search"
+    assert by_key["field__age"].context["builder_value"]["methods"] == "std"
+    assert by_key["field__active"].context["builder_value"]["methods"] == "select"
+    assert by_key["field__role"].context["builder_value"]["methods"] == "std"
+    assert by_key["field__name"].classes == "col-span-6"
+    assert by_key["field__active"].classes == "col-span-6"
 
 
 def test_pydantic_plugin_builds_actionable_layout():
     layout = pydantic_plugin.build_layout(DemoModel, flavor="actionable")
 
-    children = layout[0]["card.tight"]["children"]
-    assert next(iter(children[1].keys())) == "column"
-    assert next(iter(children[2].keys())) == "separator"
-    assert next(iter(children[3].keys())) == "column"
-    assert children[3]["column"]["ref"] == "form:errors"
-    assert next(iter(children[4].keys())) == "row"
-    action_row_children = children[4]["row"]["children"]
-    assert action_row_children[0]["row"]["ref"] == "form:status"
-    assert action_row_children[1]["row"]["ref"] == "form:actions"
+    children = layout[0].children
+    assert children[1].methods == "column"
+    assert children[2].methods == "separator"
+    assert children[3].methods == "column"
+    assert children[3].ref == "form:errors"
+    assert children[4].methods == "row"
+    action_row_children = children[4].children
+    assert action_row_children[0].ref == "form:status"
+    assert action_row_children[1].ref == "form:actions"
 
 
 def test_pydantic_plugin_builds_structured_sections():
@@ -107,8 +109,8 @@ def test_pydantic_plugin_builds_structured_sections():
     collection_fields = extract_section_fields(extract_section(layout, "Collections"))
 
     assert "field__name" in general_fields
-    assert nested_fields["field__address"]["classes"] == "col-span-12"
-    assert collection_fields["field__tags"]["classes"] == "col-span-12"
+    assert nested_fields["field__address"].classes == "col-span-12"
+    assert collection_fields["field__tags"].classes == "col-span-12"
 
 
 def test_pydantic_plugin_resolves_nested_models_and_collections_as_structured_widgets():
@@ -190,8 +192,11 @@ def test_pydantic_plugin_build_section_node_returns_column_wrapper():
         flavor="std",
     )
 
-    assert node["column"]["classes"] == "w-full gap-2"
-    assert node["column"]["children"][0]["label"]["classes"] == "text-subtitle2 text-primary"
+    assert isinstance(node, LayoutNode)
+    assert node.methods == "column"
+    assert node.classes == "w-full gap-2"
+    assert node.children[0].methods == "label"
+    assert node.children[0].classes == "text-subtitle2 text-primary"
 
 
 def test_pydantic_plugin_build_field_context_and_resolve_field_node_delegate(monkeypatch):

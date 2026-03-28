@@ -1,6 +1,6 @@
 from .builder import builder
 from .core.table import TableHandle
-from .core.models import TableSpec
+from .core.models import LayoutNode, TableSpec
 from .plugins import plugin_registry
 from .plugins.registry import (
     maybe_render_collection,
@@ -49,16 +49,15 @@ def table(source, flavor: str = "std"):
     rows = prepare_collection_rows(plugin, source)
 
     layout = [
-        {
-            widget.component: {
-                "params": {
-                    **widget.params,
-                    "rows": rows,
-                },
-                "props": widget.props,
-                "classes": widget.classes,
-            }
-        }
+        LayoutNode(
+            methods=widget.component,
+            params={
+                **widget.params,
+                "rows": rows,
+            },
+            props=widget.props,
+            classes=widget.classes,
+        )
     ]
 
     table_spec.layout = layout

@@ -2,6 +2,7 @@ from datetime import datetime
 import typing as t
 
 from pydantic import BaseModel, Field
+from nicegui_builder.core.models import LayoutNode
 
 
 class DemoModel(BaseModel):
@@ -27,24 +28,23 @@ class DemoDateTimeModel(BaseModel):
 
 
 def extract_section(layout, title: str):
-    children = layout[0]["card.tight"]["children"]
+    children = layout[0].children
     for child in children[1:]:
-        if next(iter(child.keys())) != "column":
+        if child.methods != "column":
             continue
-        column = child["column"]
-        if column["children"][0]["label"]["params"]["text"] == title:
-            return column
+        if child.children[0].methods == "label" and child.children[0].params["text"] == title:
+            return child
     raise KeyError(title)
 
 
-def extract_section_fields(section_column):
-    children = section_column["children"]
+def extract_section_fields(section_column: LayoutNode):
+    children = section_column.children
     grid = next(
-        child["grid"]
+        child
         for child in children
-        if next(iter(child.keys())) == "grid"
+        if child.methods == "grid"
     )
     return {
-        next(iter(child.keys())): next(iter(child.values()))
-        for child in grid["children"]
+        child.methods: child
+        for child in grid.children
     }

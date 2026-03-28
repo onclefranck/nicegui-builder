@@ -5,6 +5,7 @@ from typing import Callable
 from nicegui.elements.mixins.value_element import ValueElement
 
 from .context import builder_ctx, component_refs, ensure_builder_runtime
+from .models import LayoutNode
 
 
 class DateTimeInput(ValueElement):
@@ -160,18 +161,17 @@ class DateTimeInput(ValueElement):
     def _internal_ref(self, part: str) -> str:
         return f"__datetime_input:{id(self)}:{part}"
 
-    def _part_node(self, *, methods: str, ref: str, value, options: dict[str, str]) -> dict:
-        return {
-            methods: {
-                "ref": ref,
-                "params": {
-                    "value": value,
-                    "label": options["label"],
-                },
-                "classes": options["classes"],
-                "props": options["props"],
-            }
-        }
+    def _part_node(self, *, methods: str, ref: str, value, options: dict[str, str]) -> LayoutNode:
+        return LayoutNode(
+            methods=methods,
+            ref=ref,
+            params={
+                "value": value,
+                "label": options["label"],
+            },
+            classes=options["classes"],
+            props=options["props"],
+        )
 
     def _layout(
         self,
@@ -181,34 +181,33 @@ class DateTimeInput(ValueElement):
         time_value,
         date_options: dict[str, str],
         time_options: dict[str, str],
-    ) -> list[dict]:
+    ) -> list[LayoutNode]:
         container_ref = self._internal_ref("container")
         date_ref = self.date_ref or self._internal_ref("date")
         time_ref = self.time_ref or self._internal_ref("time")
 
         return [
-            {
-                container_config["methods"]: {
-                    "ref": container_ref,
-                    "params": dict(container_config["params"]),
-                    "classes": container_config["classes"],
-                    "props": container_config["props"],
-                    "children": [
-                        self._part_node(
-                            methods="date_input",
-                            ref=date_ref,
-                            value=date_value,
-                            options=date_options,
-                        ),
-                        self._part_node(
-                            methods="time_input",
-                            ref=time_ref,
-                            value=time_value,
-                            options=time_options,
-                        ),
-                    ],
-                }
-            }
+            LayoutNode(
+                methods=container_config["methods"],
+                ref=container_ref,
+                params=dict(container_config["params"]),
+                classes=container_config["classes"],
+                props=container_config["props"],
+                children=[
+                    self._part_node(
+                        methods="date_input",
+                        ref=date_ref,
+                        value=date_value,
+                        options=date_options,
+                    ),
+                    self._part_node(
+                        methods="time_input",
+                        ref=time_ref,
+                        value=time_value,
+                        options=time_options,
+                    ),
+                ],
+            )
         ]
 
     def _assign_built_parts(self, refs: dict) -> None:
@@ -331,7 +330,7 @@ def build_split_datetime_node(
     time_ref: str | None = None,
     date_options: dict | None = None,
     time_options: dict | None = None,
-) -> dict:
+) -> LayoutNode:
     logical_ref = ref or f"field:{field_name}"
     normalized_container = DateTimeInput.normalize_container(container)
     normalized_date_options = DateTimeInput.normalize_part_options(
@@ -351,10 +350,10 @@ def build_split_datetime_node(
         },
     )
 
-    return {
-        "methods": "datetime_input",
-        "ref": logical_ref,
-        "params": {
+    return LayoutNode(
+        methods="datetime_input",
+        ref=logical_ref,
+        params={
             "value": raw_value,
             "container": normalized_container,
             "date_ref": date_ref or f"{logical_ref}:date",
@@ -362,8 +361,7 @@ def build_split_datetime_node(
             "date_options": normalized_date_options,
             "time_options": normalized_time_options,
         },
-        "props": component_props,
-        "classes": component_classes,
-        "children": [],
-    }
+        props=component_props,
+        classes=component_classes,
+    )
 

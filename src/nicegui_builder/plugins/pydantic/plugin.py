@@ -2,7 +2,7 @@ import typing as t
 
 from pydantic import BaseModel
 
-from nicegui_builder.core.models import FieldSpec, WidgetSpec
+from nicegui_builder.core.models import FieldSpec, LayoutNode, WidgetSpec
 
 from .inspect import build_field_context
 from .mapping import (
@@ -151,42 +151,43 @@ def _build_section_node(
             widget_variant = "std"
         widget = resolve_widget(field, variant=widget_variant)
         field_children.append(
-            {
-                f"field__{field.name}": {
-                    "classes": field_classes_resolver(field, widget),
-                    "methods": widget_variant,
-                }
-            }
+            LayoutNode(
+                methods=f"field__{field.name}",
+                classes=field_classes_resolver(field, widget),
+                context={
+                    "builder_value": {
+                        "classes": field_classes_resolver(field, widget),
+                        "methods": widget_variant,
+                    }
+                },
+            )
         )
 
     section_children = [
-        {
-            "label": {
-                "params": {"text": title},
-                "classes": "text-subtitle2 text-primary",
-            }
-        }
+        LayoutNode(
+            methods="label",
+            params={"text": title},
+            classes="text-subtitle2 text-primary",
+        )
     ]
 
     if flavor == "compact":
         section_children.extend(field_children)
     else:
         section_children.append(
-            {
-                "grid": {
-                    "params": {"columns": 12},
-                    "classes": "w-full gap-3",
-                    "children": field_children,
-                }
-            }
+            LayoutNode(
+                methods="grid",
+                params={"columns": 12},
+                classes="w-full gap-3",
+                children=field_children,
+            )
         )
 
-    return {
-        "column": {
-            "classes": "w-full gap-2",
-            "children": section_children,
-        }
-    }
+    return LayoutNode(
+        methods="column",
+        classes="w-full gap-2",
+        children=section_children,
+    )
 
 
 class PydanticPlugin:
@@ -273,14 +274,11 @@ class PydanticPlugin:
         else:
             field_classes_resolver = _default_field_classes
         children = [
-            {
-                "label": {
-                    "params": {
-                        "text": title,
-                    },
-                    "classes": "text-lg",
-                }
-            }
+            LayoutNode(
+                methods="label",
+                params={"text": title},
+                classes="text-lg",
+            )
         ]
 
         for section_title, section_fields in _group_fields_by_section(fields):
@@ -297,42 +295,37 @@ class PydanticPlugin:
         if flavor == "actionable":
             children.extend(
                 [
-                    {"separator": None},
-                    {
-                        "column": {
-                            "ref": "form:errors",
-                            "classes": "w-full gap-2",
-                        }
-                    },
-                    {
-                        "row": {
-                            "classes": "w-full items-center justify-between gap-2",
-                            "children": [
-                                {
-                                    "row": {
-                                        "ref": "form:status",
-                                        "classes": "items-center gap-2",
-                                    }
-                                },
-                                {
-                                    "row": {
-                                        "ref": "form:actions",
-                                        "classes": "items-center justify-end gap-2",
-                                    }
-                                },
-                            ],
-                        }
-                    },
+                    LayoutNode(methods="separator"),
+                    LayoutNode(
+                        methods="column",
+                        ref="form:errors",
+                        classes="w-full gap-2",
+                    ),
+                    LayoutNode(
+                        methods="row",
+                        classes="w-full items-center justify-between gap-2",
+                        children=[
+                            LayoutNode(
+                                methods="row",
+                                ref="form:status",
+                                classes="items-center gap-2",
+                            ),
+                            LayoutNode(
+                                methods="row",
+                                ref="form:actions",
+                                classes="items-center justify-end gap-2",
+                            ),
+                        ],
+                    ),
                 ]
             )
 
         return [
-            {
-                "card.tight": {
-                    "classes": "w-full p-4 gap-3",
-                    "children": children,
-                }
-            }
+            LayoutNode(
+                methods="card.tight",
+                classes="w-full p-4 gap-3",
+                children=children,
+            )
         ]
 
     def resolve_widget(self, spec: FieldSpec, variant: str = "std") -> WidgetSpec:

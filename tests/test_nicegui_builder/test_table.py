@@ -4,7 +4,7 @@ import importlib
 import pytest
 
 table_module = importlib.import_module("nicegui_builder.table")
-from nicegui_builder.core.models import CollectionSpec, FieldSpec, WidgetSpec
+from nicegui_builder.core.models import CollectionSpec, FieldSpec, LayoutNode, WidgetSpec
 
 
 class FakePlugin:
@@ -89,8 +89,10 @@ def test_table_uses_prepare_rows_for_generic_builder_path(monkeypatch):
 
     handle = table_module.table([{"name": "Ada"}])
 
-    assert handle.spec.layout[0]["table"]["params"]["rows"] == [{"name": "Prepared"}]
-    assert calls["layout"][0]["table"]["params"]["rows"] == [{"name": "Prepared"}]
+    assert isinstance(handle.spec.layout[0], LayoutNode)
+    assert handle.spec.layout[0].methods == "table"
+    assert handle.spec.layout[0].params["rows"] == [{"name": "Prepared"}]
+    assert calls["layout"][0].params["rows"] == [{"name": "Prepared"}]
 
 
 def test_table_falls_back_to_source_to_dict_when_plugin_has_no_prepare_rows(monkeypatch):
@@ -112,7 +114,7 @@ def test_table_falls_back_to_source_to_dict_when_plugin_has_no_prepare_rows(monk
     handle = table_module.table(ToDictSource())
 
     assert calls["orient"] == "records"
-    assert handle.spec.layout[0]["table"]["params"]["rows"] == [{"name": "From source"}]
+    assert handle.spec.layout[0].params["rows"] == [{"name": "From source"}]
 
 
 def test_table_rejects_plugins_without_table_capabilities(monkeypatch):
