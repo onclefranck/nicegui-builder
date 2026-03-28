@@ -7,7 +7,7 @@ from .form import (
     LiveButtonBinding,
     LivePanelBinding,
 )
-from .models import ActionSpec, CollectionSpec, FieldSpec, FormSpec, LayoutNode, TableSpec, WidgetSpec
+from .models import ActionSpec, CollectionSpec, FieldSpec, FormSpec, LayoutNode, ResolvedFieldNode, TableSpec, WidgetSpec
 from .table import TableHandle
 from .view import ViewHandle
 
@@ -20,6 +20,7 @@ __all__ = [
     "FormState",
     "FormValidationResult",
     "LayoutNode",
+    "ResolvedFieldNode",
     "TableSpec",
     "TableHandle",
     "ViewHandle",

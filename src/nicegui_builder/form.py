@@ -32,12 +32,12 @@ def _resolve_plugin_field(key: str, value: dict):
         fieldname,
         value,
     )
-    ctx.update(resolved["field_ctx"])
-    ctx["default_info"] = resolved.get("default_info")
-    logical_ref = value.get("ref") or resolved["node"].get("ref") or f"field:{fieldname}"
-    resolved["node"]["ref"] = logical_ref
+    ctx.update(resolved.field_ctx)
+    ctx["default_info"] = resolved.default_info
+    logical_ref = value.get("ref") or resolved.node.ref or f"field:{fieldname}"
+    resolved.node.ref = logical_ref
     ctx.setdefault("_field_refs", {})[fieldname] = logical_ref
-    return resolved["node"]
+    return resolved.node
 
 
 register("field", _resolve_plugin_field)

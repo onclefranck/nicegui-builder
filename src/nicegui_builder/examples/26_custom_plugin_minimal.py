@@ -9,7 +9,7 @@ from dataclasses import dataclass
 from nicegui import ui
 
 import nicegui_builder
-from nicegui_builder.core.models import FieldSpec, WidgetSpec
+from nicegui_builder.core.models import FieldSpec, LayoutNode, ResolvedFieldNode, WidgetSpec
 from nicegui_builder.plugins import plugin_registry
 from nicegui_builder.utils import load_layout
 
@@ -65,13 +65,17 @@ class LostSockPlugin:
             params["text"] = fieldname.replace("_", " ").title()
         else:
             params["label"] = fieldname.replace("_", " ").title()
-        node = {
-            "methods": widget.component,
-            "params": params,
-            "props": widget.props,
-            "classes": value.get("classes", widget.classes),
-        }
-        return {"field_ctx": field_ctx, "default_info": {"methods": widget.component}, "node": node}
+        node = LayoutNode(
+            methods=widget.component,
+            params=params,
+            props=widget.props,
+            classes=value.get("classes", widget.classes),
+        )
+        return ResolvedFieldNode(
+            field_ctx=field_ctx,
+            default_info={"methods": widget.component},
+            node=node,
+        )
 
     def resolve_widget(self, spec: FieldSpec, variant: str = "std") -> WidgetSpec:
         if spec.name == "urgent" or variant == "switch":

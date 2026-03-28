@@ -1,4 +1,5 @@
 from .inspect import build_field_context
+from nicegui_builder.core.models import LayoutNode, ResolvedFieldNode
 from nicegui_builder.core.datetime_inputs import DateTimeInput, build_split_datetime_node
 from .mapping import (
     resolve_map_type,
@@ -6,7 +7,7 @@ from .mapping import (
 )
 
 
-def _build_datetime_split_node(field_ctx: dict, default_info: dict, value: dict | None) -> dict:
+def _build_datetime_split_node(field_ctx: dict, default_info: dict, value: dict | None) -> LayoutNode:
     value = value or {}
     label = field_ctx.get("attributes_title") or field_ctx["fieldname"]
     raw_value = field_ctx.get("fieldvalue")
@@ -26,18 +27,22 @@ def _build_datetime_split_node(field_ctx: dict, default_info: dict, value: dict 
     if raw_container is None or "props" not in raw_container:
         container["props"] = default_info.get("props", container.get("props", ""))
 
-    return build_split_datetime_node(
-        field_name=field_ctx["fieldname"],
-        label=label,
-        raw_value=raw_value,
-        ref=logical_ref,
-        container=container,
-        component_props=value.get("props", ""),
-        component_classes=value.get("classes", ""),
+    return LayoutNode.from_dict(
+        build_split_datetime_node(
+            field_name=field_ctx["fieldname"],
+            label=label,
+            raw_value=raw_value,
+            ref=logical_ref,
+            container=container,
+            component_props=value.get("props", ""),
+            component_classes=value.get("classes", ""),
+        )
     )
 
 
-def resolve_field_node(model_class, model_instance, fieldname: str, value: dict | None) -> dict:
+def resolve_field_node(
+    model_class, model_instance, fieldname: str, value: dict | None
+) -> ResolvedFieldNode:
     value = value or {}
 
     field_ctx = build_field_context(model_class, model_instance, fieldname)
@@ -50,11 +55,11 @@ def resolve_field_node(model_class, model_instance, fieldname: str, value: dict 
     )
 
     if map_type == "datetime" and widget.variant == "split":
-        return {
-            "field_ctx": field_ctx,
-            "default_info": default_info,
-            "node": _build_datetime_split_node(field_ctx, default_info, value),
-        }
+        return ResolvedFieldNode(
+            field_ctx=field_ctx,
+            default_info=default_info,
+            node=_build_datetime_split_node(field_ctx, default_info, value),
+        )
 
     params = dict(widget.params)
     params.update(value.get("params") or {})
@@ -74,13 +79,13 @@ def resolve_field_node(model_class, model_instance, fieldname: str, value: dict 
         if part
     )
 
-    return {
-        "field_ctx": field_ctx,
-        "default_info": default_info,
-        "node": {
-            "methods": widget.component,
-            "params": params,
-            "props": props,
-            "classes": classes,
-        },
-    }
+    return ResolvedFieldNode(
+        field_ctx=field_ctx,
+        default_info=default_info,
+        node=LayoutNode(
+            methods=widget.component,
+            params=params,
+            props=props,
+            classes=classes,
+        ),
+    )

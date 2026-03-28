@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Protocol
 
-from nicegui_builder.core.models import CollectionSpec, FieldSpec, WidgetSpec
+from nicegui_builder.core.models import CollectionSpec, FieldSpec, ResolvedFieldNode, WidgetSpec
 
 
 class SourcePlugin(Protocol):
@@ -19,7 +19,7 @@ class FieldPlugin(SourcePlugin, Protocol):
 
     def resolve_field_node(
         self, model_class, model_instance, fieldname: str, value: dict | None
-    ) -> dict: ...
+    ) -> ResolvedFieldNode: ...
 
     def resolve_widget(self, spec: FieldSpec, variant: str = "std") -> WidgetSpec: ...
 

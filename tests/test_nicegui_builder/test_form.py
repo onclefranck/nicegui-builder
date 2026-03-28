@@ -5,7 +5,7 @@ from pathlib import Path
 import pytest
 
 form_module = importlib.import_module("nicegui_builder.form")
-from nicegui_builder.core.models import FieldSpec
+from nicegui_builder.core.models import FieldSpec, LayoutNode, ResolvedFieldNode
 
 
 class FakePlugin:
@@ -18,11 +18,11 @@ class FakePlugin:
         return self.field_specs
 
     def resolve_field_node(self, model_class, model_instance, fieldname, value):
-        return {
-            "field_ctx": {"fieldname": fieldname},
-            "default_info": {},
-            "node": {"methods": "input", "params": {"label": fieldname}},
-        }
+        return ResolvedFieldNode(
+            node=LayoutNode(methods="input", params={"label": fieldname}),
+            field_ctx={"fieldname": fieldname},
+            default_info={},
+        )
 
     def build_layout(self, source, flavor=""):
         return [{"label": {"params": {"text": "fallback layout"}}}]
@@ -102,11 +102,11 @@ def test_resolve_plugin_field_updates_builder_context_and_assigns_field_ref():
             assert model_instance == "instance"
             assert fieldname == "name"
             assert value == {"classes": "w-full"}
-            return {
-                "field_ctx": {"title": "Name"},
-                "default_info": {"methods": "input"},
-                "node": {"params": {"label": "Name"}},
-            }
+            return ResolvedFieldNode(
+                node=LayoutNode(methods="input", params={"label": "Name"}),
+                field_ctx={"title": "Name"},
+                default_info={"methods": "input"},
+            )
 
     ctx = {
         "plugin": FieldPlugin(),
@@ -120,7 +120,7 @@ def test_resolve_plugin_field_updates_builder_context_and_assigns_field_ref():
     finally:
         form_module.builder_ctx.reset(token)
 
-    assert node["ref"] == "field:name"
+    assert node.ref == "field:name"
     assert current["fieldname"] == "name"
     assert current["title"] == "Name"
     assert current["default_info"] == {"methods": "input"}
@@ -130,11 +130,11 @@ def test_form_reraises_missing_layout_when_plugin_cannot_build_one(monkeypatch):
     plugin = types.SimpleNamespace(
         name="fake",
         inspect_fields=lambda source: [FieldSpec(name="name", python_type=str)],
-        resolve_field_node=lambda model_class, model_instance, fieldname, value: {
-            "field_ctx": {"fieldname": fieldname},
-            "default_info": {},
-            "node": {"methods": "input", "params": {"label": fieldname}},
-        },
+        resolve_field_node=lambda model_class, model_instance, fieldname, value: ResolvedFieldNode(
+            node=LayoutNode(methods="input", params={"label": fieldname}),
+            field_ctx={"fieldname": fieldname},
+            default_info={},
+        ),
     )
     monkeypatch.setattr(form_module.plugin_registry, "resolve", lambda source: plugin)
     monkeypatch.setattr(

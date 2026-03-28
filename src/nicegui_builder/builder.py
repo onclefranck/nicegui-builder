@@ -1,5 +1,6 @@
 from nicegui import ui
 from importlib import import_module
+from .core.models import LayoutNode
 from .core.context import builder_ctx, component_refs, ensure_builder_runtime, get_root_component, set_root_component
 
 builder_expansion_registry = {}
@@ -21,6 +22,9 @@ def resolve_context_value(value, ctx):
 
 
 def _normalize_layout_entry(component: dict, ctx: dict) -> dict:
+    if isinstance(component, LayoutNode):
+        return component.to_builder_dict()
+
     key, value = next(iter(component.items()))
     if value is None:
         value = {}
@@ -28,6 +32,8 @@ def _normalize_layout_entry(component: dict, ctx: dict) -> dict:
     if "__" in key:
         register_key, builder_key = key.split("__", 1)
         resolved = builder_expansion_registry[register_key](builder_key, value)
+        if isinstance(resolved, LayoutNode):
+            return resolved.to_builder_dict()
         return {
             "methods": resolved.get("methods"),
             "params": resolved.get("params") or {},
