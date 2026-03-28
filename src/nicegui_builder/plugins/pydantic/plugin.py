@@ -73,17 +73,29 @@ def _actionable_field_classes(spec: FieldSpec, widget: WidgetSpec) -> str:
     return _default_field_classes(spec, widget)
 
 
+def _field_meta(spec: FieldSpec) -> dict:
+    return spec.source_meta
+
+
+def _field_section_key(spec: FieldSpec) -> str:
+    return _field_meta(spec).get("section", "general")
+
+
+def _field_group_label(spec: FieldSpec) -> str:
+    meta = _field_meta(spec)
+    if "group_label" in meta:
+        return meta["group_label"]
+    if meta.get("is_nested_model"):
+        return "Nested models"
+    if meta.get("is_collection"):
+        return "Collections"
+    if meta.get("is_structured"):
+        return "Structured data"
+    return "General"
+
+
 def _filter_variant_for_field(spec: FieldSpec) -> str:
-    if spec.python_type is bool:
-        return "select"
-
-    if spec.choices:
-        return "std"
-
-    if spec.python_type in {int, float}:
-        return "std"
-
-    return "search"
+    return _field_meta(spec).get("filter_variant", "search")
 
 
 def _is_pydantic_model_type(annotation) -> bool:
@@ -99,13 +111,7 @@ def _is_collection_annotation(annotation) -> bool:
 
 
 def _section_for_field(spec: FieldSpec) -> str:
-    if spec.source_meta.get("is_nested_model"):
-        return "Nested models"
-    if spec.source_meta.get("is_collection"):
-        return "Collections"
-    if spec.source_meta.get("is_structured"):
-        return "Structured data"
-    return "General"
+    return _field_group_label(spec)
 
 
 def _group_fields_by_section(fields: list[FieldSpec]) -> list[tuple[str, list[FieldSpec]]]:
@@ -205,9 +211,26 @@ class PydanticPlugin:
             is_nested_model = _is_pydantic_model_type(annotation)
             is_collection = _is_collection_annotation(annotation)
             is_structured = map_type in {"dict", "list", "set", "tuple", "Json"} or is_nested_model
+            section = "structured" if is_structured else "general"
+
+            if is_nested_model:
+                group_label = "Nested models"
+            elif is_collection:
+                group_label = "Collections"
+            elif is_structured:
+                group_label = "Structured data"
+            else:
+                group_label = "General"
 
             if map_type in {"Literal", "Enum"}:
                 choices = extract_options(field_info)
+
+            if annotation is bool:
+                filter_variant = "select"
+            elif choices or annotation in {int, float}:
+                filter_variant = "std"
+            else:
+                filter_variant = "search"
 
             fields.append(
                 FieldSpec(
@@ -226,7 +249,9 @@ class PydanticPlugin:
                         "is_nested_model": is_nested_model,
                         "is_collection": is_collection,
                         "is_structured": is_structured,
-                        "section": "structured" if is_structured else "general",
+                        "section": section,
+                        "group_label": group_label,
+                        "filter_variant": filter_variant,
                     },
                 )
             )

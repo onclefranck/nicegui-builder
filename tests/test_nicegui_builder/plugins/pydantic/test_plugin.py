@@ -121,6 +121,9 @@ def test_pydantic_plugin_resolves_nested_models_and_collections_as_structured_wi
     assert address_widget.component == "textarea"
     assert "font-mono" in address_widget.classes
     assert tags_widget.component == "textarea"
+    assert by_name["address"].source_meta["group_label"] == "Nested models"
+    assert by_name["tags"].source_meta["group_label"] == "Collections"
+    assert by_name["tags"].source_meta["filter_variant"] == "search"
 
 
 def test_pydantic_plugin_resolves_datetime_to_split_widget():
@@ -133,6 +136,7 @@ def test_pydantic_plugin_resolves_datetime_to_split_widget():
     assert widget.component == "datetime_input"
     assert widget.variant == "split"
     assert widget.params["container"]["methods"] == "row"
+    assert field.source_meta["filter_variant"] == "search"
 
 
 def test_pydantic_plugin_supports_model_types_and_instances_but_not_other_values():
