@@ -45,6 +45,26 @@ def _normalize_layout_entry(component: dict, ctx: dict) -> LayoutNode:
     return LayoutNode.from_layout_entry(component)
 
 
+def _prepare_node(component, ctx: dict) -> LayoutNode:
+    normalized = _normalize_layout_entry(component, ctx)
+    params = {
+        key: resolve_context_value(value, ctx)
+        for key, value in normalized.params.items()
+    }
+    classes = resolve_context_value(normalized.classes, ctx)
+    props = resolve_context_value(normalized.props, ctx)
+
+    return LayoutNode(
+        methods=normalized.methods,
+        params=params,
+        props=props,
+        classes=classes,
+        ref=normalized.ref,
+        children=normalized.children,
+        context=normalized.context,
+    )
+
+
 def _render_method_chain(method_chain: str, params: dict):
     ui_component = None
     methods = method_chain.split('.')
@@ -68,38 +88,24 @@ def visit(components: list):
 
         ctx = dict(builder_ctx.get())
         ctx_token = builder_ctx.set(ctx)
-        normalized = _normalize_layout_entry(component, ctx)
-        params = dict(normalized.params)
-        classes = normalized.classes
-        props = normalized.props
-        ref = normalized.ref
-        children = normalized.children
+        prepared = _prepare_node(component, ctx)
+        ui_component = _render_method_chain(prepared.methods, prepared.params)
 
-        for k, v in params.items():
-            params[k] = resolve_context_value(v, ctx)
+        if prepared.classes:
+            ui_component.classes(prepared.classes)
 
-        classes = resolve_context_value(classes, ctx)
-        props = resolve_context_value(props, ctx)
-        ui_component = _render_method_chain(normalized.methods, params)
-        
-        # apply classes if any
-        if classes:
-            ui_component.classes(classes)
-        
-        # apply props if any
-        if props:
-            ui_component.props(props)
+        if prepared.props:
+            ui_component.props(prepared.props)
 
-        if ref:
+        if prepared.ref:
             refs = component_refs(ctx)
-            if ref in refs:
-                raise ValueError(f"duplicate component ref: {ref}")
-            refs[ref] = ui_component
+            if prepared.ref in refs:
+                raise ValueError(f"duplicate component ref: {prepared.ref}")
+            refs[prepared.ref] = ui_component
 
-        # process children if any
-        if children:
+        if prepared.children:
             with ui_component:
-                visit(children)
+                visit(prepared.children)
 
         set_root_component(ctx, ui_component)
 
