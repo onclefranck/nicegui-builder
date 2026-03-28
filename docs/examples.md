@@ -46,11 +46,11 @@ These examples should help a user understand the project in a few minutes.
 
 Goal:
 
-- show how `builder(...)` renders a YAML layout
+- show how `builder(...)` renders a sidecar YAML layout
 
 Covers:
 
-- YAML layout loading
+- sidecar YAML loading
 - simple components
 - `builder(...)`
 
@@ -62,12 +62,12 @@ Suggested file:
 
 Goal:
 
-- show that layouts can also be provided as Python data structures
+- show a second small builder example with a sidecar layout file
 
 Covers:
 
-- inline layout
-- no external YAML file
+- sidecar layout loading through a small utility
+- another small declarative layout
 
 Suggested file:
 

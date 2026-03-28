@@ -1,0 +1,16 @@
+- card.tight:
+    classes: w-full max-w-3xl mx-auto p-4 gap-3
+    children:
+    - label:
+        params:
+          text: Lost sock pass
+        classes: text-h6
+    - label:
+        params:
+          text: A custom plugin can be tiny and still be useful.
+        classes: text-body2 text-grey-7
+    - field__owner_name:
+    - field__sock_description:
+        methods: textarea
+    - field__urgent:
+        methods: switch

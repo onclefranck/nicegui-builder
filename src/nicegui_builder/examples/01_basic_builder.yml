@@ -1,0 +1,11 @@
+- card.tight:
+    classes: w-full max-w-xl mx-auto p-4 gap-2
+    children:
+    - label:
+        params:
+          text: Festival of Mismatched Socks
+        classes: text-h5
+    - label:
+        params:
+          text: Three days of applause, confusion, and highly decorative laundry decisions.
+        classes: text-body2 text-grey-7

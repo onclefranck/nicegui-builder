@@ -1,15 +1,10 @@
-import pathlib as p
-import yaml
-
 from nicegui import ui
 import nicegui_builder
+from nicegui_builder.utils import load_layout
 
 
 def build_ui():
-    with p.Path("src/nicegui_builder/examples/demo_basic_builder.yml").open(encoding="utf-8") as file:
-        layout = yaml.safe_load(file)
-
-    ui.builder(layout)
+    ui.builder(load_layout("demo_basic_builder"))
 
 
 def main(*, port: int = 8080, host: str | None = None, reload: bool = False):

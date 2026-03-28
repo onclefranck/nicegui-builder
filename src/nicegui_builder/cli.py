@@ -12,6 +12,7 @@ from nicegui import ui
 
 from .builder import builder
 from .form import form
+from .utils import load_layout
 
 
 @dataclass(frozen=True)
@@ -212,9 +213,7 @@ def run_example(name: str, *, port: int = 8080, host: str | None = None, reload:
 
 
 def run_layout(path: str, *, port: int = 8080, host: str | None = None, reload: bool = False):
-    layout_path = Path(path)
-    with layout_path.open(encoding="utf-8") as file:
-        layout = yaml.safe_load(file)
+    layout = load_layout(path)
 
     def build_ui():
         builder(layout)

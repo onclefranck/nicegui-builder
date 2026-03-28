@@ -102,19 +102,19 @@ See [`docs/public-api.md`](docs/public-api.md) for the current stable surface.
 Use `builder(...)` when you already have a declarative layout.
 
 ```python
-import yaml
-from pathlib import Path
-
 from nicegui import ui
 from nicegui_builder import builder
+from nicegui_builder.utils import load_layout
 
-layout = yaml.safe_load(
-    Path("src/nicegui_builder/examples/demo_basic_builder.yml").read_text(encoding="utf-8")
-)
+layout = load_layout("demo_basic_builder")
 
 builder(layout)
 ui.run()
 ```
+
+`load_layout(...)` is a small convenience helper for YAML layouts.
+If you pass only a layout name and a matching `.yml` or `.yaml` file lives next to the calling Python module, that adjacent file is loaded automatically.
+Otherwise, the provided path is used as-is.
 
 `builder(...)` returns the root NiceGUI component.
 If layout nodes declare `ref`, that root component also exposes a `component_refs` dictionary for later lookup.

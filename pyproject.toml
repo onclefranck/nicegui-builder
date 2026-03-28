@@ -49,6 +49,8 @@ nicegui_builder = [
   "examples/*.yaml",
   "plugins/pydantic/*.yml",
   "plugins/pydantic/*.yaml",
+  "plugins/pydantic/examples/*.yml",
+  "plugins/pydantic/examples/*.yaml",
 ]
 
 [tool.setuptools.dynamic]

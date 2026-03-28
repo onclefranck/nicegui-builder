@@ -1,11 +1,11 @@
 import enum
 from functools import cache
-import pathlib as p
 import types
 import typing as t
 
 from pydantic import BaseModel
-import yaml
+
+from ...utils import load_layout
 
 
 NoneType = type(None)
@@ -100,11 +100,7 @@ def unwrap_optional_annotation(annotation):
 
 @cache
 def load_pydantic_widget_map():
-    mod_folder = p.Path(__file__).parent
-    map_path = mod_folder / "pydantic-nicegui.yml"
-    with map_path.open(encoding="utf-8") as f:
-        mapping = yaml.safe_load(f)
-    return mapping
+    return load_layout("pydantic-nicegui.yml", caller_file=__file__)
 
 
 @cache

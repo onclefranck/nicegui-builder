@@ -32,6 +32,14 @@ from nicegui_builder import (
 
 These names are expected to remain importable across normal library evolution.
 
+The following utility import is also part of the supported public surface:
+
+```python
+from nicegui_builder.utils import load_layout
+```
+
+`load_layout(...)` loads a YAML layout from an explicit path, or from a sidecar `.yml` / `.yaml` file adjacent to the calling module when only a layout name is provided.
+
 In addition, the observable behavior of the top-level entry points is part of the stable contract.
 Examples:
 

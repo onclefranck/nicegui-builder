@@ -7,35 +7,11 @@ What they got is a banner, a slogan, and alarming confidence.
 from nicegui import ui
 
 import nicegui_builder
-
-
-LAYOUT = [
-    {
-        "card.tight": {
-            "classes": "w-full max-w-xl mx-auto p-4 gap-2",
-            "children": [
-                {
-                    "label": {
-                        "params": {"text": "Festival of Mismatched Socks"},
-                        "classes": "text-h5",
-                    }
-                },
-                {
-                    "label": {
-                        "params": {
-                            "text": "Three days of applause, confusion, and highly decorative laundry decisions."
-                        },
-                        "classes": "text-body2 text-grey-7",
-                    }
-                },
-            ],
-        }
-    }
-]
+from nicegui_builder.utils import load_layout
 
 
 def build_ui():
-    ui.builder(LAYOUT)
+    ui.builder(load_layout("01_basic_builder"))
 
 
 def main(*, port: int = 8080, host: str | None = None, reload: bool = False):

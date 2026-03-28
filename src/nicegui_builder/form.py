@@ -1,24 +1,21 @@
 from importlib import import_module
 import pathlib as p
 
-import yaml
-
 from .builder import builder, register, builder_ctx
 from .core.context import component_refs, ensure_builder_runtime
 from .core.form import FormHandle
 from .core.models import FormSpec
 from .plugins import plugin_registry
 from .plugins.registry import build_form_layout, maybe_render_form, resolve_field_plugin
+from .utils import load_layout
 
 
 def _resolve_layout_from_source(source, flavor: str):
     source_class = source if isinstance(source, type) else source.__class__
     source_name = source_class.__name__
     layout_name = f"{source_name}-{flavor}" if flavor else source_name
-    mod_folder = p.Path(import_module(source_class.__module__).__file__).parent
-    layout_path = mod_folder / f"{layout_name}.yaml"
-    with layout_path.open(encoding="utf-8") as f:
-        return yaml.safe_load(f)
+    module_file = p.Path(import_module(source_class.__module__).__file__)
+    return load_layout(layout_name, caller_file=module_file)
 
 
 def _resolve_plugin_field(key: str, value: dict):

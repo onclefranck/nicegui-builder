@@ -11,6 +11,7 @@ from nicegui import ui
 import nicegui_builder
 from nicegui_builder.core.models import FieldSpec, WidgetSpec
 from nicegui_builder.plugins import plugin_registry
+from nicegui_builder.utils import load_layout
 
 
 @dataclass
@@ -43,32 +44,7 @@ class LostSockPlugin:
 
     def build_layout(self, source, flavor: str = ""):
         del flavor
-        return [
-            {
-                "card.tight": {
-                    "classes": "w-full max-w-3xl mx-auto p-4 gap-3",
-                    "children": [
-                        {
-                            "label": {
-                                "params": {"text": "Lost sock pass"},
-                                "classes": "text-h6",
-                            }
-                        },
-                        {
-                            "label": {
-                                "params": {
-                                    "text": "A custom plugin can be tiny and still be useful."
-                                },
-                                "classes": "text-body2 text-grey-7",
-                            }
-                        },
-                        {"field__owner_name": None},
-                        {"field__sock_description": {"methods": "textarea"}},
-                        {"field__urgent": {"methods": "switch"}},
-                    ],
-                }
-            }
-        ]
+        return load_layout("26_custom_plugin_minimal")
 
     def build_field_context(self, model_class, model_instance, fieldname: str) -> dict:
         del model_class
