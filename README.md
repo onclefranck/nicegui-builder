@@ -19,7 +19,7 @@ It currently provides three main entry points:
 
 - `builder(layout)` for declarative NiceGUI rendering
 - `form(source, flavor="")` for plugin-driven forms
-- `table(source, variant="std")` for plugin-driven tabular views
+- `table(source, flavor="std")` for plugin-driven tabular views
 
 When `nicegui_builder` is imported, it also attaches those entry points to NiceGUI's `ui` object at runtime:
 
@@ -214,7 +214,7 @@ starts_at.date
 starts_at.time
 ```
 
-### `table(source, variant="std")`
+### `table(source, flavor="std")`
 
 Use `table(...)` when you want a plugin to inspect a collection-like source and render a table.
 
@@ -236,10 +236,10 @@ handle = table(df)
 ui.run()
 ```
 
-For the `pandas` plugin, a richer filtered table variant is also available:
+For the `pandas` plugin, a richer filtered table flavor is also available:
 
 ```python
-handle = table(df, variant="filters")
+handle = table(df, flavor="filters")
 ```
 
 The built-in filtered table UI exposes operator symbols out of the box:

@@ -55,7 +55,7 @@ def build_ui():
         "Active filters can be toggled with a checkbox or removed, with comma-separated input for in/not in and two values for between."
     ).classes("text-body2 text-grey-6")
 
-    handle = ui.table_builder(_registrations_dataframe(), variant="filters")
+    handle = ui.table_builder(_registrations_dataframe(), flavor="filters")
 
     with ui.row().classes("gap-2"):
         ui.button(

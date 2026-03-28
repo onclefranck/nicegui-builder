@@ -31,7 +31,7 @@ def test_form_and_table_specs_hold_expected_shapes():
         source_class=list,
         collection_spec=collection,
         widget_spec=widget,
-        variant="filters",
+        flavor="filters",
         plugin_name="pandas",
     )
 

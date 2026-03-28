@@ -66,7 +66,7 @@ class TableSpec:
     source: t.Any = None
     widget_spec: WidgetSpec | None = None
     layout: t.Any = None
-    variant: str = "std"
+    flavor: str = "std"
     plugin_name: str = ""
 
 

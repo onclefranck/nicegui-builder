@@ -30,11 +30,11 @@ class CollectionPlugin(SourcePlugin, Protocol):
     def inspect_collection(self, source) -> CollectionSpec: ...
 
     def resolve_collection_widget(
-        self, spec: CollectionSpec, variant: str = "std"
+        self, spec: CollectionSpec, flavor: str = "std"
     ) -> WidgetSpec: ...
 
     def render_collection(
-        self, source, spec: CollectionSpec, variant: str = "std"
+        self, source, spec: CollectionSpec, flavor: str = "std"
     ): ...
 
 

@@ -507,7 +507,7 @@ class PandasPlugin:
         )
 
     def resolve_collection_widget(
-        self, spec: CollectionSpec, variant: str = "std"
+        self, spec: CollectionSpec, flavor: str = "std"
     ) -> WidgetSpec:
         columns = [
             {
@@ -532,7 +532,7 @@ class PandasPlugin:
         default_sort_by = spec.columns[0].name if spec.columns else "id"
         return WidgetSpec(
             component="table",
-            variant=variant,
+            variant=flavor,
             params={
                 "columns": columns,
                 "rows": [],
@@ -583,14 +583,14 @@ class PandasPlugin:
         self,
         source,
         spec: CollectionSpec,
-        variant: str = "std",
+        flavor: str = "std",
         table_spec: TableSpec | None = None,
     ):
-        if variant != "filters":
+        if flavor != "filters":
             return None
 
         widget = table_spec.widget_spec if table_spec is not None else self.resolve_collection_widget(
-            spec, variant=variant
+            spec, flavor=flavor
         )
         rows = self.prepare_rows(source)
         filter_values: dict[str, object] = {}

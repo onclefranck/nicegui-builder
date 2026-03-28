@@ -191,7 +191,7 @@ Suggested file:
 
 Goal:
 
-- show `table(df, variant="filters")`
+- show `table(df, flavor="filters")`
 
 Covers:
 

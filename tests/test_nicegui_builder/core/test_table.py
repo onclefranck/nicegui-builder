@@ -43,7 +43,7 @@ def test_table_spec_is_public_and_can_wrap_pandas_collection_spec():
         collection_spec=collection_spec,
         source=df,
         widget_spec=widget_spec,
-        variant="std",
+        flavor="std",
         plugin_name=pandas_plugin.name,
     )
 

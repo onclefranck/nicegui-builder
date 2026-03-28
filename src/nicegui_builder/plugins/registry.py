@@ -71,12 +71,12 @@ def maybe_render_collection(
     source,
     spec,
     *,
-    variant: str = "std",
+    flavor: str = "std",
     table_spec=None,
 ):
     render_collection = getattr(plugin, "render_collection", None)
     if callable(render_collection):
-        return render_collection(source, spec, variant=variant, table_spec=table_spec)
+        return render_collection(source, spec, flavor=flavor, table_spec=table_spec)
     return None
 
 

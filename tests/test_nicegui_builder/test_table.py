@@ -13,7 +13,7 @@ class FakePlugin:
     def inspect_collection(self, source):
         return CollectionSpec(name="DemoRows", columns=[FieldSpec(name="name", python_type=str)])
 
-    def resolve_collection_widget(self, spec, variant="std"):
+    def resolve_collection_widget(self, spec, flavor="std"):
         return WidgetSpec(component="table", params={"columns": [], "row_key": "id"}, classes="w-full")
 
 
@@ -60,16 +60,16 @@ def test_table_returns_plugin_rendered_collection_when_available(monkeypatch):
     rendered_component = types.SimpleNamespace(filter_values={})
 
     class RenderPlugin(FakePlugin):
-        def render_collection(self, source, spec, variant="std", table_spec=None):
+        def render_collection(self, source, spec, flavor="std", table_spec=None):
             return rendered_component
 
     monkeypatch.setattr(table_module.plugin_registry, "resolve", lambda source: RenderPlugin())
 
-    handle = table_module.table([{"name": "Ada"}], variant="filters")
+    handle = table_module.table([{"name": "Ada"}], flavor="filters")
 
     assert handle.component is rendered_component
     assert handle.spec.plugin_name == "fake"
-    assert handle.spec.variant == "filters"
+    assert handle.spec.flavor == "filters"
 
 
 def test_table_uses_prepare_rows_for_generic_builder_path(monkeypatch):

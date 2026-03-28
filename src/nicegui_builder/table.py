@@ -27,22 +27,22 @@ def _build_table_handle(component, table_spec: TableSpec, plugin=None):
     return handle
 
 
-def table(source, variant: str = "std"):
+def table(source, flavor: str = "std"):
     plugin = resolve_collection_plugin(source)
 
     collection_spec = plugin.inspect_collection(source)
     source_class = source if isinstance(source, type) else source.__class__
-    widget = plugin.resolve_collection_widget(collection_spec, variant=variant)
+    widget = plugin.resolve_collection_widget(collection_spec, flavor=flavor)
     table_spec = TableSpec(
         source_class=source_class,
         collection_spec=collection_spec,
         source=source,
         widget_spec=widget,
-        variant=variant,
+        flavor=flavor,
         plugin_name=plugin.name,
     )
 
-    rendered = maybe_render_collection(plugin, source, collection_spec, variant=variant, table_spec=table_spec)
+    rendered = maybe_render_collection(plugin, source, collection_spec, flavor=flavor, table_spec=table_spec)
     if rendered is not None:
         return _build_table_handle(rendered, table_spec, plugin=plugin)
 

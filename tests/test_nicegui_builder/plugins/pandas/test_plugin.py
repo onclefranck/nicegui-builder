@@ -266,7 +266,7 @@ def test_pandas_plugin_resolve_collection_widget_and_prepare_rows():
             FieldSpec(name="score", python_type=int, title="Score"),
         ],
     )
-    widget = pandas_plugin.resolve_collection_widget(spec, variant="filters")
+    widget = pandas_plugin.resolve_collection_widget(spec, flavor="filters")
     rows = pandas_plugin.prepare_rows(pandas.DataFrame([{"name": "Ada", "score": 10}]))
 
     assert widget.component == "table"
@@ -321,11 +321,11 @@ def test_pandas_plugin_supports_richer_filter_operators():
     assert len(skipped_rows) == 3
 
 
-def test_pandas_plugin_render_collection_returns_none_for_non_filter_variant():
+def test_pandas_plugin_render_collection_returns_none_for_non_filter_flavor():
     df = pandas.DataFrame([{"name": "Ada", "score": 10}])
     spec = pandas_plugin.inspect_collection(df)
 
-    assert pandas_plugin.render_collection(df, spec, variant="std") is None
+    assert pandas_plugin.render_collection(df, spec, flavor="std") is None
 
 
 def test_pandas_plugin_render_collection_builds_filter_ui_and_binds_state(monkeypatch):
@@ -336,13 +336,13 @@ def test_pandas_plugin_render_collection_builds_filter_ui_and_binds_state(monkey
         ]
     )
     spec = pandas_plugin.inspect_collection(df)
-    widget_spec = pandas_plugin.resolve_collection_widget(spec, variant="filters")
+    widget_spec = pandas_plugin.resolve_collection_widget(spec, flavor="filters")
     table_spec = TableSpec(
         source_class=df.__class__,
         collection_spec=spec,
         source=df,
         widget_spec=widget_spec,
-        variant="filters",
+        flavor="filters",
         plugin_name="pandas",
     )
 
@@ -462,7 +462,7 @@ def test_pandas_plugin_render_collection_builds_filter_ui_and_binds_state(monkey
     monkeypatch.setattr(pandas_module.ui, "checkbox", lambda value=False, on_change=None, **kwargs: FakeCheckbox(value=value, on_change=on_change, **kwargs))
     monkeypatch.setattr(pandas_module.ui, "table", lambda **kwargs: FakeTable(**kwargs))
 
-    rendered = pandas_plugin.render_collection(df, spec, variant="filters", table_spec=table_spec)
+    rendered = pandas_plugin.render_collection(df, spec, flavor="filters", table_spec=table_spec)
 
     assert rendered is not None
     assert rendered.table_spec is table_spec
@@ -563,7 +563,7 @@ def test_pandas_plugin_render_collection_uses_select_controls_and_requires_attac
         collection_spec=spec,
         source=df,
         widget_spec=widget_spec,
-        variant="filters",
+        flavor="filters",
         plugin_name="pandas",
     )
 
@@ -663,7 +663,7 @@ def test_pandas_plugin_render_collection_uses_select_controls_and_requires_attac
     monkeypatch.setattr(pandas_module.ui, "table", lambda **kwargs: FragileTable(**kwargs))
 
     with pytest.raises(RuntimeError, match="read-only attachment"):
-        pandas_plugin.render_collection(df, spec, variant="filters", table_spec=table_spec)
+        pandas_plugin.render_collection(df, spec, flavor="filters", table_spec=table_spec)
 
     monkeypatch.setattr(
         pandas_module.ui,
@@ -682,7 +682,7 @@ def test_pandas_plugin_render_collection_uses_select_controls_and_requires_attac
         )(),
     )
 
-    rendered = pandas_plugin.render_collection(df, spec, variant="filters", table_spec=table_spec)
+    rendered = pandas_plugin.render_collection(df, spec, flavor="filters", table_spec=table_spec)
 
     assert rendered is not None
     field_control = next(control for control in controls if control.kind == "select" and control.kwargs.get("label") == "Field")
@@ -704,13 +704,13 @@ def test_pandas_plugin_render_collection_avoids_recursive_operator_updates(monke
         ]
     )
     spec = pandas_plugin.inspect_collection(df)
-    widget_spec = pandas_plugin.resolve_collection_widget(spec, variant="filters")
+    widget_spec = pandas_plugin.resolve_collection_widget(spec, flavor="filters")
     table_spec = TableSpec(
         source_class=df.__class__,
         collection_spec=spec,
         source=df,
         widget_spec=widget_spec,
-        variant="filters",
+        flavor="filters",
         plugin_name="pandas",
     )
 
@@ -816,7 +816,7 @@ def test_pandas_plugin_render_collection_avoids_recursive_operator_updates(monke
     monkeypatch.setattr(pandas_module.ui, "checkbox", lambda value=False, on_change=None, **kwargs: FakeCheckbox(value=value, on_change=on_change, **kwargs))
     monkeypatch.setattr(pandas_module.ui, "table", lambda **kwargs: FakeTable(**kwargs))
 
-    rendered = pandas_plugin.render_collection(df, spec, variant="filters", table_spec=table_spec)
+    rendered = pandas_plugin.render_collection(df, spec, flavor="filters", table_spec=table_spec)
 
     assert rendered is not None
     field_control = next(control for control in controls if control.kind == "select" and control.kwargs.get("label") == "Field")

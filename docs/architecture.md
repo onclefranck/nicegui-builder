@@ -117,7 +117,7 @@ classDiagram
         +source
         +widget_spec
         +layout
-        +variant
+        +flavor
         +plugin_name
     }
 
@@ -206,10 +206,10 @@ classDiagram
     class CollectionPlugin {
         <<protocol>>
         +inspect_collection(source)
-        +resolve_collection_widget(spec, variant)
+        +resolve_collection_widget(spec, flavor)
         +prepare_rows(source)
         +filter_rows(source, filter_values)
-        +render_collection(source, spec, variant)
+        +render_collection(source, spec, flavor)
     }
 
     class PluginRegistry {
@@ -366,7 +366,7 @@ Main role:
 - tables
 - column inspection
 - filter-oriented metadata
-- filtered table variant
+- filtered table flavor
 
 Examples of notable behavior:
 

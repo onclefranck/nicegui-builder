@@ -63,13 +63,13 @@ Required entry-point methods:
 
 - `supports(source)`
 - `inspect_collection(source)`
-- `resolve_collection_widget(spec, variant="std")`
+- `resolve_collection_widget(spec, flavor="std")`
 
 Common but optional extension points:
 
 - `prepare_rows(source)`
 - `filter_rows(source, filter_values)`
-- `render_collection(source, spec, variant="std")`
+- `render_collection(source, spec, flavor="std")`
 
 ## Registration
 
@@ -142,7 +142,7 @@ Use `render_form(...)` or `render_collection(...)` only for behaviors that are m
 
 Current example:
 
-- the `pandas` plugin uses `render_collection(..., variant="filters")` for a richer filter UI
+- the `pandas` plugin uses `render_collection(..., flavor="filters")` for a richer filter UI
 
 ### 5. Normalize early
 
@@ -202,7 +202,7 @@ It shows how to:
 - inspect a `DataFrame`
 - infer column/filter metadata
 - provide default table widgets
-- optionally render a richer filtered table variant with a filter builder and active filter list
+- optionally render a richer filtered table flavor with a filter builder and active filter list
 
 It is also a good reference for:
 
@@ -230,7 +230,7 @@ You do not need a full NiceGUI runtime for most plugin tests.
 - Prefer specs over ad hoc dictionaries.
 - Use `source_meta` for plugin-specific metadata.
 - Keep plugin-local maps and heuristics inside the plugin package.
-- Favor small rich render variants over plugin-wide custom rendering.
+- Favor small rich render flavors over plugin-wide custom rendering.
 - Preserve compatibility with the stable top-level API.
 
 ## Future Plugin Candidates
