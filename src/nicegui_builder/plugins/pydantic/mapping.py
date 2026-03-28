@@ -154,25 +154,17 @@ def resolve_map_type(annotation) -> str:
 
 
 def get_defaults_from_map(str1: str, str2: str = "std"):
-    _str1, _str2 = str1, str2
-
-    if "|" in _str1:
-        _str1, _str2 = str1.split("|")
-    elif "|" in _str2:
-        _str1, _str2 = str2.split("|")
-
-    if not _str1:
+    mapping = load_pydantic_widget_map()
+    if not str1:
         error = (
             f"can't resolve a key from str1: \"{str1}\" and str2: \"{str2}\" "
             "to handle pydantic-nicegui.yml"
         )
         raise ValueError(error)
 
-    _str2 = _str2 if _str2 else "std"
-
-    mapping = load_pydantic_widget_map()
-    map_key = f"{_str1}|{_str2}"
-    fallback_key = f"{_str1}|std"
+    variant = str2 or "std"
+    map_key = f"{str1}|{variant}"
+    fallback_key = f"{str1}|std"
 
     if map_key in mapping:
         return mapping[map_key]
@@ -187,27 +179,24 @@ def get_defaults_from_map(str1: str, str2: str = "std"):
     raise KeyError(error)
 
 
-def resolve_widget_spec(field_info, python_type, variant: str = "std") -> tuple[WidgetSpec, dict]:
+def resolve_widget_spec(field_info, python_type, variant: str = "std") -> WidgetSpec:
     map_type = resolve_map_type(python_type)
     effective_variant = select_default_variant(field_info, map_type, variant)
     default_info = get_defaults_from_map(map_type, effective_variant)
     methods = default_info.get("methods")
 
     if map_type == "datetime" and effective_variant == "split":
-        return (
-            WidgetSpec(
-                component="datetime_input",
-                variant=effective_variant,
-                params={
-                    "container": {
-                        "methods": methods,
-                        "params": dict(default_info.get("params", {})),
-                        "classes": default_info.get("classes", ""),
-                        "props": default_info.get("props", ""),
-                    }
-                },
-            ),
-            default_info,
+        return WidgetSpec(
+            component="datetime_input",
+            variant=effective_variant,
+            params={
+                "container": {
+                    "methods": methods,
+                    "params": dict(default_info.get("params", {})),
+                    "classes": default_info.get("classes", ""),
+                    "props": default_info.get("props", ""),
+                }
+            },
         )
 
     validation_props = build_validation_props(field_info, methods)
@@ -215,15 +204,12 @@ def resolve_widget_spec(field_info, python_type, variant: str = "std") -> tuple[
         part for part in [default_info.get("props", ""), validation_props] if part
     )
 
-    return (
-        WidgetSpec(
-            component=methods,
-            variant=effective_variant,
-            params=dict(default_info.get("params", {})),
-            props=props,
-            classes=default_info.get("classes", ""),
-        ),
-        default_info,
+    return WidgetSpec(
+        component=methods,
+        variant=effective_variant,
+        params=dict(default_info.get("params", {})),
+        props=props,
+        classes=default_info.get("classes", ""),
     )
 
 

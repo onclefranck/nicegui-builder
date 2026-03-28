@@ -122,8 +122,6 @@ def test_get_defaults_from_map_covers_normal_and_error_paths(monkeypatch):
     monkeypatch.setattr(mapping_module, "load_pydantic_widget_map", lambda: fake_map)
 
     assert mapping_module.get_defaults_from_map("str", "textarea") == {"component": "textarea"}
-    assert mapping_module.get_defaults_from_map("str|textarea") == {"component": "textarea"}
-    assert mapping_module.get_defaults_from_map("", "str|textarea") == {"component": "textarea"}
     assert mapping_module.get_defaults_from_map("str", "missing") == {"component": "input"}
     assert mapping_module.get_defaults_from_map("int", "") == {"component": "number"}
 

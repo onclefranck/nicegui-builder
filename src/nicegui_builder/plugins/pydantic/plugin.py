@@ -191,8 +191,7 @@ class PydanticPlugin:
 
     def resolve_widget(self, spec: FieldSpec, variant: str = "std") -> WidgetSpec:
         field_info = spec.source_meta["field_info"]
-        widget, _ = resolve_widget_spec(field_info, spec.python_type, variant)
-        return widget
+        return resolve_widget_spec(field_info, spec.python_type, variant)
 
     def build_field_context(self, model_class, model_instance, fieldname: str) -> dict:
         return build_field_context(model_class, model_instance, fieldname)
