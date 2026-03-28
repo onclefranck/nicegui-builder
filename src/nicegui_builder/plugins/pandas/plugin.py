@@ -8,10 +8,18 @@ from nicegui_builder.core.datetime_inputs import (
 from nicegui_builder.core.filter_operators import (
     FILTER_OPERATORS,
     active_filter_clauses,
-    canonical_filter_clause,
     normalize_filter_operator,
 )
 from nicegui_builder.core.models import CollectionSpec, FieldSpec, TableSpec, WidgetSpec
+from .filters import (
+    apply_scalar_filter,
+    apply_text_filter,
+    build_operator_options,
+    format_filter_value,
+    is_empty_filter_value,
+    normalize_filter_clause,
+    validated_coerced_clause,
+)
 
 INTERNAL_ROW_ID = "nicegui_builder_row_id"
 
@@ -111,190 +119,6 @@ def _build_filter_spec(column: FieldSpec) -> FieldSpec:
             "filter_default_operator": "contains" if filter_kind == "text" else "equals",
         },
     )
-
-
-def _normalize_filter_clause(value, column: FieldSpec):
-    default_op = column.source_meta.get("filter_default_operator")
-    if default_op is None:
-        default_op = "contains" if column.source_meta.get("filter_kind") == "text" else "equals"
-    return canonical_filter_clause(value, default_op=default_op)
-
-
-def _parse_csv_values(raw_value):
-    if isinstance(raw_value, str):
-        return [item.strip() for item in raw_value.split(",") if item.strip()]
-    if isinstance(raw_value, (list, tuple, set)):
-        return [item for item in raw_value if item not in (None, "")]
-    return [raw_value]
-
-
-def _coerce_datetime_value(raw_value):
-    pd = _import_pandas()
-    if pd is None:
-        return raw_value
-    return pd.to_datetime(raw_value)
-
-
-def _coerce_filter_values(column: FieldSpec, operator: str, raw_value):
-    operator = normalize_filter_operator(operator)
-
-    if operator == "between":
-        if not isinstance(raw_value, (list, tuple)) or len(raw_value) != 2:
-            raise ValueError("between operator expects a two-item list or tuple")
-        lower, upper = raw_value
-        if column.python_type == "datetime":
-            return [_coerce_datetime_value(lower), _coerce_datetime_value(upper)]
-        if column.python_type in {int, float}:
-            caster = int if column.python_type is int else float
-            return [caster(lower), caster(upper)]
-        return [lower, upper]
-
-    if operator in {"in", "notIn"}:
-        values = _parse_csv_values(raw_value)
-        if column.python_type == "datetime":
-            return [_coerce_datetime_value(value) for value in values]
-        if column.python_type in {int, float}:
-            caster = int if column.python_type is int else float
-            return [caster(value) for value in values]
-        return values
-
-    if column.python_type == "datetime" and raw_value not in (None, ""):
-        return _coerce_datetime_value(raw_value)
-
-    return raw_value
-
-
-def _validated_coerced_clause(column: FieldSpec, clause: dict[str, object]) -> dict[str, object]:
-    operator = normalize_filter_operator(str(clause["op"]))
-    allowed = column.source_meta.get("filter_operators", [])
-    if operator not in allowed:
-        raise ValueError(f"unsupported filter operator for {column.name}: {operator}")
-
-    raw_value = clause["value"]
-    if _is_empty_filter_value(operator, raw_value):
-        return {
-            "op": operator,
-            "value": raw_value,
-            "enabled": clause.get("enabled", True),
-        }
-
-    return {
-        "op": operator,
-        "value": _coerce_filter_values(column, operator, raw_value),
-        "enabled": clause.get("enabled", True),
-    }
-
-
-def _apply_text_filter(filtered, column_name: str, operator: str, raw_value):
-    operator = normalize_filter_operator(operator)
-    series = filtered[column_name].astype(str)
-
-    if operator == "contains":
-        return filtered[series.str.contains(str(raw_value), case=False, na=False)]
-
-    if operator == "equals":
-        return filtered[series.str.lower() == str(raw_value).lower()]
-
-    if operator == "notEquals":
-        return filtered[series.str.lower() != str(raw_value).lower()]
-
-    if operator == "startsWith":
-        return filtered[series.str.lower().str.startswith(str(raw_value).lower(), na=False)]
-
-    if operator == "endsWith":
-        return filtered[series.str.lower().str.endswith(str(raw_value).lower(), na=False)]
-
-    if operator == "in":
-        values = _parse_csv_values(raw_value)
-        normalized = {str(item).lower() for item in values}
-        return filtered[series.str.lower().isin(normalized)]
-
-    if operator == "notIn":
-        values = _parse_csv_values(raw_value)
-        normalized = {str(item).lower() for item in values}
-        return filtered[~series.str.lower().isin(normalized)]
-
-    if operator == "regex":
-        return filtered[series.str.contains(str(raw_value), case=False, na=False, regex=True)]
-
-    raise ValueError(f"unsupported text filter operator: {operator}")
-
-
-def _apply_scalar_filter(filtered, column_name: str, operator: str, raw_value):
-    operator = normalize_filter_operator(operator)
-    series = filtered[column_name]
-
-    if operator == "equals":
-        return filtered[series == raw_value]
-
-    if operator == "notEquals":
-        return filtered[series != raw_value]
-
-    if operator == "gt":
-        return filtered[series > raw_value]
-
-    if operator == "gte":
-        return filtered[series >= raw_value]
-
-    if operator == "lt":
-        return filtered[series < raw_value]
-
-    if operator == "lte":
-        return filtered[series <= raw_value]
-
-    if operator == "between":
-        if not isinstance(raw_value, (list, tuple)) or len(raw_value) != 2:
-            raise ValueError("between operator expects a two-item list or tuple")
-        lower, upper = raw_value
-        return filtered[series.between(lower, upper)]
-
-    if operator == "in":
-        values = _parse_csv_values(raw_value)
-        if _is_datetime_dtype(series.dtype):
-            values = [_coerce_datetime_value(value) for value in values]
-        elif _is_numeric_dtype(series.dtype):
-            caster = int if "int" in str(series.dtype) else float
-            values = [caster(value) for value in values]
-        return filtered[series.isin(values)]
-
-    if operator == "notIn":
-        values = _parse_csv_values(raw_value)
-        if _is_datetime_dtype(series.dtype):
-            values = [_coerce_datetime_value(value) for value in values]
-        elif _is_numeric_dtype(series.dtype):
-            caster = int if "int" in str(series.dtype) else float
-            values = [caster(value) for value in values]
-        return filtered[~series.isin(values)]
-
-    raise ValueError(f"unsupported scalar filter operator: {operator}")
-
-
-def _build_operator_options(field: FieldSpec) -> dict[str, str]:
-    return {
-        operator: FILTER_OPERATORS[operator].symbol
-        for operator in field.source_meta.get("filter_operators", [])
-        if operator in FILTER_OPERATORS
-    }
-
-
-def _is_empty_filter_value(operator: str, value) -> bool:
-    operator = normalize_filter_operator(operator)
-    if operator == "between":
-        if not isinstance(value, (list, tuple)) or len(value) != 2:
-            return True
-        return any(item in (None, "") for item in value)
-    return value in (None, "", [])
-
-
-def _format_filter_value(field: FieldSpec, value) -> str:
-    filter_kind = field.source_meta.get("filter_kind")
-    if filter_kind == "datetime":
-        if isinstance(value, (list, tuple)):
-            return " .. ".join(DateTimeInput.format_for_display(item) for item in value)
-        return DateTimeInput.format_for_display(value)
-    if isinstance(value, (list, tuple)):
-        return " .. ".join(str(item) for item in value)
-    return str(value)
 
 
 def _normalize_range_value(value) -> list[object]:
@@ -472,7 +296,7 @@ def _render_active_filters_list(
                 )
                 ui.button(icon="delete", on_click=lambda *_args, name=field_name, **_kwargs: on_remove(name)).props("flat round dense")
                 ui.label(
-                    f"{field.title or field.name} {symbol} {_format_filter_value(field, value)}"
+                    f"{field.title or field.name} {symbol} {format_filter_value(field, value)}"
                 ).classes("text-body2")
 
 
@@ -561,21 +385,21 @@ class PandasPlugin:
             if isinstance(value, dict) and value.get("enabled") is False:
                 continue
 
-            clause = _validated_coerced_clause(column, _normalize_filter_clause(value, column))
+            clause = validated_coerced_clause(column, normalize_filter_clause(value, column))
             operator = clause["op"]
             raw_value = clause["value"]
-            if _is_empty_filter_value(operator, raw_value):
+            if is_empty_filter_value(operator, raw_value):
                 continue
 
             if column.source_meta.get("filter_kind") in {"select", "boolean"}:
-                filtered = _apply_scalar_filter(filtered, column.name, operator, raw_value)
+                filtered = apply_scalar_filter(filtered, column.name, operator, raw_value)
                 continue
 
             if column.python_type in {int, float} or column.python_type == "datetime":
-                filtered = _apply_scalar_filter(filtered, column.name, operator, raw_value)
+                filtered = apply_scalar_filter(filtered, column.name, operator, raw_value)
                 continue
 
-            filtered = _apply_text_filter(filtered, column.name, operator, raw_value)
+            filtered = apply_text_filter(filtered, column.name, operator, raw_value)
 
         return _rows_from_dataframe(filtered)
 
@@ -622,7 +446,7 @@ class PandasPlugin:
                         label="Field",
                     )
                     operator_control = ui.select(
-                        options=_build_operator_options(initial_field),
+                        options=build_operator_options(initial_field),
                         value=builder_state["operator"],
                         clearable=False,
                     )
@@ -659,7 +483,7 @@ class PandasPlugin:
                         field_name = str(event.value)
                         builder_state["field_name"] = field_name
                         field = filter_fields[field_name]
-                        _set_select_options(operator_control, _build_operator_options(field))
+                        _set_select_options(operator_control, build_operator_options(field))
                         _set_operator(field.source_meta.get("filter_default_operator", "equals"))
 
                     def _on_operator_change(event):
@@ -671,9 +495,9 @@ class PandasPlugin:
                         field_name = str(builder_state["field_name"])
                         operator = str(builder_state["operator"])
                         value = builder_state["value"]
-                        if _is_empty_filter_value(operator, value):
+                        if is_empty_filter_value(operator, value):
                             return
-                        filter_values[field_name] = _validated_coerced_clause(
+                        filter_values[field_name] = validated_coerced_clause(
                             filter_fields[field_name],
                             {"op": operator, "value": value, "enabled": True},
                         )

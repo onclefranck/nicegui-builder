@@ -6,6 +6,7 @@ import pytest
 from nicegui_builder.core.datetime_inputs import DateTimeInput
 from nicegui_builder.core.models import CollectionSpec, FieldSpec, TableSpec, WidgetSpec
 from nicegui_builder.plugins.pandas import pandas_plugin
+from nicegui_builder.plugins.pandas import filters as pandas_filters
 from nicegui_builder.plugins.pandas import plugin as pandas_module
 
 from .support import pandas
@@ -75,60 +76,60 @@ def test_normalize_and_apply_text_filters_cover_all_operators():
     )
     text_column = FieldSpec(name="name", python_type=str, source_meta={"filter_kind": "text"})
 
-    assert pandas_module._normalize_filter_clause("Ada", text_column) == {
+    assert pandas_filters.normalize_filter_clause("Ada", text_column) == {
         "op": "contains",
         "value": "Ada",
         "enabled": True,
     }
-    assert pandas_module._normalize_filter_clause({"value": "Ada"}, text_column) == {
+    assert pandas_filters.normalize_filter_clause({"value": "Ada"}, text_column) == {
         "op": "contains",
         "value": "Ada",
         "enabled": True,
     }
-    assert pandas_module._normalize_filter_clause({"op": "ge", "value": "Ada"}, text_column) == {
+    assert pandas_filters.normalize_filter_clause({"op": "ge", "value": "Ada"}, text_column) == {
         "op": "gte",
         "value": "Ada",
         "enabled": True,
     }
-    assert pandas_module._normalize_filter_clause("Ada", text_column) == {
+    assert pandas_filters.normalize_filter_clause("Ada", text_column) == {
         "op": "contains",
         "value": "Ada",
         "enabled": True,
     }
 
-    assert [row["name"] for row in pandas_module._apply_text_filter(df, "name", "contains", "a").to_dict("records")] == [
+    assert [row["name"] for row in pandas_filters.apply_text_filter(df, "name", "contains", "a").to_dict("records")] == [
         "Ada",
         "Grace",
         "Alan",
     ]
-    assert [row["name"] for row in pandas_module._apply_text_filter(df, "name", "equals", "ada").to_dict("records")] == [
+    assert [row["name"] for row in pandas_filters.apply_text_filter(df, "name", "equals", "ada").to_dict("records")] == [
         "Ada"
     ]
-    assert [row["name"] for row in pandas_module._apply_text_filter(df, "name", "notEquals", "ada").to_dict("records")] == [
+    assert [row["name"] for row in pandas_filters.apply_text_filter(df, "name", "notEquals", "ada").to_dict("records")] == [
         "Grace",
         "Alan",
     ]
-    assert [row["name"] for row in pandas_module._apply_text_filter(df, "name", "startsWith", "a").to_dict("records")] == [
+    assert [row["name"] for row in pandas_filters.apply_text_filter(df, "name", "startsWith", "a").to_dict("records")] == [
         "Ada",
         "Alan",
     ]
-    assert [row["name"] for row in pandas_module._apply_text_filter(df, "name", "endsWith", "e").to_dict("records")] == [
+    assert [row["name"] for row in pandas_filters.apply_text_filter(df, "name", "endsWith", "e").to_dict("records")] == [
         "Grace",
     ]
-    assert [row["name"] for row in pandas_module._apply_text_filter(df, "name", "in", ["Ada", "Alan"]).to_dict("records")] == [
+    assert [row["name"] for row in pandas_filters.apply_text_filter(df, "name", "in", ["Ada", "Alan"]).to_dict("records")] == [
         "Ada",
         "Alan",
     ]
-    assert [row["name"] for row in pandas_module._apply_text_filter(df, "name", "notIn", "Ada, Alan").to_dict("records")] == [
+    assert [row["name"] for row in pandas_filters.apply_text_filter(df, "name", "notIn", "Ada, Alan").to_dict("records")] == [
         "Grace"
     ]
-    assert [row["name"] for row in pandas_module._apply_text_filter(df, "name", "regex", "^a").to_dict("records")] == [
+    assert [row["name"] for row in pandas_filters.apply_text_filter(df, "name", "regex", "^a").to_dict("records")] == [
         "Ada",
         "Alan",
     ]
 
     try:
-        pandas_module._apply_text_filter(df, "name", "mystery", "Ada")
+        pandas_filters.apply_text_filter(df, "name", "mystery", "Ada")
     except ValueError as exc:
         assert "unsupported text filter operator" in str(exc)
     else:
@@ -144,28 +145,28 @@ def test_apply_scalar_filter_covers_all_operators_and_errors():
         ]
     )
 
-    assert [row["score"] for row in pandas_module._apply_scalar_filter(df, "score", "equals", 20).to_dict("records")] == [20]
-    assert [row["score"] for row in pandas_module._apply_scalar_filter(df, "score", "notEquals", 20).to_dict("records")] == [10, 30]
-    assert [row["score"] for row in pandas_module._apply_scalar_filter(df, "score", "gt", 10).to_dict("records")] == [20, 30]
-    assert [row["score"] for row in pandas_module._apply_scalar_filter(df, "score", "gte", 20).to_dict("records")] == [20, 30]
-    assert [row["score"] for row in pandas_module._apply_scalar_filter(df, "score", "lt", 30).to_dict("records")] == [10, 20]
-    assert [row["score"] for row in pandas_module._apply_scalar_filter(df, "score", "lte", 20).to_dict("records")] == [10, 20]
-    assert [row["score"] for row in pandas_module._apply_scalar_filter(df, "score", "between", [15, 30]).to_dict("records")] == [
+    assert [row["score"] for row in pandas_filters.apply_scalar_filter(df, "score", "equals", 20).to_dict("records")] == [20]
+    assert [row["score"] for row in pandas_filters.apply_scalar_filter(df, "score", "notEquals", 20).to_dict("records")] == [10, 30]
+    assert [row["score"] for row in pandas_filters.apply_scalar_filter(df, "score", "gt", 10).to_dict("records")] == [20, 30]
+    assert [row["score"] for row in pandas_filters.apply_scalar_filter(df, "score", "gte", 20).to_dict("records")] == [20, 30]
+    assert [row["score"] for row in pandas_filters.apply_scalar_filter(df, "score", "lt", 30).to_dict("records")] == [10, 20]
+    assert [row["score"] for row in pandas_filters.apply_scalar_filter(df, "score", "lte", 20).to_dict("records")] == [10, 20]
+    assert [row["score"] for row in pandas_filters.apply_scalar_filter(df, "score", "between", [15, 30]).to_dict("records")] == [
         20,
         30,
     ]
-    assert [row["score"] for row in pandas_module._apply_scalar_filter(df, "score", "in", [10, 30]).to_dict("records")] == [10, 30]
-    assert [row["score"] for row in pandas_module._apply_scalar_filter(df, "score", "notIn", "10, 30").to_dict("records")] == [20]
+    assert [row["score"] for row in pandas_filters.apply_scalar_filter(df, "score", "in", [10, 30]).to_dict("records")] == [10, 30]
+    assert [row["score"] for row in pandas_filters.apply_scalar_filter(df, "score", "notIn", "10, 30").to_dict("records")] == [20]
 
     try:
-        pandas_module._apply_scalar_filter(df, "score", "between", [10])
+        pandas_filters.apply_scalar_filter(df, "score", "between", [10])
     except ValueError as exc:
         assert "two-item" in str(exc)
     else:
         raise AssertionError("_apply_scalar_filter should validate between operands")
 
     try:
-        pandas_module._apply_scalar_filter(df, "score", "mystery", 10)
+        pandas_filters.apply_scalar_filter(df, "score", "mystery", 10)
     except ValueError as exc:
         assert "unsupported scalar filter operator" in str(exc)
     else:
@@ -182,7 +183,7 @@ def test_validated_coerced_clause_rejects_invalid_operator_and_coerces_values():
         },
     )
 
-    clause = pandas_module._validated_coerced_clause(
+    clause = pandas_filters.validated_coerced_clause(
         datetime_column,
         {"op": "between", "value": ["2026-03-21T10:00", "2026-03-21T12:00"], "enabled": True},
     )
@@ -191,7 +192,7 @@ def test_validated_coerced_clause_rejects_invalid_operator_and_coerces_values():
     assert isinstance(clause["value"][1], pandas.Timestamp)
 
     with pytest.raises(ValueError, match="unsupported filter operator"):
-        pandas_module._validated_coerced_clause(
+        pandas_filters.validated_coerced_clause(
             datetime_column,
             {"op": "contains", "value": "2026-03-21T10:00", "enabled": True},
         )
@@ -222,7 +223,7 @@ def test_datetime_helpers_keep_internal_datetime_and_ui_friendly_values():
     assert isinstance(normalized, datetime)
     date_value, time_value = DateTimeInput.split_value(normalized)
     assert DateTimeInput.combine_value(date_value, time_value) == "2026-03-21T10:15"
-    assert "T" not in pandas_module._format_filter_value(field, normalized)
+    assert "T" not in pandas_filters.format_filter_value(field, normalized)
 
 
 def test_pandas_plugin_supports_dataframe():
