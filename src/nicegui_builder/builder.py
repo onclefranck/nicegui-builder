@@ -1,9 +1,10 @@
 from nicegui import ui
 from importlib import import_module
+from typing import Callable
 from .core.models import LayoutNode
 from .core.context import builder_ctx, component_refs, ensure_builder_runtime, get_root_component, set_root_component
 
-builder_expansion_registry = {}
+builder_expansion_registry: dict[str, Callable[[str, dict], LayoutNode]] = {}
 
 
 def resolve_context_value(value, ctx):
@@ -21,7 +22,7 @@ def resolve_context_value(value, ctx):
     return value
 
 
-def _normalize_layout_entry(component: dict, ctx: dict) -> dict:
+def _normalize_layout_entry(component: dict, ctx: dict) -> LayoutNode:
     if isinstance(component, LayoutNode):
         return component
 
@@ -31,19 +32,7 @@ def _normalize_layout_entry(component: dict, ctx: dict) -> dict:
 
     if "__" in key:
         register_key, builder_key = key.split("__", 1)
-        resolved = builder_expansion_registry[register_key](builder_key, value)
-        if isinstance(resolved, LayoutNode):
-            return resolved
-        return LayoutNode.from_dict(
-            {
-                "methods": resolved.get("methods"),
-                "params": resolved.get("params") or {},
-                "classes": resolved.get("classes", ""),
-                "props": resolved.get("props", ""),
-                "ref": resolved.get("ref"),
-                "children": resolved.get("children", value.get("children", [])),
-            }
-        )
+        return builder_expansion_registry[register_key](builder_key, value)
 
     return LayoutNode.from_layout_entry(component)
 
@@ -109,7 +98,7 @@ def visit(components: list):
         builder_ctx.reset(ctx_token)
 
 
-def register(key, callback):
+def register(key: str, callback: Callable[[str, dict], LayoutNode]) -> None:
     """Register a callback so the builder can delegate node resolution
 
     In the layout, an element can be solved by an extended solver.
@@ -124,9 +113,9 @@ def register(key, callback):
 
     The callback function should have the following signature:
     `
-    def the_callback(resolver_key: str, node_value: dict) -> method: str, params: dict:
+    def the_callback(resolver_key: str, node_value: dict) -> LayoutNode:
         ...
-        return method, params
+        return LayoutNode(methods="label")
     `
 
     When registering the callback function:

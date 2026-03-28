@@ -63,13 +63,13 @@ def test_builder_returns_root_component_and_applies_registered_expansion(monkeyp
     builder_module.builder_expansion_registry.clear()
 
     def resolve_field(field_name, value):
-        return {
-            "methods": "label",
-            "params": {"text": f"Resolved {field_name}"},
-            "classes": "resolved-field",
-            "props": "outlined",
-            "ref": "field:name",
-        }
+        return LayoutNode(
+            methods="label",
+            params={"text": f"Resolved {field_name}"},
+            classes="resolved-field",
+            props="outlined",
+            ref="field:name",
+        )
 
     register("field", resolve_field)
 
