@@ -134,3 +134,30 @@ def test_get_defaults_from_map_covers_normal_and_error_paths(monkeypatch):
         mapping_module.get_defaults_from_map("float", "std")
 
     assert "float" in str(exc_info.value)
+
+
+def test_build_layout_node_merges_widget_and_override_values():
+    widget = mapping_module.WidgetSpec(
+        component="input",
+        params={"label": "Default", "value": "Ada"},
+        props="clearable",
+        classes="col-span-6",
+    )
+    field_ctx = {"fieldname": "name", "attributes_title": "Name", "fieldvalue": "Ada"}
+
+    node = mapping_module.build_layout_node(
+        field_ctx,
+        widget,
+        {
+            "params": {"label": "Display name"},
+            "props": "outlined",
+            "classes": "w-full",
+            "ref": "field:name",
+        },
+    )
+
+    assert node.methods == "input"
+    assert node.params == {"label": "Display name", "value": "Ada"}
+    assert node.props == "clearable outlined"
+    assert node.classes == "col-span-6 w-full"
+    assert node.ref == "field:name"

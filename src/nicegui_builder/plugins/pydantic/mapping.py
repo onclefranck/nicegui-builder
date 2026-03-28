@@ -4,7 +4,8 @@ import types
 import typing as t
 
 from pydantic import BaseModel
-from nicegui_builder.core.models import WidgetSpec
+from nicegui_builder.core.datetime_inputs import DateTimeInput, build_split_datetime_node
+from nicegui_builder.core.models import LayoutNode, WidgetSpec
 
 from ...utils import load_layout
 
@@ -221,4 +222,45 @@ def resolve_widget_spec(field_info, python_type, variant: str = "std") -> tuple[
             classes=default_info.get("classes", ""),
         ),
         default_info,
+    )
+
+
+def build_layout_node(field_ctx: dict, widget: WidgetSpec, value: dict | None = None) -> LayoutNode:
+    value = value or {}
+    params = dict(widget.params)
+    params.update(value.get("params") or {})
+    props = " ".join(part for part in [widget.props, value.get("props", "")] if part)
+    classes = " ".join(part for part in [widget.classes, value.get("classes", "")] if part)
+    ref = value.get("ref")
+
+    if widget.component == "datetime_input":
+        label = field_ctx.get("attributes_title") or field_ctx["fieldname"]
+        raw_value = field_ctx.get("fieldvalue")
+        logical_ref = ref or f"field:{field_ctx['fieldname']}"
+        raw_params = dict(params)
+        raw_container = raw_params.pop("container", None)
+        container = DateTimeInput.normalize_container(raw_container)
+
+        return LayoutNode.from_dict(
+            build_split_datetime_node(
+                field_name=field_ctx["fieldname"],
+                label=label,
+                raw_value=raw_value,
+                ref=logical_ref,
+                container=container,
+                component_props=props,
+                component_classes=classes,
+                date_ref=raw_params.pop("date_ref", None),
+                time_ref=raw_params.pop("time_ref", None),
+                date_options=raw_params.pop("date_options", None),
+                time_options=raw_params.pop("time_options", None),
+            )
+        )
+
+    return LayoutNode(
+        methods=widget.component,
+        params=params,
+        props=props,
+        classes=classes,
+        ref=ref,
     )
