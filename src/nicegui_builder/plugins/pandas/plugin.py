@@ -15,10 +15,15 @@ from .filters import (
     apply_scalar_filter,
     apply_text_filter,
     build_operator_options,
-    format_filter_value,
     is_empty_filter_value,
     normalize_filter_clause,
     validated_coerced_clause,
+)
+from .filter_ui import (
+    default_builder_state,
+    render_active_filters_list,
+    render_filter_value_controls,
+    set_select_options,
 )
 
 INTERNAL_ROW_ID = "nicegui_builder_row_id"
@@ -121,135 +126,6 @@ def _build_filter_spec(column: FieldSpec) -> FieldSpec:
     )
 
 
-def _normalize_range_value(value) -> list[object]:
-    if not isinstance(value, (list, tuple)) or len(value) != 2:
-        return ["", ""]
-    return list(value)
-
-
-def _set_range_item(state: dict[str, object], state_key: str, index: int, value) -> None:
-    values = _normalize_range_value(state.get(state_key))
-    values[index] = value
-    state[state_key] = values
-
-
-def _set_select_options(control, options: dict[str, str]) -> None:
-    if hasattr(control, "set_options"):
-        control.set_options(options)
-    else:
-        control.options = options
-    if hasattr(control, "update"):
-        control.update()
-
-
-def _default_builder_state(spec: CollectionSpec) -> dict[str, object]:
-    if not spec.filters:
-        return {
-            "field_name": "",
-            "operator": "equals",
-            "value": "",
-        }
-
-    initial_field = spec.filters[0]
-    initial_operator = initial_field.source_meta.get("filter_default_operator", "equals")
-    initial_value = ["", ""] if initial_operator == "between" else ""
-    return {
-        "field_name": initial_field.name,
-        "operator": initial_operator,
-        "value": initial_value,
-    }
-
-
-def _bind_textual_value_control(control, state: dict[str, object], state_key: str) -> None:
-    current_value = state.get(state_key, "")
-    if current_value not in (None, "") and hasattr(control, "value"):
-        control.value = current_value
-
-    def _on_change(event):
-        state[state_key] = event.value
-
-    control.on_value_change(_on_change)
-
-
-def _render_between_value_controls(filter_kind: str, state: dict[str, object], state_key: str) -> None:
-    left_value, right_value = _normalize_range_value(state.get(state_key))
-
-    with ui.row().classes("items-end gap-2"):
-        if filter_kind == "number":
-            left_control = ui.number(label="From")
-            right_control = ui.number(label="To")
-            if left_value not in (None, "") and hasattr(left_control, "value"):
-                left_control.value = left_value
-            if right_value not in (None, "") and hasattr(right_control, "value"):
-                right_control.value = right_value
-
-            left_control.on_value_change(lambda event: _set_range_item(state, state_key, 0, event.value))
-            right_control.on_value_change(lambda event: _set_range_item(state, state_key, 1, event.value))
-            return
-
-        with ui.column().classes("gap-2"):
-            DateTimeInput(
-                value=left_value,
-                on_value_change=lambda event: _set_range_item(state, state_key, 0, event.value),
-                date_options={"label": "From date"},
-                time_options={"label": "From time"},
-            )
-        with ui.column().classes("gap-2"):
-            DateTimeInput(
-                value=right_value,
-                on_value_change=lambda event: _set_range_item(state, state_key, 1, event.value),
-                date_options={"label": "To date"},
-                time_options={"label": "To time"},
-            )
-
-
-def _render_single_value_control(field: FieldSpec, operator: str, state: dict[str, object], state_key: str) -> None:
-    filter_kind = field.source_meta.get("filter_kind", "text")
-
-    if operator in {"in", "notIn"}:
-        _bind_textual_value_control(ui.input(label="Values").props("clearable"), state, state_key)
-        return
-
-    if filter_kind == "select" and operator in {"equals", "notEquals"}:
-        control = ui.select(
-            options=field.choices,
-            label="Value",
-            clearable=True,
-        )
-        _bind_textual_value_control(control, state, state_key)
-        return
-
-    if filter_kind == "number":
-        _bind_textual_value_control(ui.number(label="Value"), state, state_key)
-        return
-
-    if filter_kind == "boolean":
-        control = ui.select(
-            options=[True, False],
-            label="Value",
-            clearable=True,
-        )
-        _bind_textual_value_control(control, state, state_key)
-        return
-
-    if filter_kind == "datetime":
-        DateTimeInput(
-            value=state.get(state_key, ""),
-            on_value_change=lambda event: state.__setitem__(state_key, event.value),
-        )
-        return
-
-    _bind_textual_value_control(ui.input(label="Value").props("clearable"), state, state_key)
-
-
-def _render_filter_value_controls(field: FieldSpec, operator: str, state: dict[str, object], state_key: str) -> None:
-    if operator == "between":
-        _render_between_value_controls(field.source_meta.get("filter_kind", "text"), state, state_key)
-        return
-
-    _render_single_value_control(field, operator, state, state_key)
-
-
 def _rows_from_dataframe(source) -> list[dict]:
     rows = []
     for row_id, record in enumerate(source.to_dict(orient="records")):
@@ -262,42 +138,6 @@ def _rows_from_dataframe(source) -> list[dict]:
         row[INTERNAL_ROW_ID] = row_id
         rows.append(row)
     return rows
-
-
-def _render_active_filters_list(
-    active_filters_host,
-    filter_values: dict[str, object],
-    filter_fields: dict[str, FieldSpec],
-    on_toggle,
-    on_remove,
-) -> None:
-    active_filters_host.clear()
-    with active_filters_host:
-        ui.label("Active filters").classes("text-subtitle2")
-        if not filter_values:
-            ui.label("No active filters").classes("text-body2 text-grey-6")
-            return
-
-        for field_name, clause in filter_values.items():
-            if not isinstance(clause, dict):
-                continue
-            field = filter_fields.get(field_name)
-            if field is None:
-                continue
-            operator = normalize_filter_operator(clause.get("op", "equals"))
-            symbol = FILTER_OPERATORS.get(operator, FILTER_OPERATORS["equals"]).symbol
-            value = clause.get("value")
-            enabled = clause.get("enabled", True)
-
-            with ui.row().classes("w-full items-center gap-2"):
-                ui.checkbox(
-                    value=enabled,
-                    on_change=lambda event, name=field_name: on_toggle(name, event.value),
-                )
-                ui.button(icon="delete", on_click=lambda *_args, name=field_name, **_kwargs: on_remove(name)).props("flat round dense")
-                ui.label(
-                    f"{field.title or field.name} {symbol} {format_filter_value(field, value)}"
-                ).classes("text-body2")
 
 
 class PandasPlugin:
@@ -429,7 +269,7 @@ class PandasPlugin:
             table_component.rows = self.filter_rows(source, active_filter_clauses(filter_values))
             table_component.update()
 
-        builder_state = _default_builder_state(spec)
+        builder_state = default_builder_state(spec)
 
         with ui.card().classes("w-full gap-4"):
             if spec.filters:
@@ -455,7 +295,9 @@ class PandasPlugin:
                     def _render_builder_value_controls():
                         value_host.clear()
                         with value_host:
-                            _render_filter_value_controls(
+                            render_filter_value_controls(
+                                ui,
+                                DateTimeInput,
                                 filter_fields[str(builder_state["field_name"])],
                                 str(builder_state["operator"]),
                                 builder_state,
@@ -483,7 +325,7 @@ class PandasPlugin:
                         field_name = str(event.value)
                         builder_state["field_name"] = field_name
                         field = filter_fields[field_name]
-                        _set_select_options(operator_control, build_operator_options(field))
+                        set_select_options(operator_control, build_operator_options(field))
                         _set_operator(field.source_meta.get("filter_default_operator", "equals"))
 
                     def _on_operator_change(event):
@@ -527,10 +369,12 @@ class PandasPlugin:
                     apply_filters()
 
                 def render_active_filters():
-                    _render_active_filters_list(
+                    render_active_filters_list(
+                        ui,
                         active_filters_host,
                         filter_values,
                         filter_fields,
+                        FILTER_OPERATORS,
                         _toggle_filter,
                         _remove_filter,
                     )
