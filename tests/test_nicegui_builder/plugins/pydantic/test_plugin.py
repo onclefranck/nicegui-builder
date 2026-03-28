@@ -1,13 +1,13 @@
 from pydantic import BaseModel
 
 from nicegui_builder.plugins.pydantic import pydantic_plugin
-import nicegui_builder.plugins.pydantic.plugin as plugin_module
-from nicegui_builder.plugins.pydantic.plugin import (
-    _build_section_node,
-    _default_field_classes,
-    _filters_field_classes,
-    _group_fields_by_section,
+from nicegui_builder.plugins.pydantic.layout import (
+    build_section_node,
+    default_field_classes,
+    filters_field_classes,
+    group_fields_by_section,
 )
+import nicegui_builder.plugins.pydantic.plugin as plugin_module
 from nicegui_builder.core.models import FieldSpec, LayoutNode, WidgetSpec
 
 from .support import (
@@ -149,7 +149,7 @@ def test_pydantic_plugin_can_group_unknown_sections_after_known_ones():
     mystery = FieldSpec(name="mystery", python_type=str, source_meta={"group_label": "mystery"})
     structured = FieldSpec(name="payload", python_type=dict, source_meta={"is_structured": True})
 
-    grouped = _group_fields_by_section([mystery, general, structured])
+    grouped = group_fields_by_section([mystery, general, structured])
 
     assert [section for section, _ in grouped] == ["General", "Structured data", "mystery"]
 
@@ -159,17 +159,17 @@ def test_pydantic_plugin_field_class_helpers_cover_remaining_variants():
     long_text = FieldSpec(name="bio", python_type=str, source_meta={}, constraints={"max_length": 200})
     structured = FieldSpec(name="payload", python_type=dict, source_meta={"section": "structured"})
 
-    assert _default_field_classes(plain, WidgetSpec(component="color_input")) == "col-span-6"
-    assert _default_field_classes(long_text, WidgetSpec(component="input")) == "col-span-12"
-    assert _default_field_classes(structured, WidgetSpec(component="input")) == "col-span-12"
-    assert _default_field_classes(plain, WidgetSpec(component="slider")) == "col-span-12"
-    assert _filters_field_classes(plain, WidgetSpec(component="checkbox")) == "col-span-12"
+    assert default_field_classes(plain, WidgetSpec(component="color_input")) == "col-span-6"
+    assert default_field_classes(long_text, WidgetSpec(component="input")) == "col-span-12"
+    assert default_field_classes(structured, WidgetSpec(component="input")) == "col-span-12"
+    assert default_field_classes(plain, WidgetSpec(component="slider")) == "col-span-12"
+    assert filters_field_classes(plain, WidgetSpec(component="checkbox")) == "col-span-12"
 
 
 def test_pydantic_plugin_build_section_node_returns_column_wrapper():
     field = FieldSpec(name="nickname", python_type=str)
 
-    node = _build_section_node(
+    node = build_section_node(
         "General",
         [field],
         lambda spec, variant="std": WidgetSpec(component="input"),

@@ -5,6 +5,12 @@ from pydantic import BaseModel
 from nicegui_builder.core.models import FieldSpec, LayoutNode, WidgetSpec
 
 from .inspect import build_field_context
+from .layout import (
+    build_section_node,
+    default_field_classes,
+    filters_field_classes,
+    group_fields_by_section,
+)
 from .mapping import (
     extract_options,
     resolve_map_type,
@@ -33,49 +39,6 @@ def _extract_constraints(field_info) -> dict:
                 constraints[key] = value
 
     return constraints
-
-
-def _default_field_classes(spec: FieldSpec, widget: WidgetSpec) -> str:
-    if spec.source_meta.get("section") == "structured":
-        return "col-span-12"
-
-    if widget.component in {"textarea", "radio", "checkbox", "switch"}:
-        return "col-span-12"
-
-    if spec.constraints.get("max_length", 0) and spec.constraints["max_length"] > 120:
-        return "col-span-12"
-
-    if widget.component in {"input", "number", "select", "date", "time", "color_input"}:
-        return "col-span-6"
-
-    return "col-span-12"
-
-
-def _filters_field_classes(spec: FieldSpec, widget: WidgetSpec) -> str:
-    if widget.component in {"textarea", "radio"}:
-        return "col-span-12"
-
-    if widget.component in {"input", "number", "select", "date", "time"}:
-        return "col-span-6"
-
-    return "col-span-12"
-def _field_group_label(spec: FieldSpec) -> str:
-    meta = spec.source_meta
-    if "group_label" in meta:
-        return meta["group_label"]
-    if meta.get("is_nested_model"):
-        return "Nested models"
-    if meta.get("is_collection"):
-        return "Collections"
-    if meta.get("is_structured"):
-        return "Structured data"
-    return "General"
-
-
-def _filter_variant_for_field(spec: FieldSpec) -> str:
-    return spec.source_meta.get("filter_variant", "search")
-
-
 def _is_pydantic_model_type(annotation) -> bool:
     try:
         return isinstance(annotation, type) and issubclass(annotation, BaseModel)
@@ -86,80 +49,6 @@ def _is_pydantic_model_type(annotation) -> bool:
 def _is_collection_annotation(annotation) -> bool:
     origin = t.get_origin(annotation)
     return origin in {list, tuple, set, dict}
-def _group_fields_by_section(fields: list[FieldSpec]) -> list[tuple[str, list[FieldSpec]]]:
-    grouped: dict[str, list[FieldSpec]] = {}
-    for field in fields:
-        grouped.setdefault(_field_group_label(field), []).append(field)
-
-    ordered_sections = ["General", "Nested models", "Collections", "Structured data"]
-    results: list[tuple[str, list[FieldSpec]]] = []
-
-    for section in ordered_sections:
-        section_fields = grouped.pop(section, [])
-        if section_fields:
-            results.append((section, section_fields))
-
-    for section, section_fields in grouped.items():
-        results.append((section, section_fields))
-
-    return results
-
-
-def _build_section_node(
-    title: str,
-    fields: list[FieldSpec],
-    resolve_widget,
-    field_classes_resolver,
-    *,
-    flavor: str,
-):
-    field_children = []
-    for field in fields:
-        if flavor == "detail":
-            widget_variant = "label"
-        elif flavor == "filters":
-            widget_variant = _filter_variant_for_field(field)
-        else:
-            widget_variant = "std"
-        widget = resolve_widget(field, variant=widget_variant)
-        field_children.append(
-            LayoutNode(
-                methods=f"field__{field.name}",
-                classes=field_classes_resolver(field, widget),
-                context={
-                    "builder_value": {
-                        "classes": field_classes_resolver(field, widget),
-                        "methods": widget_variant,
-                    }
-                },
-            )
-        )
-
-    section_children = [
-        LayoutNode(
-            methods="label",
-            params={"text": title},
-            classes="text-subtitle2 text-primary",
-        )
-    ]
-
-    if flavor == "compact":
-        section_children.extend(field_children)
-    else:
-        section_children.append(
-            LayoutNode(
-                methods="grid",
-                params={"columns": 12},
-                classes="w-full gap-3",
-                children=field_children,
-            )
-        )
-
-    return LayoutNode(
-        methods="column",
-        classes="w-full gap-2",
-        children=section_children,
-    )
 
 
 class PydanticPlugin:
@@ -240,11 +129,11 @@ class PydanticPlugin:
         elif flavor == "detail":
             field_classes_resolver = lambda _field, _widget: "col-span-12"
         elif flavor == "filters":
-            field_classes_resolver = _filters_field_classes
+            field_classes_resolver = filters_field_classes
         elif flavor == "actionable":
-            field_classes_resolver = _default_field_classes
+            field_classes_resolver = default_field_classes
         else:
-            field_classes_resolver = _default_field_classes
+            field_classes_resolver = default_field_classes
         children = [
             LayoutNode(
                 methods="label",
@@ -253,9 +142,9 @@ class PydanticPlugin:
             )
         ]
 
-        for section_title, section_fields in _group_fields_by_section(fields):
+        for section_title, section_fields in group_fields_by_section(fields):
             children.append(
-                _build_section_node(
+                build_section_node(
                     section_title,
                     section_fields,
                     self.resolve_widget,
