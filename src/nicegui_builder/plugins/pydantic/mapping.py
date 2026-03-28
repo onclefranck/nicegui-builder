@@ -14,6 +14,8 @@ NoneType = type(None)
 
 
 def extract_options(field_info, **kwargs):
+    # The builder may call this through `$module:function` context resolution and
+    # pass the full field context as keyword arguments, so this signature must stay tolerant.
     annotation = unwrap_optional_annotation(field_info.annotation)
     origin = t.get_origin(annotation)
 

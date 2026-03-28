@@ -628,14 +628,11 @@ class PandasPlugin:
                     )
                     value_host = ui.column().classes("gap-2")
 
-                    def _current_field() -> FieldSpec:
-                        return filter_fields[str(builder_state["field_name"])]
-
                     def _render_builder_value_controls():
                         value_host.clear()
                         with value_host:
                             _render_filter_value_controls(
-                                _current_field(),
+                                filter_fields[str(builder_state["field_name"])],
                                 str(builder_state["operator"]),
                                 builder_state,
                                 "value",

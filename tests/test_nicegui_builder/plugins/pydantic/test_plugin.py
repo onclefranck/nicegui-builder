@@ -3,11 +3,8 @@ from pydantic import BaseModel
 from nicegui_builder.plugins.pydantic import pydantic_plugin
 import nicegui_builder.plugins.pydantic.plugin as plugin_module
 from nicegui_builder.plugins.pydantic.plugin import (
-    _actionable_field_classes,
     _build_section_node,
-    _compact_field_classes,
     _default_field_classes,
-    _detail_field_classes,
     _filters_field_classes,
     _group_fields_by_section,
 )
@@ -147,19 +144,10 @@ def test_pydantic_plugin_supports_model_types_and_instances_but_not_other_values
     assert pydantic_plugin.supports("not-a-model") is False
 
 
-def test_pydantic_plugin_can_group_unknown_sections_after_known_ones(monkeypatch):
+def test_pydantic_plugin_can_group_unknown_sections_after_known_ones():
     general = FieldSpec(name="general", python_type=str, source_meta={})
-    mystery = FieldSpec(name="mystery", python_type=str, source_meta={})
+    mystery = FieldSpec(name="mystery", python_type=str, source_meta={"group_label": "mystery"})
     structured = FieldSpec(name="payload", python_type=dict, source_meta={"is_structured": True})
-
-    original = plugin_module._section_for_field
-
-    def fake_section_for_field(spec):
-        if spec.name == "mystery":
-            return "mystery"
-        return original(spec)
-
-    monkeypatch.setattr(plugin_module, "_section_for_field", fake_section_for_field)
 
     grouped = _group_fields_by_section([mystery, general, structured])
 
@@ -175,10 +163,7 @@ def test_pydantic_plugin_field_class_helpers_cover_remaining_variants():
     assert _default_field_classes(long_text, WidgetSpec(component="input")) == "col-span-12"
     assert _default_field_classes(structured, WidgetSpec(component="input")) == "col-span-12"
     assert _default_field_classes(plain, WidgetSpec(component="slider")) == "col-span-12"
-    assert _compact_field_classes(plain, WidgetSpec(component="input")) == "w-full"
-    assert _detail_field_classes(plain, WidgetSpec(component="input")) == "col-span-12"
     assert _filters_field_classes(plain, WidgetSpec(component="checkbox")) == "col-span-12"
-    assert _actionable_field_classes(plain, WidgetSpec(component="input")) == "col-span-6"
 
 
 def test_pydantic_plugin_build_section_node_returns_column_wrapper():

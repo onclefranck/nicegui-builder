@@ -69,34 +69,6 @@ class LayoutNode:
             ],
         )
 
-    @classmethod
-    def from_dict(cls, data: JsonDict) -> "LayoutNode":
-        return cls(
-            methods=data["methods"],
-            params=dict(data.get("params") or {}),
-            props=data.get("props", ""),
-            classes=data.get("classes", ""),
-            ref=data.get("ref"),
-            children=[
-                cls.from_dict(child) if isinstance(child, dict) and "methods" in child else child
-                for child in (data.get("children") or [])
-            ],
-            context=dict(data.get("context") or {}),
-        )
-
-    def to_builder_dict(self) -> JsonDict:
-        return {
-            "methods": self.methods,
-            "params": dict(self.params),
-            "props": self.props,
-            "classes": self.classes,
-            "ref": self.ref,
-            "children": [
-                child.to_builder_dict() if isinstance(child, LayoutNode) else child
-                for child in self.children
-            ],
-        }
-
     def to_layout_entry(self) -> JsonDict:
         return {
             self.methods: {

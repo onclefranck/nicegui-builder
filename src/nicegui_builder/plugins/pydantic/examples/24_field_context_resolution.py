@@ -71,7 +71,7 @@ def build_ui():
 
         with ui.card().classes("gap-2"):
             ui.label("Resolved node").classes("text-subtitle1")
-            ui.markdown(f"```json\n{_pretty(resolved.node.to_builder_dict())}\n```").classes("w-full")
+            ui.markdown(f"```json\n{_pretty(resolved.node.to_layout_entry())}\n```").classes("w-full")
 
 
 def main(*, port: int = 8080, host: str | None = None, reload: bool = False):

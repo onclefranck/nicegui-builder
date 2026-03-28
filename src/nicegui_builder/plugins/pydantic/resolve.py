@@ -7,12 +7,10 @@ def resolve_field_node(
     model_class, model_instance, fieldname: str, value: dict | None
 ) -> ResolvedFieldNode:
     value = value or {}
-
     field_ctx = build_field_context(model_class, model_instance, fieldname)
     field_info = field_ctx["field_info"]
     requested_variant = value.get("methods", "std")
-
-    widget, _default_info = resolve_widget_spec(field_info, field_info.annotation, requested_variant)
+    widget, _ = resolve_widget_spec(field_info, field_info.annotation, requested_variant)
 
     return ResolvedFieldNode(
         field_ctx=field_ctx,

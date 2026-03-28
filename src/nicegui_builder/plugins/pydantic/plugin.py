@@ -51,14 +51,6 @@ def _default_field_classes(spec: FieldSpec, widget: WidgetSpec) -> str:
     return "col-span-12"
 
 
-def _compact_field_classes(spec: FieldSpec, widget: WidgetSpec) -> str:
-    return "w-full"
-
-
-def _detail_field_classes(spec: FieldSpec, widget: WidgetSpec) -> str:
-    return "col-span-12"
-
-
 def _filters_field_classes(spec: FieldSpec, widget: WidgetSpec) -> str:
     if widget.component in {"textarea", "radio"}:
         return "col-span-12"
@@ -67,22 +59,8 @@ def _filters_field_classes(spec: FieldSpec, widget: WidgetSpec) -> str:
         return "col-span-6"
 
     return "col-span-12"
-
-
-def _actionable_field_classes(spec: FieldSpec, widget: WidgetSpec) -> str:
-    return _default_field_classes(spec, widget)
-
-
-def _field_meta(spec: FieldSpec) -> dict:
-    return spec.source_meta
-
-
-def _field_section_key(spec: FieldSpec) -> str:
-    return _field_meta(spec).get("section", "general")
-
-
 def _field_group_label(spec: FieldSpec) -> str:
-    meta = _field_meta(spec)
+    meta = spec.source_meta
     if "group_label" in meta:
         return meta["group_label"]
     if meta.get("is_nested_model"):
@@ -95,7 +73,7 @@ def _field_group_label(spec: FieldSpec) -> str:
 
 
 def _filter_variant_for_field(spec: FieldSpec) -> str:
-    return _field_meta(spec).get("filter_variant", "search")
+    return spec.source_meta.get("filter_variant", "search")
 
 
 def _is_pydantic_model_type(annotation) -> bool:
@@ -108,16 +86,10 @@ def _is_pydantic_model_type(annotation) -> bool:
 def _is_collection_annotation(annotation) -> bool:
     origin = t.get_origin(annotation)
     return origin in {list, tuple, set, dict}
-
-
-def _section_for_field(spec: FieldSpec) -> str:
-    return _field_group_label(spec)
-
-
 def _group_fields_by_section(fields: list[FieldSpec]) -> list[tuple[str, list[FieldSpec]]]:
     grouped: dict[str, list[FieldSpec]] = {}
     for field in fields:
-        grouped.setdefault(_section_for_field(field), []).append(field)
+        grouped.setdefault(_field_group_label(field), []).append(field)
 
     ordered_sections = ["General", "Nested models", "Collections", "Structured data"]
     results: list[tuple[str, list[FieldSpec]]] = []
@@ -264,13 +236,13 @@ class PydanticPlugin:
         fields = self.inspect_fields(source)
         flavor = flavor or ""
         if flavor == "compact":
-            field_classes_resolver = _compact_field_classes
+            field_classes_resolver = lambda _field, _widget: "w-full"
         elif flavor == "detail":
-            field_classes_resolver = _detail_field_classes
+            field_classes_resolver = lambda _field, _widget: "col-span-12"
         elif flavor == "filters":
             field_classes_resolver = _filters_field_classes
         elif flavor == "actionable":
-            field_classes_resolver = _actionable_field_classes
+            field_classes_resolver = _default_field_classes
         else:
             field_classes_resolver = _default_field_classes
         children = [
@@ -330,7 +302,7 @@ class PydanticPlugin:
 
     def resolve_widget(self, spec: FieldSpec, variant: str = "std") -> WidgetSpec:
         field_info = spec.source_meta["field_info"]
-        widget, _default_info = resolve_widget_spec(field_info, spec.python_type, variant)
+        widget, _ = resolve_widget_spec(field_info, spec.python_type, variant)
         return widget
 
     def build_field_context(self, model_class, model_instance, fieldname: str) -> dict:
