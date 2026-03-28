@@ -21,7 +21,6 @@ class FakePlugin:
         return ResolvedFieldNode(
             node=LayoutNode(methods="input", params={"label": fieldname}),
             field_ctx={"fieldname": fieldname},
-            default_info={},
         )
 
     def build_layout(self, source, flavor=""):
@@ -105,7 +104,6 @@ def test_resolve_plugin_field_updates_builder_context_and_assigns_field_ref():
             return ResolvedFieldNode(
                 node=LayoutNode(methods="input", params={"label": "Name"}),
                 field_ctx={"title": "Name"},
-                default_info={"methods": "input"},
             )
 
     ctx = {
@@ -123,7 +121,6 @@ def test_resolve_plugin_field_updates_builder_context_and_assigns_field_ref():
     assert node.ref == "field:name"
     assert current["fieldname"] == "name"
     assert current["title"] == "Name"
-    assert current["default_info"] == {"methods": "input"}
 
 
 def test_form_reraises_missing_layout_when_plugin_cannot_build_one(monkeypatch):
@@ -133,7 +130,6 @@ def test_form_reraises_missing_layout_when_plugin_cannot_build_one(monkeypatch):
         resolve_field_node=lambda model_class, model_instance, fieldname, value: ResolvedFieldNode(
             node=LayoutNode(methods="input", params={"label": fieldname}),
             field_ctx={"fieldname": fieldname},
-            default_info={},
         ),
     )
     monkeypatch.setattr(form_module.plugin_registry, "resolve", lambda source: plugin)

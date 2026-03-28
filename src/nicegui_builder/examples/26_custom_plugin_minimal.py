@@ -73,7 +73,6 @@ class LostSockPlugin:
         )
         return ResolvedFieldNode(
             field_ctx=field_ctx,
-            default_info={"methods": widget.component},
             node=node,
         )
 

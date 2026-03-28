@@ -82,7 +82,6 @@ class LayoutNode:
 class ResolvedFieldNode:
     node: LayoutNode
     field_ctx: JsonDict = field(default_factory=dict)
-    default_info: JsonDict = field(default_factory=dict)
 
 
 @dataclass(slots=True)

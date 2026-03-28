@@ -57,7 +57,6 @@ def resolve_field_node(
     if map_type == "datetime" and widget.variant == "split":
         return ResolvedFieldNode(
             field_ctx=field_ctx,
-            default_info=default_info,
             node=_build_datetime_split_node(field_ctx, default_info, value),
         )
 
@@ -81,7 +80,6 @@ def resolve_field_node(
 
     return ResolvedFieldNode(
         field_ctx=field_ctx,
-        default_info=default_info,
         node=LayoutNode(
             methods=widget.component,
             params=params,
