@@ -153,18 +153,18 @@ def resolve_map_type(annotation) -> str:
     return str(annotation)
 
 
-def get_defaults_from_map(str1: str, str2: str = "std"):
+def get_defaults_from_map(map_type: str, variant: str = "std"):
     mapping = load_pydantic_widget_map()
-    if not str1:
+    if not map_type:
         error = (
-            f"can't resolve a key from str1: \"{str1}\" and str2: \"{str2}\" "
+            f"can't resolve a key from map_type: \"{map_type}\" and variant: \"{variant}\" "
             "to handle pydantic-nicegui.yml"
         )
         raise ValueError(error)
 
-    variant = str2 or "std"
-    map_key = f"{str1}|{variant}"
-    fallback_key = f"{str1}|std"
+    variant = variant or "std"
+    map_key = f"{map_type}|{variant}"
+    fallback_key = f"{map_type}|std"
 
     if map_key in mapping:
         return mapping[map_key]
@@ -173,31 +173,35 @@ def get_defaults_from_map(str1: str, str2: str = "std"):
         return mapping[fallback_key]
 
     error = (
-        f"can't resolve a key from str1: \"{str1}\" and str2: \"{str2}\" "
+        f"can't resolve a key from map_type: \"{map_type}\" and variant: \"{variant}\" "
         "to handle pydantic-nicegui.yml"
     )
     raise KeyError(error)
 
 
-def resolve_widget_spec(field_info, python_type, variant: str = "std") -> WidgetSpec:
-    map_type = resolve_map_type(python_type)
+def _build_datetime_widget_spec(variant: str, methods: str, default_info: dict) -> WidgetSpec:
+    return WidgetSpec(
+        component="datetime_input",
+        variant=variant,
+        params={
+            "container": {
+                "methods": methods,
+                "params": dict(default_info.get("params", {})),
+                "classes": default_info.get("classes", ""),
+                "props": default_info.get("props", ""),
+            }
+        },
+    )
+
+
+def resolve_widget_spec(field_info, python_type, variant: str = "std", map_type: str | None = None) -> WidgetSpec:
+    map_type = map_type or resolve_map_type(python_type)
     effective_variant = select_default_variant(field_info, map_type, variant)
     default_info = get_defaults_from_map(map_type, effective_variant)
     methods = default_info.get("methods")
 
     if map_type == "datetime" and effective_variant == "split":
-        return WidgetSpec(
-            component="datetime_input",
-            variant=effective_variant,
-            params={
-                "container": {
-                    "methods": methods,
-                    "params": dict(default_info.get("params", {})),
-                    "classes": default_info.get("classes", ""),
-                    "props": default_info.get("props", ""),
-                }
-            },
-        )
+        return _build_datetime_widget_spec(effective_variant, methods, default_info)
 
     validation_props = build_validation_props(field_info, methods)
     props = " ".join(

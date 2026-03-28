@@ -39,6 +39,48 @@ def _extract_constraints(field_info) -> dict:
                 constraints[key] = value
 
     return constraints
+
+
+def _classify_field(field_info) -> tuple[list[object], dict]:
+    annotation = field_info.annotation
+    map_type = resolve_map_type(annotation)
+    choices: list[object] = []
+    is_nested_model = _is_pydantic_model_type(annotation)
+    is_collection = _is_collection_annotation(annotation)
+    is_structured = map_type in {"dict", "list", "set", "tuple", "Json"} or is_nested_model
+    section = "structured" if is_structured else "general"
+
+    if is_nested_model:
+        group_label = "Nested models"
+    elif is_collection:
+        group_label = "Collections"
+    elif is_structured:
+        group_label = "Structured data"
+    else:
+        group_label = "General"
+
+    if map_type in {"Literal", "Enum"}:
+        choices = extract_options(field_info)
+
+    if annotation is bool:
+        filter_variant = "select"
+    elif choices or annotation in {int, float}:
+        filter_variant = "std"
+    else:
+        filter_variant = "search"
+
+    return choices, {
+        "field_info": field_info,
+        "map_type": map_type,
+        "is_nested_model": is_nested_model,
+        "is_collection": is_collection,
+        "is_structured": is_structured,
+        "section": section,
+        "group_label": group_label,
+        "filter_variant": filter_variant,
+    }
+
+
 def _is_pydantic_model_type(annotation) -> bool:
     try:
         return isinstance(annotation, type) and issubclass(annotation, BaseModel)
@@ -66,33 +108,8 @@ class PydanticPlugin:
         for fieldname, field_info in model_class.model_fields.items():
             metadata = field_info.asdict()
             attributes = metadata.get("attributes", {})
-            map_type = resolve_map_type(field_info.annotation)
             nullable = field_info.default is None
-            choices: list[object] = []
-            annotation = field_info.annotation
-            is_nested_model = _is_pydantic_model_type(annotation)
-            is_collection = _is_collection_annotation(annotation)
-            is_structured = map_type in {"dict", "list", "set", "tuple", "Json"} or is_nested_model
-            section = "structured" if is_structured else "general"
-
-            if is_nested_model:
-                group_label = "Nested models"
-            elif is_collection:
-                group_label = "Collections"
-            elif is_structured:
-                group_label = "Structured data"
-            else:
-                group_label = "General"
-
-            if map_type in {"Literal", "Enum"}:
-                choices = extract_options(field_info)
-
-            if annotation is bool:
-                filter_variant = "select"
-            elif choices or annotation in {int, float}:
-                filter_variant = "std"
-            else:
-                filter_variant = "search"
+            choices, source_meta = _classify_field(field_info)
 
             fields.append(
                 FieldSpec(
@@ -106,15 +123,7 @@ class PydanticPlugin:
                     examples=list(attributes.get("examples") or []),
                     choices=choices,
                     constraints=_extract_constraints(field_info),
-                    source_meta={
-                        "field_info": field_info,
-                        "is_nested_model": is_nested_model,
-                        "is_collection": is_collection,
-                        "is_structured": is_structured,
-                        "section": section,
-                        "group_label": group_label,
-                        "filter_variant": filter_variant,
-                    },
+                    source_meta=source_meta,
                 )
             )
 
@@ -191,7 +200,12 @@ class PydanticPlugin:
 
     def resolve_widget(self, spec: FieldSpec, variant: str = "std") -> WidgetSpec:
         field_info = spec.source_meta["field_info"]
-        return resolve_widget_spec(field_info, spec.python_type, variant)
+        return resolve_widget_spec(
+            field_info,
+            spec.python_type,
+            variant,
+            map_type=spec.source_meta.get("map_type"),
+        )
 
     def build_field_context(self, model_class, model_instance, fieldname: str) -> dict:
         return build_field_context(model_class, model_instance, fieldname)
