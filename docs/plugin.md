@@ -2,7 +2,7 @@
 
 [Home](../README.md)
 
-[Previous: Publishing](publishing.md) | [Next: Architecture](architecture.md)
+[Previous: Table](table.md) | [Next: Architecture](architecture.md)
 
 This document explains how to add a new source plugin to `nicegui-builder`.
 
