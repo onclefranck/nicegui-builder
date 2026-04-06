@@ -11,7 +11,7 @@ from nicegui_builder import load_layout
 
 
 def build_ui():
-    ui.builder(load_layout("01_basic_builder"))
+    ui.builder(load_layout("ex01_basic_builder"))
 
 
 def main(*, port: int = 8080, host: str | None = None, reload: bool = False):

@@ -15,8 +15,8 @@ Run these commands from the project root:
 
 ```bash
 nicegui-builder examples list
-nicegui-builder examples run 03_pydantic_form_basic
-nicegui-builder examples run 10_pandas_table_filters --port 8081
+nicegui-builder examples run ex03_pydantic_form_basic
+nicegui-builder examples run ex10_pandas_table_filters --port 8081
 ```
 
 The first command lists every bundled example.

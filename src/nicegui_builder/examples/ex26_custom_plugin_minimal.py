@@ -44,7 +44,7 @@ class LostSockPlugin:
 
     def build_layout(self, source, flavor: str = ""):
         del flavor
-        return load_layout("26_custom_plugin_minimal")
+        return load_layout("ex26_custom_plugin_minimal")
 
     def build_field_context(self, model_class, model_instance, fieldname: str) -> dict:
         del model_class

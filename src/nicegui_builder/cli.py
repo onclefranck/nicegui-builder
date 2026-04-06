@@ -22,6 +22,12 @@ class ExampleSpec:
     group: str
 
 
+def _strip_example_prefix(name: str) -> str:
+    if len(name) >= 4 and name.startswith("ex") and name[2:4].isdigit():
+        return name[2:]
+    return name
+
+
 def _build_windows_keypress_watcher(stop_event: threading.Event, message: str):
     try:
         import msvcrt
@@ -174,8 +180,16 @@ def resolve_example_spec(name: str) -> ExampleSpec:
     if exact is not None:
         return exact
 
+    normalized_name = _strip_example_prefix(name)
+    normalized_exact = next(
+        (spec for spec in examples if _strip_example_prefix(spec.name) == normalized_name),
+        None,
+    )
+    if normalized_exact is not None:
+        return normalized_exact
+
     for example in examples:
-        if example.name.startswith(name):
+        if example.name.startswith(name) or _strip_example_prefix(example.name).startswith(normalized_name):
             return example
 
     raise LookupError(f"unknown example: {name}")

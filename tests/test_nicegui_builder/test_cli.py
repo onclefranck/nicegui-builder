@@ -11,16 +11,16 @@ def test_list_examples_includes_known_examples():
 
     assert "demo_basic_builder" in examples
     assert "demo_pydantic_builder" in examples
-    assert "04_pandas_table_basic" in examples
+    assert "ex04_pandas_table_basic" in examples
 
 
 def test_list_example_specs_include_plugin_groups():
     specs = cli.list_example_specs()
     grouped = {spec.name: spec.group for spec in specs}
 
-    assert grouped["01_basic_builder"] == "core"
-    assert grouped["03_pydantic_form_basic"] == "pydantic"
-    assert grouped["04_pandas_table_basic"] == "pandas"
+    assert grouped["ex01_basic_builder"] == "core"
+    assert grouped["ex03_pydantic_form_basic"] == "pydantic"
+    assert grouped["ex04_pandas_table_basic"] == "pandas"
 
 
 def test_load_object_resolves_module_paths():
@@ -43,12 +43,12 @@ def test_resolve_example_name_accepts_full_name(monkeypatch):
         cli,
         "list_example_specs",
         lambda: [
-            cli.ExampleSpec("01_basic_builder", "pkg.core.01_basic_builder", "core"),
-            cli.ExampleSpec("03_pydantic_form_basic", "pkg.pydantic.03_pydantic_form_basic", "pydantic"),
+            cli.ExampleSpec("ex01_basic_builder", "pkg.core.ex01_basic_builder", "core"),
+            cli.ExampleSpec("ex03_pydantic_form_basic", "pkg.pydantic.ex03_pydantic_form_basic", "pydantic"),
         ],
     )
 
-    assert cli.resolve_example_name("01_basic_builder") == "01_basic_builder"
+    assert cli.resolve_example_name("ex01_basic_builder") == "ex01_basic_builder"
 
 
 def test_resolve_example_name_accepts_numeric_shortcut(monkeypatch):
@@ -56,12 +56,12 @@ def test_resolve_example_name_accepts_numeric_shortcut(monkeypatch):
         cli,
         "list_example_specs",
         lambda: [
-            cli.ExampleSpec("01_basic_builder", "pkg.core.01_basic_builder", "core"),
-            cli.ExampleSpec("03_pydantic_form_basic", "pkg.pydantic.03_pydantic_form_basic", "pydantic"),
+            cli.ExampleSpec("ex01_basic_builder", "pkg.core.ex01_basic_builder", "core"),
+            cli.ExampleSpec("ex03_pydantic_form_basic", "pkg.pydantic.ex03_pydantic_form_basic", "pydantic"),
         ],
     )
 
-    assert cli.resolve_example_name("01") == "01_basic_builder"
+    assert cli.resolve_example_name("01") == "ex01_basic_builder"
 
 
 def test_resolve_example_name_accepts_partial_prefix(monkeypatch):
@@ -69,13 +69,13 @@ def test_resolve_example_name_accepts_partial_prefix(monkeypatch):
         cli,
         "list_example_specs",
         lambda: [
-            cli.ExampleSpec("01_basic_builder", "pkg.core.01_basic_builder", "core"),
-            cli.ExampleSpec("03_pydantic_form_basic", "pkg.pydantic.03_pydantic_form_basic", "pydantic"),
+            cli.ExampleSpec("ex01_basic_builder", "pkg.core.ex01_basic_builder", "core"),
+            cli.ExampleSpec("ex03_pydantic_form_basic", "pkg.pydantic.ex03_pydantic_form_basic", "pydantic"),
         ],
     )
 
-    assert cli.resolve_example_name("01_") == "01_basic_builder"
-    assert cli.resolve_example_name("01_basic") == "01_basic_builder"
+    assert cli.resolve_example_name("01_") == "ex01_basic_builder"
+    assert cli.resolve_example_name("01_basic") == "ex01_basic_builder"
 
 
 def test_resolve_example_name_returns_first_match_for_ambiguous_shortcut(monkeypatch):
@@ -83,19 +83,19 @@ def test_resolve_example_name_returns_first_match_for_ambiguous_shortcut(monkeyp
         cli,
         "list_example_specs",
         lambda: [
-            cli.ExampleSpec("01_alpha", "pkg.core.01_alpha", "core"),
-            cli.ExampleSpec("01_beta", "pkg.pydantic.01_beta", "pydantic"),
+            cli.ExampleSpec("ex01_alpha", "pkg.core.ex01_alpha", "core"),
+            cli.ExampleSpec("ex01_beta", "pkg.pydantic.ex01_beta", "pydantic"),
         ],
     )
 
-    assert cli.resolve_example_name("01") == "01_alpha"
+    assert cli.resolve_example_name("01") == "ex01_alpha"
 
 
 def test_resolve_example_name_raises_for_unknown_example(monkeypatch):
     monkeypatch.setattr(
         cli,
         "list_example_specs",
-        lambda: [cli.ExampleSpec("01_basic_builder", "pkg.core.01_basic_builder", "core")],
+        lambda: [cli.ExampleSpec("ex01_basic_builder", "pkg.core.ex01_basic_builder", "core")],
     )
 
     try:
