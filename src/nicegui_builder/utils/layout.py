@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import typing as t
 from inspect import currentframe
 from pathlib import Path
 
@@ -16,22 +17,19 @@ def _caller_file() -> Path:
 
 
 def _resolve_base_dir(caller_file: str | Path | None) -> Path:
-    if caller_file is None:
-        caller_path = _caller_file()
-    else:
-        caller_path = Path(caller_file).resolve()
+    caller_path = _caller_file() if caller_file is None else Path(caller_file).resolve()
     return caller_path if caller_path.is_dir() else caller_path.parent
 
 
 def _adjacent_candidates(base_dir: Path, requested: Path) -> list[Path]:
-    if requested.is_absolute() or requested.parent != Path("."):
+    if requested.is_absolute() or requested.parent != Path():
         return []
     if requested.suffix:
         return [base_dir / requested.name]
     return [base_dir / f"{requested.name}.yml", base_dir / f"{requested.name}.yaml"]
 
 
-def load_layout(layout: str | Path, *, caller_file: str | Path | None = None):
+def load_layout(layout: str | Path, *, caller_file: str | Path | None = None) -> dict[str, t.Any]:
     requested = Path(layout)
     base_dir = _resolve_base_dir(caller_file)
 

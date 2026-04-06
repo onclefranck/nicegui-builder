@@ -1,16 +1,15 @@
-from importlib import import_module
 import pathlib as p
+from importlib import import_module
 
-from .builder import builder, register, builder_ctx
+from .builder import LayoutNode, builder, builder_ctx, register
 from .core.context import component_refs, ensure_builder_runtime
 from .core.form import FormHandle
 from .core.models import FormSpec
-from .plugins import plugin_registry
 from .plugins.registry import build_form_layout, maybe_render_form, resolve_field_plugin
 from .utils import load_layout
 
 
-def _resolve_layout_from_source(source, flavor: str):
+def _resolve_layout_from_source(source: object, flavor: str) -> FormHandle:
     source_class = source if isinstance(source, type) else source.__class__
     source_name = source_class.__name__
     layout_name = f"{source_name}-{flavor}" if flavor else source_name
@@ -18,7 +17,7 @@ def _resolve_layout_from_source(source, flavor: str):
     return load_layout(layout_name, caller_file=module_file)
 
 
-def _resolve_plugin_field(key: str, value: dict):
+def _resolve_plugin_field(key: str, value: dict) -> LayoutNode:
     value = value or {}
     ctx = builder_ctx.get()
 
@@ -42,7 +41,7 @@ def _resolve_plugin_field(key: str, value: dict):
 register("field", _resolve_plugin_field)
 
 
-def form(source, flavor: str = ""):
+def form(source: object, flavor: str = "") -> FormHandle:
     plugin = resolve_field_plugin(source)
 
     source_class = source if isinstance(source, type) else source.__class__
