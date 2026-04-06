@@ -15,6 +15,8 @@
         classes: w-full gap-3
         children:
         - field__sock_color:
+            # uncomment the following line to allow combobox instead
+            # methods: select
         - field__mismatch_level:
     - row:
         classes: w-full items-start gap-3

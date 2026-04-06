@@ -9,7 +9,8 @@ from datetime import datetime
 from nicegui import ui
 
 import nicegui_builder
-from nicegui_builder.plugins.pydantic.examples.models import Contest
+
+from .models import Contest
 
 
 def _sample_contest() -> Contest:

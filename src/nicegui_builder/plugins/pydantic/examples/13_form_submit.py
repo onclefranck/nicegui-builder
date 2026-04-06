@@ -7,7 +7,8 @@ which is a surprisingly philosophical sentence for a sock festival.
 from nicegui import ui
 
 import nicegui_builder
-from nicegui_builder.plugins.pydantic.examples.models import Registration
+
+from .models import Registration
 
 
 def _notify_values(values: dict[str, object]):

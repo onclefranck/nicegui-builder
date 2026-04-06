@@ -6,13 +6,14 @@ This is where a `datetime` quietly becomes two inputs and nobody panics. Much.
 
 from nicegui import ui
 
-from nicegui_builder.plugins.pydantic.examples.models import Contest, Participant, Registration
 from nicegui_builder.plugins.pydantic.mapping import (
     get_defaults_from_map,
     resolve_map_type,
     select_default_variant,
 )
 from nicegui_builder.plugins.pydantic.plugin import PydanticPlugin
+
+from .models import Contest, Participant, Registration
 
 
 def _mapping_rows(plugin: PydanticPlugin, source) -> list[dict[str, str]]:

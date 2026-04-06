@@ -8,7 +8,8 @@ This is the closest the festival gets to executive polish.
 from nicegui import ui
 
 import nicegui_builder
-from nicegui_builder.plugins.pydantic.examples.models import Contest
+
+from .models import Contest
 
 
 def _save_contest(model: Contest):
