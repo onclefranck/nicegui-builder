@@ -7,7 +7,7 @@ to "look, the festival form is already on screen".
 from nicegui import ui
 
 
-def build_ui():
+def build_ui() -> None:
     ui.label("CLI: run a form source").classes("text-h5")
     ui.markdown(
         """
@@ -24,7 +24,7 @@ or for checking whether the committee's latest field additions were truly wise.
     ).classes("w-full max-w-3xl")
 
 
-def main(*, port: int = 8080, host: str | None = None, reload: bool = False):
+def main(*, port: int = 8080, host: str | None = None, reload: bool = False) -> None:
     ui.run(root=build_ui, port=port, host=host, reload=reload)
 
 

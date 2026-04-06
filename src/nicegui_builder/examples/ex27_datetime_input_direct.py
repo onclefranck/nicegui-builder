@@ -8,10 +8,10 @@ from datetime import datetime
 
 from nicegui import ui
 
-import nicegui_builder
+import nicegui_builder  # noqa: F401
 
 
-def build_ui():
+def build_ui() -> None:
     ui.label("Direct datetime_input usage").classes("text-h5")
     ui.label(
         "This example uses ui.datetime_input(...) directly, without form_builder or pandas."
@@ -63,7 +63,7 @@ def build_ui():
             )
 
 
-def main(*, port: int = 8080, host: str | None = None, reload: bool = False):
+def main(*, port: int = 8080, host: str | None = None, reload: bool = False) -> None:
     ui.run(root=build_ui, port=port, host=host, reload=reload)
 
 

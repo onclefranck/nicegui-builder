@@ -6,7 +6,7 @@ This is how bureaucracy starts to feel dangerously confident.
 
 from nicegui import ui
 
-import nicegui_builder
+import nicegui_builder  # noqa: F401
 
 from .models import Registration
 
@@ -24,7 +24,7 @@ def _delete_registration(target):
     ui.notify(f"Deleted registration for {participant_name}")
 
 
-def build_ui():
+def build_ui() -> None:
     ui.label("CRUD-ready form actions").classes("text-h5")
     ui.label(
         "The registration desk has discovered buttons that sound official and therefore improve morale."
@@ -58,7 +58,7 @@ def build_ui():
     ).classes("text-caption text-grey-7")
 
 
-def main(*, port: int = 8080, host: str | None = None, reload: bool = False):
+def main(*, port: int = 8080, host: str | None = None, reload: bool = False) -> None:
     ui.run(root=build_ui, port=port, host=host, reload=reload)
 
 

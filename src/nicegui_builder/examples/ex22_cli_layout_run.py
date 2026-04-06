@@ -7,7 +7,7 @@ This is for the moment when someone says
 from nicegui import ui
 
 
-def build_ui():
+def build_ui() -> None:
     ui.label("CLI: run a layout file").classes("text-h5")
     ui.markdown(
         """
@@ -23,7 +23,7 @@ especially when the registration desk has opinions about spacing.
     ).classes("w-full max-w-3xl")
 
 
-def main(*, port: int = 8080, host: str | None = None, reload: bool = False):
+def main(*, port: int = 8080, host: str | None = None, reload: bool = False) -> None:
     ui.run(root=build_ui, port=port, host=host, reload=reload)
 
 

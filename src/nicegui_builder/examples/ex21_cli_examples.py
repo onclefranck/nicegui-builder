@@ -7,7 +7,7 @@ paste, and run before the kettle boils.
 from nicegui import ui
 
 
-def build_ui():
+def build_ui() -> None:
     ui.label("CLI: bundled examples").classes("text-h5")
     ui.markdown(
         """
@@ -26,7 +26,7 @@ demands a demonstration before lunch.
     ).classes("w-full max-w-3xl")
 
 
-def main(*, port: int = 8080, host: str | None = None, reload: bool = False):
+def main(*, port: int = 8080, host: str | None = None, reload: bool = False) -> None:
     ui.run(root=build_ui, port=port, host=host, reload=reload)
 
 

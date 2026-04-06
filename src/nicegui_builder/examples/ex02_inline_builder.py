@@ -6,7 +6,7 @@ but also wants it immediately and with suspicious confidence.
 
 from nicegui import ui
 
-import nicegui_builder
+import nicegui_builder  # noqa: F401
 
 
 LAYOUT = [
@@ -56,11 +56,11 @@ LAYOUT = [
 ]
 
 
-def build_ui():
+def build_ui() -> None:
     ui.builder(LAYOUT)
 
 
-def main(*, port: int = 8080, host: str | None = None, reload: bool = False):
+def main(*, port: int = 8080, host: str | None = None, reload: bool = False) -> None:
     ui.run(root=build_ui, port=port, host=host, reload=reload)
 
 

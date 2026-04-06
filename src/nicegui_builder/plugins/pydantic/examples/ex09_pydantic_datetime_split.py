@@ -8,7 +8,7 @@ from datetime import datetime
 
 from nicegui import ui
 
-import nicegui_builder
+import nicegui_builder  # noqa: F401
 
 from .models import Contest
 
@@ -22,7 +22,7 @@ def _sample_contest() -> Contest:
     )
 
 
-def build_ui():
+def build_ui() -> None:
     ui.label("Datetime split input").classes("text-h5")
     ui.label(
         "The schedule field is rendered as a date input plus a time input, then recombined by the handle."
@@ -46,7 +46,7 @@ def build_ui():
         ).classes("text-caption text-grey-7")
 
 
-def main(*, port: int = 8080, host: str | None = None, reload: bool = False):
+def main(*, port: int = 8080, host: str | None = None, reload: bool = False) -> None:
     ui.run(root=build_ui, port=port, host=host, reload=reload)
 
 

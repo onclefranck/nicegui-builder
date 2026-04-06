@@ -6,12 +6,12 @@ It is the closest thing this festival has to a reliable chaperone.
 
 from nicegui import ui
 
-import nicegui_builder
+import nicegui_builder  # noqa: F401
 
 from .models import Participant
 
 
-def build_ui():
+def build_ui() -> None:
     ui.label("Live form helpers").classes("text-h5")
     ui.label(
         "Dirty tracking, live validation, and strategic buttons all reacting as the form changes."
@@ -48,7 +48,7 @@ def build_ui():
     ).classes("text-caption text-grey-7")
 
 
-def main(*, port: int = 8080, host: str | None = None, reload: bool = False):
+def main(*, port: int = 8080, host: str | None = None, reload: bool = False) -> None:
     ui.run(root=build_ui, port=port, host=host, reload=reload)
 
 

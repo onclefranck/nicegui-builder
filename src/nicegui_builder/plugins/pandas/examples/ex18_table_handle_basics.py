@@ -63,7 +63,7 @@ def _sort_by_duration(handle):
     ui.notify(f"Sorted by duration: {durations}")
 
 
-def build_ui():
+def build_ui() -> None:
     ui.label("TableHandle basics").classes("text-h5")
     ui.label(
         "Rows can be read, replaced, and sorted without rethinking the entire festival."
@@ -86,7 +86,7 @@ def build_ui():
         )
 
 
-def main(*, port: int = 8080, host: str | None = None, reload: bool = False):
+def main(*, port: int = 8080, host: str | None = None, reload: bool = False) -> None:
     ui.run(root=build_ui, port=port, host=host, reload=reload)
 
 

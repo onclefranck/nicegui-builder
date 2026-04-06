@@ -7,7 +7,7 @@ This example documents the evidence to the contrary.
 from nicegui import ui
 from pydantic import BaseModel, Field
 
-import nicegui_builder
+import nicegui_builder  # noqa: F401
 
 
 class SupplyCrate(BaseModel):
@@ -37,7 +37,7 @@ class ParadePlan(BaseModel):
     )
 
 
-def build_ui():
+def build_ui() -> None:
     ui.label("Structured Pydantic fields").classes("text-h5")
     ui.label(
         "Nested models, lists, and dict-like values are grouped into their own generated sections."
@@ -56,7 +56,7 @@ def build_ui():
         )
 
 
-def main(*, port: int = 8080, host: str | None = None, reload: bool = False):
+def main(*, port: int = 8080, host: str | None = None, reload: bool = False) -> None:
     ui.run(root=build_ui, port=port, host=host, reload=reload)
 
 

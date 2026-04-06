@@ -43,7 +43,7 @@ def _markdown_table(rows: list[dict[str, str]]) -> str:
     return f"{header}\n{body}"
 
 
-def build_ui():
+def build_ui() -> None:
     plugin = PydanticPlugin()
 
     ui.label("Plugin-local mapping").classes("text-h5")
@@ -68,7 +68,7 @@ def build_ui():
     ).classes("text-caption text-grey-7")
 
 
-def main(*, port: int = 8080, host: str | None = None, reload: bool = False):
+def main(*, port: int = 8080, host: str | None = None, reload: bool = False) -> None:
     ui.run(root=build_ui, port=port, host=host, reload=reload)
 
 

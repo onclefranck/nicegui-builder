@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 from nicegui import ui
 
-import nicegui_builder
+import nicegui_builder  # noqa: F401
 
 
 class DemoPydanticBuilder(BaseModel):
@@ -10,11 +10,11 @@ class DemoPydanticBuilder(BaseModel):
     email: str
 
 
-def build_ui():
+def build_ui() -> None:
     ui.form_builder(DemoPydanticBuilder)
 
 
-def main(*, port: int = 8080, host: str | None = None, reload: bool = False):
+def main(*, port: int = 8080, host: str | None = None, reload: bool = False) -> None:
     ui.run(root=build_ui, port=port, host=host, reload=reload)
 
 

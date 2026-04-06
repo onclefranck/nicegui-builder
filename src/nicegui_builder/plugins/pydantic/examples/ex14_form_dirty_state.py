@@ -6,7 +6,7 @@ This example celebrates the exact moment it stops being one.
 
 from nicegui import ui
 
-import nicegui_builder
+import nicegui_builder  # noqa: F401
 
 from .models import Participant
 
@@ -19,7 +19,7 @@ def _show_changes(handle):
     ui.notify(str(changes))
 
 
-def build_ui():
+def build_ui() -> None:
     ui.label("Dirty state helpers").classes("text-h5")
     ui.label(
         "Change a field, and the form will cheerfully admit that it is no longer in its original state."
@@ -51,7 +51,7 @@ def build_ui():
         )
 
 
-def main(*, port: int = 8080, host: str | None = None, reload: bool = False):
+def main(*, port: int = 8080, host: str | None = None, reload: bool = False) -> None:
     ui.run(root=build_ui, port=port, host=host, reload=reload)
 
 

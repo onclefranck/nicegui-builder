@@ -9,7 +9,7 @@ import json
 
 from nicegui import ui
 
-import nicegui_builder
+import nicegui_builder  # noqa: F401
 from nicegui_builder.plugins import plugin_registry
 
 from .models import Participant
@@ -38,7 +38,7 @@ def _pretty(data) -> str:
     return json.dumps(data, indent=2, default=str)
 
 
-def build_ui():
+def build_ui() -> None:
     plugin = plugin_registry.resolve(Participant)
     sample = Participant(
         display_name="Rosalind Semicolon",
@@ -75,7 +75,7 @@ def build_ui():
             ui.markdown(f"```json\n{_pretty(resolved.node.to_layout_entry())}\n```").classes("w-full")
 
 
-def main(*, port: int = 8080, host: str | None = None, reload: bool = False):
+def main(*, port: int = 8080, host: str | None = None, reload: bool = False) -> None:
     ui.run(root=build_ui, port=port, host=host, reload=reload)
 
 

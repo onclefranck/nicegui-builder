@@ -6,12 +6,12 @@ change values, reset values, and pretend this was always the plan.
 
 from nicegui import ui
 
-import nicegui_builder
+import nicegui_builder  # noqa: F401
 
 from .models import Participant, SockColor
 
 
-def build_ui():
+def build_ui() -> None:
     ui.label("FormHandle basics").classes("text-h5")
     ui.label(
         "A few runtime helpers are enough to make the registration desk feel improbably organized."
@@ -59,7 +59,7 @@ def build_ui():
         )
 
 
-def main(*, port: int = 8080, host: str | None = None, reload: bool = False):
+def main(*, port: int = 8080, host: str | None = None, reload: bool = False) -> None:
     ui.run(root=build_ui, port=port, host=host, reload=reload)
 
 

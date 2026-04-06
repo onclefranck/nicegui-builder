@@ -10,7 +10,7 @@ from typing import Literal
 from nicegui import ui
 from pydantic import BaseModel, Field
 
-import nicegui_builder
+import nicegui_builder  # noqa: F401
 
 
 class SockMood(str, Enum):
@@ -47,7 +47,7 @@ class VariantShowcase(BaseModel):
     )
 
 
-def build_ui():
+def build_ui() -> None:
     ui.label("Pydantic field variants").classes("text-h5")
     ui.label(
         "Here the layout explicitly requests widget variants instead of relying on the plugin defaults."
@@ -83,7 +83,7 @@ def build_ui():
     ).classes("w-full max-w-4xl")
 
 
-def main(*, port: int = 8080, host: str | None = None, reload: bool = False):
+def main(*, port: int = 8080, host: str | None = None, reload: bool = False) -> None:
     ui.run(root=build_ui, port=port, host=host, reload=reload)
 
 

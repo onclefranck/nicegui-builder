@@ -48,7 +48,7 @@ def _select_first_two(handle):
     ui.notify("Selected the first two rows. The desk feels decisive.")
 
 
-def build_ui():
+def build_ui() -> None:
     ui.label("Table pagination, selection, and export").classes("text-h5")
     ui.label(
         "A few runtime helpers turn the registration board into a surprisingly capable little control panel."
@@ -78,7 +78,7 @@ def build_ui():
         )
 
 
-def main(*, port: int = 8080, host: str | None = None, reload: bool = False):
+def main(*, port: int = 8080, host: str | None = None, reload: bool = False) -> None:
     ui.run(root=build_ui, port=port, host=host, reload=reload)
 
 

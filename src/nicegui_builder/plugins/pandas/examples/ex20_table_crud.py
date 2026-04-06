@@ -100,7 +100,7 @@ def _select_first_visible_row(handle):
     ui.notify(f"Selected: {rows[0]['title']}")
 
 
-def build_ui():
+def build_ui() -> None:
     ui.label("CRUD-ready table actions").classes("text-h5")
     ui.label(
         "Selection is used by 'Delete selected'. 'Export CSV' previews the full current table."
@@ -125,7 +125,7 @@ def build_ui():
     )
 
 
-def main(*, port: int = 8080, host: str | None = None, reload: bool = False):
+def main(*, port: int = 8080, host: str | None = None, reload: bool = False) -> None:
     ui.run(root=build_ui, port=port, host=host, reload=reload)
 
 

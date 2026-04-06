@@ -43,7 +43,7 @@ def _registrations_dataframe() -> pd.DataFrame:
     )
 
 
-def build_ui():
+def build_ui() -> None:
     ui.label("Filtered Pandas table").classes("text-h5")
     ui.label(
         "Small filters appear automatically so the desk can find people before the ceremonial confusion begins."
@@ -99,7 +99,7 @@ def build_ui():
         )
 
 
-def main(*, port: int = 8080, host: str | None = None, reload: bool = False):
+def main(*, port: int = 8080, host: str | None = None, reload: bool = False) -> None:
     ui.run(root=build_ui, port=port, host=host, reload=reload)
 
 

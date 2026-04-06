@@ -6,7 +6,7 @@ which is a surprisingly philosophical sentence for a sock festival.
 
 from nicegui import ui
 
-import nicegui_builder
+import nicegui_builder  # noqa: F401
 
 from .models import Registration
 
@@ -19,7 +19,7 @@ def _notify_model(model: Registration):
     ui.notify(f"Rebuilt model with status {model.status}")
 
 
-def build_ui():
+def build_ui() -> None:
     ui.label("Form submit and model reconstruction").classes("text-h5")
     ui.label(
         "The same form can submit plain values or a reconstructed Pydantic model, depending on the desk's mood."
@@ -60,7 +60,7 @@ def build_ui():
     )
 
 
-def main(*, port: int = 8080, host: str | None = None, reload: bool = False):
+def main(*, port: int = 8080, host: str | None = None, reload: bool = False) -> None:
     ui.run(root=build_ui, port=port, host=host, reload=reload)
 
 

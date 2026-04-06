@@ -8,7 +8,7 @@ from datetime import datetime
 
 from nicegui import ui
 
-import nicegui_builder
+import nicegui_builder  # noqa: F401
 
 from .models import Contest, Participant, Registration
 
@@ -47,7 +47,7 @@ def _section(title: str, description: str):
         return ui.column().classes("w-full gap-3")
 
 
-def build_ui():
+def build_ui() -> None:
     ui.label("Automatic Pydantic form flavors").classes("text-h5")
     ui.label(
         "Because the Festival of Mismatched Socks deserves both dignity and options."
@@ -95,7 +95,7 @@ def build_ui():
             handle.live_error_panel(as_model=True, strategy="invalid")
 
 
-def main(*, port: int = 8080, host: str | None = None, reload: bool = False):
+def main(*, port: int = 8080, host: str | None = None, reload: bool = False) -> None:
     ui.run(root=build_ui, port=port, host=host, reload=reload)
 
 

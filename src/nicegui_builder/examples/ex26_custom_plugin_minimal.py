@@ -8,7 +8,7 @@ from dataclasses import dataclass
 
 from nicegui import ui
 
-import nicegui_builder
+import nicegui_builder  # noqa: F401
 from nicegui_builder import load_layout
 from nicegui_builder.core.models import FieldSpec, LayoutNode, ResolvedFieldNode, WidgetSpec
 from nicegui_builder.plugins import plugin_registry
@@ -88,7 +88,7 @@ class LostSockPlugin:
         return None
 
 
-def build_ui():
+def build_ui() -> None:
     plugin_registry.register(LostSockPlugin())
 
     ui.label("Minimal custom plugin").classes("text-h5")
@@ -109,7 +109,7 @@ def build_ui():
         )
 
 
-def main(*, port: int = 8080, host: str | None = None, reload: bool = False):
+def main(*, port: int = 8080, host: str | None = None, reload: bool = False) -> None:
     ui.run(root=build_ui, port=port, host=host, reload=reload)
 
 

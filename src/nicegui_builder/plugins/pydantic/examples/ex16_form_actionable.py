@@ -7,7 +7,7 @@ This is the closest the festival gets to executive polish.
 
 from nicegui import ui
 
-import nicegui_builder
+import nicegui_builder  # noqa: F401
 
 from .models import Contest
 
@@ -16,7 +16,7 @@ def _save_contest(model: Contest):
     ui.notify(f"Contest saved: {model.title}")
 
 
-def build_ui():
+def build_ui() -> None:
     ui.label("Actionable flavor").classes("text-h5")
     ui.label(
         "This layout exposes built-in status, action, and error areas so the handle can do more of the stage work."
@@ -48,7 +48,7 @@ def build_ui():
     ).classes("text-caption text-grey-7")
 
 
-def main(*, port: int = 8080, host: str | None = None, reload: bool = False):
+def main(*, port: int = 8080, host: str | None = None, reload: bool = False) -> None:
     ui.run(root=build_ui, port=port, host=host, reload=reload)
 
 

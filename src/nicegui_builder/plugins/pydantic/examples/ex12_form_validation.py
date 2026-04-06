@@ -7,7 +7,7 @@ The participants remain gloriously unpredictable.
 
 from nicegui import ui
 
-import nicegui_builder
+import nicegui_builder  # noqa: F401
 
 from .models import Participant
 
@@ -17,7 +17,7 @@ def _apply_errors(handle):
     ui.notify("Field errors applied. The desk has entered its corrective era.")
 
 
-def build_ui():
+def build_ui() -> None:
     ui.label("Form validation and error handling").classes("text-h5")
     ui.label(
         "Try clearing the required fields, then use the controls below to inspect and display validation errors."
@@ -59,7 +59,7 @@ def build_ui():
     )
 
 
-def main(*, port: int = 8080, host: str | None = None, reload: bool = False):
+def main(*, port: int = 8080, host: str | None = None, reload: bool = False) -> None:
     ui.run(root=build_ui, port=port, host=host, reload=reload)
 
 
