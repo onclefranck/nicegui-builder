@@ -18,6 +18,7 @@ from .core import (
 from .core.datetime_inputs import DateTimeInput
 from .form import form
 from .table import table
+from .utils import load_layout
 
 
 def _attach_to_ui() -> None:
@@ -34,6 +35,7 @@ STABLE_API = (
     "builder",
     "form",
     "table",
+    "load_layout",
     "ActionSpec",
     "FormHandle",
     "FormSpec",
@@ -59,6 +61,7 @@ __all__ = [
     "ActionSpec",
     "form",
     "table",
+    "load_layout",
     "FormHandle",
     "FormSpec",
     "FormState",

@@ -7,7 +7,7 @@ change values, reset values, and pretend this was always the plan.
 from nicegui import ui
 
 import nicegui_builder
-from nicegui_builder.example_models import Participant, SockColor
+from nicegui_builder.plugins.pydantic.examples.models import Participant, SockColor
 
 
 def build_ui():

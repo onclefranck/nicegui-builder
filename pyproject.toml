@@ -43,14 +43,14 @@ include-package-data = true
 nicegui_builder = [
   "py.typed",
   "*.pyi",
-  "example_models/*.yml",
-  "example_models/*.yaml",
   "examples/*.yml",
   "examples/*.yaml",
   "plugins/pydantic/*.yml",
   "plugins/pydantic/*.yaml",
   "plugins/pydantic/examples/*.yml",
   "plugins/pydantic/examples/*.yaml",
+  "plugins/pydantic/examples/models/*.yml",
+  "plugins/pydantic/examples/models/*.yaml",
 ]
 
 [tool.setuptools.dynamic]

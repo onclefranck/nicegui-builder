@@ -8,7 +8,7 @@ The digital future has rarely felt so necessary.
 from nicegui import ui
 
 import nicegui_builder
-from nicegui_builder.example_models import Participant
+from nicegui_builder.plugins.pydantic.examples.models import Participant
 
 
 def build_ui():

@@ -7,7 +7,7 @@ This is how bureaucracy starts to feel dangerously confident.
 from nicegui import ui
 
 import nicegui_builder
-from nicegui_builder.example_models import Registration
+from nicegui_builder.plugins.pydantic.examples.models import Registration
 
 
 def _create_registration(model: Registration):

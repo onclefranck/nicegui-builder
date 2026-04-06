@@ -1,0 +1,23 @@
+- card.tight:
+    classes: w-full max-w-3xl mx-auto p-4 gap-4
+    children:
+    - label:
+        params:
+          text: _{source_class.__name__}
+        classes: text-h5
+    - label:
+        params:
+          text: Register a participant and assess the seriousness of their sock mismatch.
+        classes: text-body2 text-grey-7
+    - field__display_name:
+    - field__email:
+    - row:
+        classes: w-full gap-3
+        children:
+        - field__sock_color:
+        - field__mismatch_level:
+    - row:
+        classes: w-full items-start gap-3
+        children:
+        - field__returning_legend:
+        - field__emergency_note:

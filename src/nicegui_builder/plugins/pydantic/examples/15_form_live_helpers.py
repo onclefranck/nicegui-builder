@@ -7,7 +7,7 @@ It is the closest thing this festival has to a reliable chaperone.
 from nicegui import ui
 
 import nicegui_builder
-from nicegui_builder.example_models import Participant
+from nicegui_builder.plugins.pydantic.examples.models import Participant
 
 
 def build_ui():

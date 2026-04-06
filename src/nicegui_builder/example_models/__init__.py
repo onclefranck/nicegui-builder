@@ -1,6 +1,13 @@
-from .contest import Contest, ContestCategory
-from .participant import Participant, SockColor
-from .registration import Registration, RegistrationStatus
+"""Backward-compatible alias for pydantic example models."""
+
+from nicegui_builder.plugins.pydantic.examples.models import (
+    Contest,
+    ContestCategory,
+    Participant,
+    Registration,
+    RegistrationStatus,
+    SockColor,
+)
 
 __all__ = [
     "Contest",

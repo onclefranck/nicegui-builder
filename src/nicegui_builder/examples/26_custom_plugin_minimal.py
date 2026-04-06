@@ -9,9 +9,9 @@ from dataclasses import dataclass
 from nicegui import ui
 
 import nicegui_builder
+from nicegui_builder import load_layout
 from nicegui_builder.core.models import FieldSpec, LayoutNode, ResolvedFieldNode, WidgetSpec
 from nicegui_builder.plugins import plugin_registry
-from nicegui_builder.utils import load_layout
 
 
 @dataclass

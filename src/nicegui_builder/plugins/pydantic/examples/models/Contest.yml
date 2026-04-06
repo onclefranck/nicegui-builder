@@ -1,0 +1,24 @@
+- card.tight:
+    classes: w-full max-w-3xl mx-auto p-4 gap-4
+    children:
+    - label:
+        params:
+          text: _{source_class.__name__}
+        classes: text-h5
+    - label:
+        params:
+          text: Configure a contest with categories, timing, and a courageous emcee.
+        classes: text-body2 text-grey-7
+    - field__title:
+    - row:
+        classes: w-full gap-3
+        children:
+        - field__category:
+        - field__duration_minutes:
+    - field__starts_at:
+        methods: datetime_split
+    - row:
+        classes: w-full items-start gap-3
+        children:
+        - field__team_event:
+        - field__master_of_ceremonies:

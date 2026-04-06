@@ -1,6 +1,6 @@
 from nicegui import ui
 import nicegui_builder
-from nicegui_builder.utils import load_layout
+from nicegui_builder import load_layout
 
 
 def build_ui():
