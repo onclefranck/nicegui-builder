@@ -2,21 +2,21 @@
 str|std:
   methods: input
   params:
-    value: _{fieldvalue}
+    value: =fieldvalue
     label: _{attributes_title}
     placeholder: _{attributes_description}
   props: clearable
 str|textarea:
   methods: textarea
   params:
-    value: _{fieldvalue}
+    value: =fieldvalue
     label: _{attributes_title}
     placeholder: _{attributes_description}
   props: autogrow clearable
 str|password:
   methods: input
   params:
-    value: _{fieldvalue}
+    value: =fieldvalue
     label: _{attributes_title}
     password: True
     password_toggle_button: True
@@ -24,21 +24,21 @@ str|password:
 str|email:
   methods: input
   params:
-    value: _{fieldvalue}
+    value: =fieldvalue
     label: _{attributes_title}
     placeholder: _{attributes_description}
   props: type=email clearable
 str|search:
   methods: input
   params:
-    value: _{fieldvalue}
+    value: =fieldvalue
     label: _{attributes_title}
     placeholder: _{attributes_description}
   props: clearable
 str|color:
   methods: color_input
   params:
-    value: _{fieldvalue}
+    value: =fieldvalue
     label: _{attributes_title}
 str|label:
   methods: label
@@ -48,14 +48,14 @@ str|label:
 bytes|std:
   methods: input
   params:
-    value: _{fieldvalue}
+    value: =fieldvalue
     label: _{attributes_title}
     placeholder: _{attributes_description}
   props: clearable
 bytes|textarea:
   methods: textarea
   params:
-    value: _{fieldvalue}
+    value: =fieldvalue
     label: _{attributes_title}
     placeholder: _{attributes_description}
   props: autogrow clearable
@@ -67,7 +67,7 @@ bytes|label:
 SecretStr|std:
   methods: input
   params:
-    value: _{fieldvalue}
+    value: =fieldvalue
     label: _{attributes_title}
     password: True
     password_toggle_button: True
@@ -76,98 +76,98 @@ SecretStr|std:
 EmailStr|std:
   methods: input
   params:
-    value: _{fieldvalue}
+    value: =fieldvalue
     label: _{attributes_title}
     placeholder: _{attributes_description}
   props: type=email clearable
 NameEmail|std:
   methods: input
   params:
-    value: _{fieldvalue}
+    value: =fieldvalue
     label: _{attributes_title}
     placeholder: _{attributes_description}
   props: type=email clearable
 AnyUrl|std:
   methods: input
   params:
-    value: _{fieldvalue}
+    value: =fieldvalue
     label: _{attributes_title}
     placeholder: _{attributes_description}
   props: type=url clearable
 AnyHttpUrl|std:
   methods: input
   params:
-    value: _{fieldvalue}
+    value: =fieldvalue
     label: _{attributes_title}
     placeholder: _{attributes_description}
   props: type=url clearable
 HttpUrl|std:
   methods: input
   params:
-    value: _{fieldvalue}
+    value: =fieldvalue
     label: _{attributes_title}
     placeholder: _{attributes_description}
   props: type=url clearable
 FileUrl|std:
   methods: input
   params:
-    value: _{fieldvalue}
+    value: =fieldvalue
     label: _{attributes_title}
     placeholder: _{attributes_description}
   props: type=url clearable
 Path|std:
   methods: input
   params:
-    value: _{fieldvalue}
+    value: =fieldvalue
     label: _{attributes_title}
     placeholder: _{attributes_description}
   props: clearable
 UUID|std:
   methods: input
   params:
-    value: _{fieldvalue}
+    value: =fieldvalue
     label: _{attributes_title}
     placeholder: _{attributes_description}
 UUID1|std:
   methods: input
   params:
-    value: _{fieldvalue}
+    value: =fieldvalue
     label: _{attributes_title}
     placeholder: _{attributes_description}
 UUID3|std:
   methods: input
   params:
-    value: _{fieldvalue}
+    value: =fieldvalue
     label: _{attributes_title}
     placeholder: _{attributes_description}
 UUID4|std:
   methods: input
   params:
-    value: _{fieldvalue}
+    value: =fieldvalue
     label: _{attributes_title}
     placeholder: _{attributes_description}
 UUID5|std:
   methods: input
   params:
-    value: _{fieldvalue}
+    value: =fieldvalue
     label: _{attributes_title}
     placeholder: _{attributes_description}
 IPvAnyAddress|std:
   methods: input
   params:
-    value: _{fieldvalue}
+    value: =fieldvalue
     label: _{attributes_title}
     placeholder: _{attributes_description}
 IPvAnyInterface|std:
   methods: input
   params:
-    value: _{fieldvalue}
+    value: =fieldvalue
     label: _{attributes_title}
     placeholder: _{attributes_description}
 IPvAnyNetwork|std:
   methods: input
   params:
-    value: _{fieldvalue}
+    value: =fieldvalue
     label: _{attributes_title}
     placeholder: _{attributes_description}
 
@@ -175,18 +175,18 @@ IPvAnyNetwork|std:
 int|std:
   methods: number
   params:
-    value: _{fieldvalue}
+    value: =fieldvalue
     label: _{attributes_title}
     precision: 0
   props: clearable
 int|slider:
   methods: slider
   params:
-    value: _{fieldvalue}
+    value: =fieldvalue
 int|knob:
   methods: knob
   params:
-    value: _{fieldvalue}
+    value: =fieldvalue
 int|label:
   methods: label
   params:
@@ -195,18 +195,18 @@ int|label:
 float|std:
   methods: number
   params:
-    value: _{fieldvalue}
+    value: =fieldvalue
     label: _{attributes_title}
     precision: 2
   props: clearable
 float|slider:
   methods: slider
   params:
-    value: _{fieldvalue}
+    value: =fieldvalue
 float|knob:
   methods: knob
   params:
-    value: _{fieldvalue}
+    value: =fieldvalue
 float|label:
   methods: label
   params:
@@ -215,7 +215,7 @@ float|label:
 Decimal|std:
   methods: number
   params:
-    value: _{fieldvalue}
+    value: =fieldvalue
     label: _{attributes_title}
     precision: 2
   props: clearable
@@ -228,17 +228,17 @@ Decimal|label:
 bool|std:
   methods: checkbox
   params:
-    value: _{fieldvalue}
+    value: =fieldvalue
     text: _{attributes_title}
 bool|switch:
   methods: switch
   params:
-    value: _{fieldvalue}
+    value: =fieldvalue
     text: _{attributes_title}
 bool|select:
   methods: select
   params:
-    value: _{fieldvalue}
+    value: =fieldvalue
     label: _{attributes_title}
     options:
       - true
@@ -253,14 +253,14 @@ bool|label:
 Literal|std:
   methods: select
   params:
-    value: _{fieldvalue}
+    value: =fieldvalue
     label: _{attributes_title}
     options: $nicegui_builder.plugins.pydantic.mapping:extract_options
   props: clearable
 Literal|radio:
   methods: radio
   params:
-    value: _{fieldvalue}
+    value: =fieldvalue
     options: $nicegui_builder.plugins.pydantic.mapping:extract_options
 Literal|label:
   methods: label
@@ -270,14 +270,14 @@ Literal|label:
 Enum|std:
   methods: select
   params:
-    value: _{fieldvalue}
+    value: =fieldvalue
     label: _{attributes_title}
     options: $nicegui_builder.plugins.pydantic.mapping:extract_options
   props: clearable
 Enum|radio:
   methods: radio
   params:
-    value: _{fieldvalue}
+    value: =fieldvalue
     options: $nicegui_builder.plugins.pydantic.mapping:extract_options
 Enum|label:
   methods: label
@@ -288,14 +288,13 @@ Enum|label:
 date|std:
   methods: input
   params:
-    value: _{fieldvalue}
+    value: =fieldvalue
     label: _{attributes_title}
   props: clearable
 date|picker:
   methods: date
   params:
-    value: _{fieldvalue}
-    label: _{attributes_title}
+    value: =fieldvalue
 date|label:
   methods: label
   params:
@@ -304,14 +303,13 @@ date|label:
 time|std:
   methods: input
   params:
-    value: _{fieldvalue}
+    value: =fieldvalue
     label: _{attributes_title}
   props: clearable
 time|picker:
   methods: time
   params:
-    value: _{fieldvalue}
-    label: _{attributes_title}
+    value: =fieldvalue
 time|label:
   methods: label
   params:
@@ -320,7 +318,7 @@ time|label:
 datetime|std:
   methods: input
   params:
-    value: _{fieldvalue}
+    value: =fieldvalue
     label: _{attributes_title}
   props: clearable
 datetime|split:
@@ -334,7 +332,7 @@ datetime|label:
 timedelta|std:
   methods: input
   params:
-    value: _{fieldvalue}
+    value: =fieldvalue
     label: _{attributes_title}
   props: clearable
 timedelta|label:
@@ -346,7 +344,7 @@ timedelta|label:
 dict|std:
   methods: textarea
   params:
-    value: _{fieldvalue}
+    value: =fieldvalue
     label: _{attributes_title}
     placeholder: _{attributes_description}
   props: autogrow clearable
@@ -354,7 +352,7 @@ dict|std:
 list|std:
   methods: textarea
   params:
-    value: _{fieldvalue}
+    value: =fieldvalue
     label: _{attributes_title}
     placeholder: _{attributes_description}
   props: autogrow clearable
@@ -362,7 +360,7 @@ list|std:
 set|std:
   methods: textarea
   params:
-    value: _{fieldvalue}
+    value: =fieldvalue
     label: _{attributes_title}
     placeholder: _{attributes_description}
   props: autogrow clearable
@@ -370,7 +368,7 @@ set|std:
 tuple|std:
   methods: textarea
   params:
-    value: _{fieldvalue}
+    value: =fieldvalue
     label: _{attributes_title}
     placeholder: _{attributes_description}
   props: autogrow clearable
@@ -378,7 +376,7 @@ tuple|std:
 Json|std:
   methods: textarea
   params:
-    value: _{fieldvalue}
+    value: =fieldvalue
     label: _{attributes_title}
     placeholder: _{attributes_description}
   props: autogrow clearable
