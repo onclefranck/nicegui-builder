@@ -8,6 +8,16 @@ builder_expansion_registry: dict[str, Callable[[str, dict], LayoutNode]] = {}
 
 
 def resolve_context_value(value, ctx):
+    """Resolve a layout-value token against the builder context.
+
+    Three conventions are supported:
+      - `_...`  : string interpolation, runs `str.format(**ctx)` on the rest.
+                  Result is always a `str`.
+      - `$mod:fn`: dynamic resolution, imports `mod` and calls `fn(**ctx)`.
+      - `=name` : context lookup, returns `ctx[name]` as its native type
+                  (int, float, bool, None, date, ...). Use this when the
+                  target widget requires a non-string value.
+    """
     if not isinstance(value, str):
         return value
 
@@ -18,6 +28,9 @@ def resolve_context_value(value, ctx):
         import_string = value.removeprefix("$")
         module, func = import_string.split(':')
         return getattr(import_module(module), func)(**ctx)
+
+    if value.startswith("="):
+        return ctx[value.removeprefix("=")]
 
     return value
 
