@@ -1,10 +1,10 @@
-from dataclasses import dataclass, field
-from collections.abc import Callable
-from contextlib import nullcontext
-from decimal import Decimal
-from datetime import datetime
 import enum
 import json
+from collections.abc import Callable
+from contextlib import nullcontext
+from dataclasses import dataclass, field
+from datetime import datetime
+from decimal import Decimal
 
 from nicegui import ui
 

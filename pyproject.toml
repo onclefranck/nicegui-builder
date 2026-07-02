@@ -41,6 +41,7 @@ include-package-data = true
 
 [tool.setuptools.package-data]
 nicegui_builder = [
+  # PEP 561 marker: this package ships inline type information for type checkers.
   "py.typed",
   "*.pyi",
   "examples/*.yml",
