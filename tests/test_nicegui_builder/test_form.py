@@ -59,8 +59,10 @@ def test_form_uses_plugin_build_layout_when_yaml_is_missing(monkeypatch):
     fake_plugin = FakePlugin()
     calls = {}
 
-    monkeypatch.setattr(form_module.plugin_registry, "resolve", lambda source: fake_plugin)
-    monkeypatch.setattr(form_module, "_resolve_layout_from_source", lambda source, flavor: (_ for _ in ()).throw(FileNotFoundError()))
+    monkeypatch.setattr(form_module, "resolve_field_plugin", lambda source: fake_plugin)
+    monkeypatch.setattr(
+        form_module, "_resolve_layout_from_source", lambda source, flavor: (_ for _ in ()).throw(FileNotFoundError())
+    )
 
     def fake_builder(layout):
         calls["layout"] = layout
@@ -81,14 +83,16 @@ def test_form_returns_plugin_rendered_form_when_available(monkeypatch):
         def render_form(self, source, flavor=""):
             return fake_handle
 
-    monkeypatch.setattr(form_module.plugin_registry, "resolve", lambda source: RenderPlugin())
+    monkeypatch.setattr(form_module, "resolve_field_plugin", lambda source: RenderPlugin())
 
     assert form_module.form(type("Demo", (), {})) is fake_handle
 
 
 def test_form_rejects_plugins_without_form_capabilities(monkeypatch):
-    plugin = types.SimpleNamespace(name="broken")
-    monkeypatch.setattr(form_module.plugin_registry, "resolve", lambda source: plugin)
+    def reject_plugin(source):
+        raise TypeError("plugin 'broken' is missing required method(s): inspect_fields, resolve_field_node")
+
+    monkeypatch.setattr(form_module, "resolve_field_plugin", reject_plugin)
 
     with pytest.raises(TypeError):
         form_module.form(type("Demo", (), {}))
@@ -132,7 +136,7 @@ def test_form_reraises_missing_layout_when_plugin_cannot_build_one(monkeypatch):
             field_ctx={"fieldname": fieldname},
         ),
     )
-    monkeypatch.setattr(form_module.plugin_registry, "resolve", lambda source: plugin)
+    monkeypatch.setattr(form_module, "resolve_field_plugin", lambda source: plugin)
     monkeypatch.setattr(
         form_module,
         "_resolve_layout_from_source",
@@ -152,7 +156,7 @@ def test_form_uses_source_instance_when_building_handle(monkeypatch):
 
     instance = Demo()
 
-    monkeypatch.setattr(form_module.plugin_registry, "resolve", lambda source: fake_plugin)
+    monkeypatch.setattr(form_module, "resolve_field_plugin", lambda source: fake_plugin)
     monkeypatch.setattr(
         form_module,
         "_resolve_layout_from_source",
@@ -191,7 +195,7 @@ def test_form_exposes_custom_component_refs_and_split_datetime_composites(monkey
             self.date_ref = "starts_at:date"
             self.time_ref = "starts_at:time"
 
-    monkeypatch.setattr(form_module.plugin_registry, "resolve", lambda source: DateTimePlugin())
+    monkeypatch.setattr(form_module, "resolve_field_plugin", lambda source: DateTimePlugin())
     monkeypatch.setattr(
         form_module,
         "_resolve_layout_from_source",
