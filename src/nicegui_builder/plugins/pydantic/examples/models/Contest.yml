@@ -3,7 +3,7 @@
     children:
     - label:
         params:
-          text: _{source_class.__name__}
+          text: "{{ source_class.__name__ }}"
         classes: text-h5
     - label:
         params:

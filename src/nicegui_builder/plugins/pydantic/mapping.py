@@ -13,9 +13,7 @@ from ...utils import load_layout
 NoneType = type(None)
 
 
-def extract_options(field_info, **kwargs):
-    # The builder may call this through `$module:function` context resolution and
-    # pass the full field context as keyword arguments, so this signature must stay tolerant.
+def extract_options(field_info):
     annotation = unwrap_optional_annotation(field_info.annotation)
     origin = t.get_origin(annotation)
 
@@ -109,10 +107,7 @@ def load_pydantic_widget_map():
 
 @cache
 def available_map_types():
-    return {
-        key.split("|", 1)[0]
-        for key in load_pydantic_widget_map()
-    }
+    return {key.split("|", 1)[0] for key in load_pydantic_widget_map()}
 
 
 def resolve_map_type(annotation) -> str:
@@ -134,11 +129,7 @@ def resolve_map_type(annotation) -> str:
         if issubclass(annotation, enum.Enum):
             candidates.append("Enum")
 
-        candidates.extend(
-            base.__name__
-            for base in annotation.__mro__[1:]
-            if base is not object
-        )
+        candidates.extend(base.__name__ for base in annotation.__mro__[1:] if base is not object)
     elif hasattr(annotation, "__name__"):
         candidates.append(annotation.__name__)
 
@@ -157,8 +148,7 @@ def get_defaults_from_map(map_type: str, variant: str = "std"):
     mapping = load_pydantic_widget_map()
     if not map_type:
         error = (
-            f"can't resolve a key from map_type: \"{map_type}\" and variant: \"{variant}\" "
-            "to handle pydantic-nicegui.yml"
+            f'can\'t resolve a key from map_type: "{map_type}" and variant: "{variant}" to handle pydantic-nicegui.yml'
         )
         raise ValueError(error)
 
@@ -172,10 +162,7 @@ def get_defaults_from_map(map_type: str, variant: str = "std"):
     if fallback_key in mapping:
         return mapping[fallback_key]
 
-    error = (
-        f"can't resolve a key from map_type: \"{map_type}\" and variant: \"{variant}\" "
-        "to handle pydantic-nicegui.yml"
-    )
+    error = f'can\'t resolve a key from map_type: "{map_type}" and variant: "{variant}" to handle pydantic-nicegui.yml'
     raise KeyError(error)
 
 
@@ -204,9 +191,7 @@ def resolve_widget_spec(field_info, python_type, variant: str = "std", map_type:
         return _build_datetime_widget_spec(effective_variant, methods, default_info)
 
     validation_props = build_validation_props(field_info, methods)
-    props = " ".join(
-        part for part in [default_info.get("props", ""), validation_props] if part
-    )
+    props = " ".join(part for part in [default_info.get("props", ""), validation_props] if part)
 
     return WidgetSpec(
         component=methods,

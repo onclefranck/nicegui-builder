@@ -46,6 +46,7 @@ class LayoutNode:
     props: str = ""
     classes: str = ""
     ref: str | None = None
+    on: dict[str, str] = field(default_factory=dict)
     children: list[t.Any] = field(default_factory=list)
     context: JsonDict = field(default_factory=dict)
 
@@ -61,9 +62,12 @@ class LayoutNode:
             props=value.get("props", ""),
             classes=value.get("classes", ""),
             ref=value.get("ref"),
+            on=dict(value.get("on") or {}),
             children=[
                 cls.from_layout_entry(child)
-                if isinstance(child, dict) and "__" not in next(iter(child.keys()))
+                if isinstance(child, dict)
+                and "__" not in next(iter(child.keys()))
+                and next(iter(child.keys())) != "repeat"
                 else child
                 for child in (value.get("children") or [])
             ],
@@ -76,9 +80,9 @@ class LayoutNode:
                 "props": self.props,
                 "classes": self.classes,
                 "ref": self.ref,
+                "on": dict(self.on),
                 "children": [
-                    child.to_layout_entry() if isinstance(child, LayoutNode) else child
-                    for child in self.children
+                    child.to_layout_entry() if isinstance(child, LayoutNode) else child for child in self.children
                 ],
             }
         }

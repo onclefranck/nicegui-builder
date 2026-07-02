@@ -62,6 +62,7 @@ Supported configuration keys:
 - `props`: props string passed to `.props(...)`
 - `classes`: classes string passed to `.classes(...)`
 - `ref`: optional string reference name stored in `component_refs`
+- `on`: event-to-handler-name bindings
 - `children`: nested layout entries
 - `context`: reserved for future layout-time metadata
 
@@ -82,6 +83,25 @@ Example:
 
 If `ref` is present, the rendered component is added to the runtime `component_refs` dictionary under that name.
 Duplicate ref names are rejected.
+
+## Events
+
+Use `on` to bind a NiceGUI or DOM event to a handler supplied from Python:
+
+```yaml
+- button:
+    params:
+      text: Save
+    on:
+      click: save
+```
+
+```python
+root = builder(layout, handlers={"save": save})
+```
+
+Handler names must exist in the `handlers` mapping. Missing handlers fail during build.
+The builder calls component methods such as `on_click(...)` or `on_value_change(...)` when present, and falls back to `component.on(event, handler)` for DOM-style event names.
 
 ## Expansion Nodes
 
@@ -154,7 +174,7 @@ That is equivalent to:
 
 This can be useful when the plugin default is already good enough.
 
-## `params` Values
+## Dynamic Values
 
 `params` accepts arbitrary JSON-like YAML values:
 
@@ -165,32 +185,87 @@ This can be useful when the plugin default is already good enough.
 - arrays
 - nested objects
 
-The builder also resolves two special string conventions at runtime:
-
-- strings starting with `_`
-  - treated as Python `str.format(**context)` templates
-- strings starting with `$`
-  - treated as `module:function` callbacks that receive the current builder context
+The builder resolves `{{ ... }}` tokens in `params`, `classes`, and `props`.
 
 Examples:
 
 ```yaml
 - label:
     params:
-      text: _Hello {name}
-```
-
-```yaml
-- label:
+      text: "Hello {{ user.name }}"
+- switch:
     params:
-      text: $my_app.layout_helpers:format_title
+      value: "{{ enabled }}"
+    classes: "w-full {{ extra_classes }}"
 ```
 
-The schema intentionally allows those values as ordinary strings.
-Their runtime meaning is documented here because JSON Schema cannot validate the import target itself.
+If the entire value is one token, the resolved object keeps its type.
+That is why `value: "{{ enabled }}"` passes a boolean instead of the string `"True"`.
+
+Dynamic expressions support:
+
+- root names from `builder(..., context={...})` or the current repeat scope
+- attribute paths such as `{{ user.name }}`
+- item paths such as `{{ row['score'] }}`
+- filters supplied from Python, for example `{{ duration | mmss }}`
+
+```python
+root = builder(
+    layout,
+    context={"user": user, "enabled": True},
+    filters={"mmss": format_mmss},
+)
+```
+
+Use `\{{` when a literal opening token is needed.
+
+The schema intentionally allows dynamic values as ordinary strings.
+Their runtime meaning is documented here because JSON Schema cannot validate the context path or filter name itself.
 
 The runtime context is intentionally small and operational.
 In practice, layouts should treat it as helper data for formatting and callbacks, not as a place to depend on large amounts of implicit mutable state.
+
+## Repeat Nodes
+
+Use `repeat` to render one child template per item in a context iterable:
+
+```yaml
+- repeat:
+    in: "{{ segments }}"
+    as: seg
+    key: "{{ seg.segment_id }}"
+    children:
+      - label:
+          ref: segment_label
+          params:
+            text: "#{{ $index }} {{ seg.name }}"
+```
+
+For each item, the child scope includes:
+
+- the item under the configured `as` name
+- `$index`
+- `$key`, when `key` is configured
+
+Refs inside a repeat are collected as dictionaries keyed by `$key`, so `segment_label` becomes `root.component_refs["segment_label"][segment_id]`.
+
+Handlers bound inside a repeat receive the current item first:
+
+```python
+def choose(segment, event=None):
+    ...
+```
+
+## Rebuild
+
+When a referenced container has children, the builder stores its original child template.
+The returned root component exposes `rebuild(ref_name, context=None)`:
+
+```python
+root.rebuild("segments_panel", context={"segments": new_segments})
+```
+
+`rebuild` clears the referenced component and renders that stored child template again with the original context plus the provided context override.
 
 ## What The Schema Validates Well
 
@@ -198,8 +273,8 @@ The shipped schema is strong at validating:
 
 - the top-level list shape
 - one-entry-per-node objects
-- standard vs expansion node shapes
-- the presence and type of `params`, `props`, `classes`, `ref`, `children`, and `context`
+- standard vs expansion vs repeat node shapes
+- the presence and type of `params`, `props`, `classes`, `ref`, `on`, `children`, and `context`
 - plugin override keys currently used in layouts such as `methods`
 
 ## What The Schema Does Not Fully Validate
@@ -211,7 +286,7 @@ Some things are outside the reach of a practical static schema:
 - whether a plugin accepts a given `methods` override such as `email` or `textarea`
 - whether a `params.container` override is meaningful for a given field/plugin
 - whether a specialized component such as `datetime_input` imposes additional runtime invariants on that container config
-- semantic correctness of runtime context expressions in `_...` or `$module:function` strings
+- semantic correctness of runtime context expressions and filter names in `{{ ... }}` strings
 
 So the schema should be treated as a strong structural guardrail, not as a complete semantic type system.
 

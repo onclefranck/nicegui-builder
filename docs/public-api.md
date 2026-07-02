@@ -43,7 +43,8 @@ from nicegui_builder.utils import load_layout
 In addition, the observable behavior of the top-level entry points is part of the stable contract.
 Examples:
 
-- `builder(...)` returns the root component and may attach `component_refs` when layout nodes declare `ref`
+- `builder(...)` returns the root component and may attach `component_refs` plus `rebuild(ref_name, context=None)` when layouts declare refs
+- `builder(..., context=..., handlers=..., filters=...)` supplies dynamic layout data, named event handlers, and whitelisted value filters
 - `form(...)` returns a `FormHandle` with `component_refs` and `get_component(ref)`
 - `table(...)` returns a `TableHandle` with the documented handle helpers
 

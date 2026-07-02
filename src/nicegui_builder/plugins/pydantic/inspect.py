@@ -5,6 +5,8 @@ from flatten_dict import flatten
 from pydantic import BaseModel
 from pydantic_core import PydanticUndefined
 
+from .mapping import extract_options
+
 
 def _serialize_field_value(fieldvalue):
     if fieldvalue in (PydanticUndefined, None):
@@ -37,4 +39,5 @@ def build_field_context(model_class, model_instance, fieldname: str) -> dict:
         fieldvalue = ""
 
     ctx["fieldvalue"] = _serialize_field_value(fieldvalue)
+    ctx["choices"] = extract_options(field_info)
     return ctx

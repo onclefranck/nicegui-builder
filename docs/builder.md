@@ -27,6 +27,19 @@ ui.run()
 If you pass only a layout name and a matching `.yml` or `.yaml` file lives next to the calling Python module, that adjacent file is loaded automatically.
 Otherwise, the provided path is used as-is.
 
+`builder(...)` also accepts runtime data and named callbacks:
+
+```python
+root = builder(
+    layout,
+    context={"items": items},
+    handlers={"select": select_item},
+    filters={"title": str.title},
+)
+```
+
+Layouts can interpolate context with `{{ ... }}`, bind events with `on`, and render repeated children with `repeat`.
+
 ## Return Value
 
 `builder(...)` returns the root NiceGUI component.
@@ -50,6 +63,11 @@ root = builder(layout)
 root.component_refs["profile_card"]
 root.component_refs["title_label"]
 ```
+
+Refs declared inside `repeat` nodes are exposed as dictionaries keyed by the repeat key.
+
+If a referenced component has children, the returned root component also exposes `rebuild(ref_name, context=None)`.
+It clears that component and renders its original child template again with updated context.
 
 ## Related Documents
 

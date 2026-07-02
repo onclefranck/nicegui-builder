@@ -95,6 +95,14 @@
         "$ref": "#/$defs/jsonValue"
       }
     },
+    "eventsObject": {
+      "type": "object",
+      "description": "Named NiceGUI or DOM event bindings resolved through builder handlers.",
+      "default": {},
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
     "childrenArray": {
       "type": "array",
       "default": [],
@@ -125,8 +133,39 @@
         },
         "context": {
           "$ref": "#/$defs/contextObject"
+        },
+        "on": {
+          "$ref": "#/$defs/eventsObject"
         }
       }
+    },
+    "repeatNodeConfig": {
+      "type": "object",
+      "description": "Render the same child template for every item in an iterable resolved from builder context.",
+      "required": [
+        "in",
+        "as",
+        "children"
+      ],
+      "properties": {
+        "in": {
+          "type": "string",
+          "description": "Dynamic expression resolving to the iterable, for example {{ rows }}."
+        },
+        "as": {
+          "type": "string",
+          "pattern": "^[A-Za-z_][A-Za-z0-9_]*$",
+          "description": "Scope name used for the current item."
+        },
+        "key": {
+          "type": "string",
+          "description": "Dynamic expression resolving to the stable item key."
+        },
+        "children": {
+          "$ref": "#/$defs/childrenArray"
+        }
+      },
+      "additionalProperties": false
     },
     "standardNodeConfig": {
       "allOf": [
@@ -202,8 +241,24 @@
         "$ref": "#/$defs/expansionNodeValue"
       }
     },
+    "repeatLayoutEntry": {
+      "type": "object",
+      "description": "A repeated child template.",
+      "required": [
+        "repeat"
+      ],
+      "properties": {
+        "repeat": {
+          "$ref": "#/$defs/repeatNodeConfig"
+        }
+      },
+      "additionalProperties": false
+    },
     "layoutEntry": {
       "oneOf": [
+        {
+          "$ref": "#/$defs/repeatLayoutEntry"
+        },
         {
           "$ref": "#/$defs/standardLayoutEntry"
         },
