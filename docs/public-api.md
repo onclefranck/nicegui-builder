@@ -14,6 +14,7 @@ Imports from the top-level package are considered the stable API:
 from nicegui_builder import (
     builder,
     form,
+    register_filter,
     table,
     ActionSpec,
     FormHandle,
@@ -44,7 +45,9 @@ In addition, the observable behavior of the top-level entry points is part of th
 Examples:
 
 - `builder(...)` returns the root component and may attach `component_refs` plus `rebuild(ref_name, context=None)` when layouts declare refs
-- `builder(..., context=..., handlers=..., filters=...)` supplies dynamic layout data, named event handlers, and whitelisted value filters
+- `builder(..., context=..., handlers=..., filters=...)` supplies dynamic layout data, named event handlers, and call-specific Jinja filters
+- `form(..., filters=...)` supplies call-specific Jinja filters when rendering a YAML-backed form layout
+- `register_filter(name, callback)` registers a callback into the builder's package-level Jinja filter registry for later builder and form renders
 - `form(...)` returns a `FormHandle` with `component_refs` and `get_component(ref)`
 - `table(...)` returns a `TableHandle` with the documented handle helpers
 

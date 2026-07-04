@@ -64,8 +64,9 @@ def test_form_uses_plugin_build_layout_when_yaml_is_missing(monkeypatch):
         form_module, "_resolve_layout_from_source", lambda source, flavor: (_ for _ in ()).throw(FileNotFoundError())
     )
 
-    def fake_builder(layout):
+    def fake_builder(layout, *, filters=None):
         calls["layout"] = layout
+        calls["filters"] = filters
         return object()
 
     monkeypatch.setattr(form_module, "builder", fake_builder)
@@ -74,6 +75,31 @@ def test_form_uses_plugin_build_layout_when_yaml_is_missing(monkeypatch):
 
     assert handle.spec.plugin_name == "fake"
     assert calls["layout"][0]["label"]["params"]["text"] == "fallback layout"
+    assert calls["filters"] is None
+
+
+def test_form_passes_filters_to_builder(monkeypatch):
+    fake_plugin = FakePlugin()
+    calls = {}
+    filters = {"title": str.title}
+
+    monkeypatch.setattr(form_module, "resolve_field_plugin", lambda source: fake_plugin)
+    monkeypatch.setattr(
+        form_module,
+        "_resolve_layout_from_source",
+        lambda source, flavor: [{"label": {"params": {"text": "{{ name | title }}"}}}],
+    )
+
+    def fake_builder(layout, *, filters=None):
+        calls["layout"] = layout
+        calls["filters"] = filters
+        return object()
+
+    monkeypatch.setattr(form_module, "builder", fake_builder)
+
+    form_module.form(type("Demo", (), {}), filters=filters)
+
+    assert calls["filters"] is filters
 
 
 def test_form_returns_plugin_rendered_form_when_available(monkeypatch):
@@ -162,7 +188,7 @@ def test_form_uses_source_instance_when_building_handle(monkeypatch):
         "_resolve_layout_from_source",
         lambda source, flavor: [{"label": {"params": {"text": "loaded"}}}],
     )
-    monkeypatch.setattr(form_module, "builder", lambda layout: object())
+    monkeypatch.setattr(form_module, "builder", lambda layout, *, filters=None: object())
 
     original_form_handle = form_module.FormHandle
 
@@ -202,7 +228,7 @@ def test_form_exposes_custom_component_refs_and_split_datetime_composites(monkey
         lambda source, flavor: [{"field__starts_at": {"ref": "starts_at"}}],
     )
 
-    def fake_builder(layout):
+    def fake_builder(layout, *, filters=None):
         ctx = form_module.builder_ctx.get()
         refs = form_module.component_refs(ctx)
         ctx["_field_refs"]["starts_at"] = "starts_at"

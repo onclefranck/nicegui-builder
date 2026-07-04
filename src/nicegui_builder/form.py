@@ -1,5 +1,6 @@
 import pathlib as p
 from importlib import import_module
+from typing import Callable
 
 from .builder import LayoutNode, builder, builder_ctx, register
 from .core.context import component_refs, ensure_builder_runtime
@@ -41,7 +42,7 @@ def _resolve_plugin_field(key: str, value: dict) -> LayoutNode:
 register("field", _resolve_plugin_field)
 
 
-def form(source: object, flavor: str = "") -> FormHandle:
+def form(source: object, flavor: str = "", *, filters: dict[str, Callable] | None = None) -> FormHandle:
     plugin = resolve_field_plugin(source)
 
     source_class = source if isinstance(source, type) else source.__class__
@@ -78,7 +79,7 @@ def form(source: object, flavor: str = "") -> FormHandle:
         plugin_name=plugin.name,
     )
 
-    root_component = builder(layout)
+    root_component = builder(layout, filters=filters)
     refs = dict(component_refs(ctx))
     field_refs = dict(ctx.get("_field_refs", {}))
     for field in field_specs:

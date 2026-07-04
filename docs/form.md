@@ -52,6 +52,14 @@ handle = form(Contact, flavor="actionable")
 
 The original intent of `flavor` is to let a developer choose among multiple layouts for the same model source.
 
+YAML-backed form layouts can use custom Jinja filters passed at render time:
+
+```python
+form(Contact, filters={"title": str.title})
+```
+
+Filters registered with `register_filter(...)` are also available to form layouts without passing them to each call.
+
 ## Datetime Fields
 
 For `datetime` fields, the built-in `pydantic` plugin uses a dedicated `datetime_input` component.

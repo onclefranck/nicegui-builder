@@ -1,15 +1,33 @@
-from nicegui import ui
-import re
+from types import SimpleNamespace
 from typing import Callable
 
-from .core.models import LayoutNode
+from jinja2 import StrictUndefined, TemplateError, Undefined
+from jinja2.nativetypes import NativeEnvironment
+from nicegui import ui
+
 from .core.context import builder_ctx, component_refs, ensure_builder_runtime, get_root_component, set_root_component
+from .core.models import LayoutNode
 
 builder_expansion_registry: dict[str, Callable[[str, dict], LayoutNode]] = {}
+builder_filter_registry: dict[str, Callable] = {}
 
-TOKEN_RE = re.compile(r"(?<!\\)\{\{\s*(.*?)\s*\}\}")
-TOKEN_ONLY_RE = re.compile(r"\{\{\s*(.*?)\s*\}\}")
-PATH_PART_RE = re.compile(r"\.([A-Za-z_][A-Za-z0-9_]*)|\[['\"]([^'\"]+)['\"]\]")
+ESCAPED_TOKEN_START = "\0NICEGUI_BUILDER_ESCAPED_TOKEN_START\0"
+
+
+def _build_expression_environment(ctx: dict) -> NativeEnvironment:
+    environment = NativeEnvironment(undefined=StrictUndefined)
+    environment.globals.clear()
+    environment.filters.update(builder_filter_registry)
+    environment.filters.update(ensure_builder_runtime(ctx)["filters"])
+    return environment
+
+
+def _template_context(ctx: dict) -> dict:
+    return {key: value for key, value in ctx.items() if not key.startswith(("_", "$"))}
+
+
+def _normalize_jinja_source(value: str) -> str:
+    return value.replace(r"\{{", ESCAPED_TOKEN_START)
 
 
 def resolve_context_value(value, ctx):
@@ -22,54 +40,27 @@ def resolve_context_value(value, ctx):
     if not isinstance(value, str):
         return value
 
-    single_token = TOKEN_ONLY_RE.fullmatch(value)
-    if single_token:
-        return _resolve_token(single_token.group(1), ctx)
+    if "{%" in value or "{#" in value:
+        raise ValueError("Jinja statement and comment blocks are not supported in layout values")
 
-    return TOKEN_RE.sub(lambda match: str(_resolve_token(match.group(1), ctx)), value).replace(r"\{{", "{{")
+    source = _normalize_jinja_source(value)
+    if "{{" not in source:
+        return source.replace(ESCAPED_TOKEN_START, "{{")
 
-
-def _resolve_token(expression: str, ctx: dict):
-    parts = [part.strip() for part in expression.split("|")]
-    value = _resolve_path(parts[0], ctx)
-    filters = ensure_builder_runtime(ctx)["filters"]
-    for name in parts[1:]:
-        try:
-            value = filters[name](value)
-        except KeyError as exc:
-            raise ValueError(f"unknown filter {name!r}; available: {sorted(filters)}") from exc
-    return value
-
-
-def _resolve_path(path: str, ctx: dict):
-    root_match = re.match(r"^[A-Za-z_][A-Za-z0-9_]*|\$[A-Za-z_][A-Za-z0-9_]*", path)
-    if root_match is None:
-        raise ValueError(f"invalid dynamic expression: {path!r}")
-
-    root = root_match.group(0)
     try:
-        value = ctx[root]
-    except KeyError as exc:
-        raise ValueError(f"unknown context name {root!r}") from exc
+        rendered = _build_expression_environment(ctx).from_string(source).render(_template_context(ctx))
+    except TemplateError as exc:
+        raise ValueError(str(exc)) from exc
 
-    position = root_match.end()
-    while position < len(path):
-        match = PATH_PART_RE.match(path, position)
-        if match is None:
-            raise ValueError(f"invalid dynamic path: {path!r}")
-
-        attr_name, item_key = match.groups()
-        key = attr_name or item_key
-        if attr_name is not None:
-            try:
-                value = getattr(value, key)
-            except AttributeError:
-                value = value[key]
-        else:
-            value = value[key]
-        position = match.end()
-
-    return value
+    if isinstance(rendered, Undefined):
+        try:
+            str(rendered)
+        except TemplateError as exc:
+            raise ValueError(str(exc)) from exc
+        raise ValueError("undefined Jinja expression")
+    if isinstance(rendered, str):
+        return rendered.replace(ESCAPED_TOKEN_START, "{{")
+    return rendered
 
 
 def _normalize_layout_entry(component: dict, ctx: dict) -> LayoutNode:
@@ -182,10 +173,12 @@ def _render_repeat(component: dict, ctx: dict) -> None:
         scope = dict(ctx)
         scope[as_name] = item
         scope["$index"] = index
+        scope["loop"] = SimpleNamespace(index=index + 1, index0=index)
         scope["_repeat_item"] = item
         scope["_repeat_active"] = True
         if "key" in config:
             scope["$key"] = resolve_context_value(config["key"], scope)
+            scope["loop"].key = scope["$key"]
         token = builder_ctx.set(scope)
         try:
             visit(children)
@@ -293,6 +286,10 @@ def register(key: str, callback: Callable[[str, dict], LayoutNode]) -> None:
     `
     """
     builder_expansion_registry[key] = callback
+
+
+def register_filter(name: str, callback: Callable) -> None:
+    builder_filter_registry[name] = callback
 
 
 def builder(

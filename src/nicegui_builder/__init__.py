@@ -1,6 +1,6 @@
 from nicegui import ui
 
-from .builder import builder
+from .builder import builder, register_filter
 from .core import (
     ActionSpec,
     FormHandle,
@@ -36,6 +36,7 @@ STABLE_API = (
     "form",
     "table",
     "load_layout",
+    "register_filter",
     "ActionSpec",
     "FormHandle",
     "FormSpec",
@@ -62,6 +63,7 @@ __all__ = [
     "form",
     "table",
     "load_layout",
+    "register_filter",
     "FormHandle",
     "FormSpec",
     "FormState",

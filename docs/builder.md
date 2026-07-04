@@ -27,7 +27,7 @@ ui.run()
 If you pass only a layout name and a matching `.yml` or `.yaml` file lives next to the calling Python module, that adjacent file is loaded automatically.
 Otherwise, the provided path is used as-is.
 
-`builder(...)` also accepts runtime data and named callbacks:
+`builder(...)` also accepts runtime data, named callbacks, and custom Jinja filters:
 
 ```python
 root = builder(
@@ -38,7 +38,31 @@ root = builder(
 )
 ```
 
-Layouts can interpolate context with `{{ ... }}`, bind events with `on`, and render repeated children with `repeat`.
+Layouts can interpolate context with Jinja expressions in `{{ ... }}`, bind events with `on`, and render repeated children with `repeat`.
+Jinja's standard filters are available, and `filters` adds project-specific filters.
+Use `register_filter(...)` for filters that should be available to every later builder render.
+It is a package-level gateway to Jinja's own filter registry: when a layout value is rendered, the builder creates a Jinja environment and installs the registered callbacks into `environment.filters`.
+
+```python
+from nicegui_builder import register_filter
+
+def money(value):
+    return f"{value:.2f} $"
+
+
+register_filter("money", money)
+```
+
+The registered filter is then available in YAML without passing `filters=` to `builder(...)`:
+
+```yaml
+- label:
+    params:
+      text: "{{ price | money }}"
+```
+
+Call-specific filters override registered filters with the same name.
+Statement blocks such as `{% for ... %}` and `{% if ... %}` are not supported inside layout values.
 
 ## Return Value
 

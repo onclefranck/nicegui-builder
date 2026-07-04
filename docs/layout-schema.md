@@ -185,7 +185,7 @@ This can be useful when the plugin default is already good enough.
 - arrays
 - nested objects
 
-The builder resolves `{{ ... }}` tokens in `params`, `classes`, and `props`.
+The builder resolves `{{ ... }}` tokens in `params`, `classes`, and `props` as Jinja expressions.
 
 Examples:
 
@@ -207,7 +207,10 @@ Dynamic expressions support:
 - root names from `builder(..., context={...})` or the current repeat scope
 - attribute paths such as `{{ user.name }}`
 - item paths such as `{{ row['score'] }}`
-- filters supplied from Python, for example `{{ duration | mmss }}`
+- standard Jinja filters
+- filters supplied from Python through `builder(..., filters={...})`, `form(..., filters={...})`, or `register_filter(...)`
+- expression operators such as `{{ count > 0 }}` or `{{ price * quantity }}`
+- regular Jinja attribute and call semantics, including dunder attributes such as `{{ source_class.__name__ }}`
 
 ```python
 root = builder(
@@ -217,7 +220,26 @@ root = builder(
 )
 ```
 
+Registered filters are available without passing them to each render call:
+
+```python
+from nicegui_builder import register_filter
+
+register_filter("mmss", format_mmss)
+```
+
+`register_filter(...)` is a gateway to Jinja's native filter registration model.
+The builder installs those registered callbacks on the Jinja environment used to render YAML values, so the YAML syntax remains ordinary Jinja filter syntax:
+
+```yaml
+text: "{{ duration | mmss }}"
+```
+
 Use `\{{` when a literal opening token is needed.
+The Jinja literal form also works: `{{ '{{' }}`.
+
+Only expression output is supported in layout values.
+Jinja statement blocks and comments such as `{% if ... %}`, `{% for ... %}`, `{% set ... %}`, and `{# ... #}` are rejected.
 
 The schema intentionally allows dynamic values as ordinary strings.
 Their runtime meaning is documented here because JSON Schema cannot validate the context path or filter name itself.
@@ -238,14 +260,15 @@ Use `repeat` to render one child template per item in a context iterable:
       - label:
           ref: segment_label
           params:
-            text: "#{{ $index }} {{ seg.name }}"
+            text: "#{{ loop.index0 }} {{ seg.name }}"
 ```
 
 For each item, the child scope includes:
 
 - the item under the configured `as` name
-- `$index`
-- `$key`, when `key` is configured
+- `loop.index0`, the zero-based index
+- `loop.index`, the one-based index
+- `loop.key`, when `key` is configured
 
 Refs inside a repeat are collected as dictionaries keyed by `$key`, so `segment_label` becomes `root.component_refs["segment_label"][segment_id]`.
 
@@ -286,7 +309,7 @@ Some things are outside the reach of a practical static schema:
 - whether a plugin accepts a given `methods` override such as `email` or `textarea`
 - whether a `params.container` override is meaningful for a given field/plugin
 - whether a specialized component such as `datetime_input` imposes additional runtime invariants on that container config
-- semantic correctness of runtime context expressions and filter names in `{{ ... }}` strings
+- semantic correctness of Jinja context expressions and filter names in `{{ ... }}` strings
 
 So the schema should be treated as a strong structural guardrail, not as a complete semantic type system.
 

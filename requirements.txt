@@ -1,3 +1,4 @@
 flatten-dict
+jinja2
 nicegui
 pyyaml

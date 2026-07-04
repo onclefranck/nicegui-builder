@@ -4,7 +4,7 @@ from types import SimpleNamespace
 import pytest
 
 builder_module = importlib.import_module("nicegui_builder.builder")
-from nicegui_builder.builder import builder, register, resolve_context_value
+from nicegui_builder.builder import builder, register, register_filter, resolve_context_value
 from nicegui_builder.core.context import builder_ctx
 from nicegui_builder.core.models import LayoutNode
 
@@ -68,28 +68,56 @@ def test_resolve_context_value_interpolates_tokens_and_preserves_single_token_ty
     assert resolve_context_value("Hello {{ name }}", ctx) == "Hello Ada"
     assert resolve_context_value("{{ enabled }}", ctx) is True
     assert resolve_context_value("{{ items }}", ctx) == [1, 2]
+    assert resolve_context_value("{{ 40 + 2 }}", ctx) == 42
 
 
-def test_resolve_context_value_supports_paths_filters_and_escaped_tokens():
+def test_resolve_context_value_supports_jinja_paths_filters_and_escaped_tokens():
     ctx = {
         "entry": SimpleNamespace(name="Ada"),
         "row": {"score": 7},
     }
-    builder_module.ensure_builder_runtime(ctx, filters={"upper": str.upper, "bracket": lambda value: f"[{value}]"})
+    builder_module.ensure_builder_runtime(ctx, filters={"bracket": lambda value: f"[{value}]"})
 
     assert resolve_context_value("{{ entry.name | upper | bracket }}", ctx) == "[ADA]"
     assert resolve_context_value("score={{ row['score'] }}", ctx) == "score=7"
     assert resolve_context_value(r"\{{ literal }}", ctx) == "{{ literal }}"
 
 
-def test_resolve_context_value_rejects_unknown_names_and_filters():
-    with pytest.raises(ValueError, match="unknown context name 'missing'"):
+def test_resolve_context_value_supports_registered_filters_and_local_overrides():
+    builder_module.builder_filter_registry.clear()
+    try:
+        register_filter("tag", lambda value: f"<{value}>")
+
+        assert resolve_context_value("{{ name | tag }}", {"name": "Ada"}) == "<Ada>"
+
+        ctx = {"name": "Ada"}
+        builder_module.ensure_builder_runtime(ctx, filters={"tag": lambda value: f"[{value}]"})
+        assert resolve_context_value("{{ name | tag }}", ctx) == "[Ada]"
+    finally:
+        builder_module.builder_filter_registry.clear()
+
+
+def test_resolve_context_value_supports_dunder_attributes_and_calls():
+    class Demo:
+        pass
+
+    ctx = {"source_class": Demo, "name": "Ada"}
+
+    assert resolve_context_value("{{ source_class.__name__ }}", ctx) == "Demo"
+    assert resolve_context_value("{{ name.upper() }}", ctx) == "ADA"
+    assert resolve_context_value("{{ name.__class__.__name__ }}", ctx) == "str"
+
+
+def test_resolve_context_value_rejects_unknown_names_filters_and_blocks():
+    with pytest.raises(ValueError, match="'missing' is undefined"):
         resolve_context_value("{{ missing }}", {})
 
     ctx = {"name": "Ada"}
     builder_module.ensure_builder_runtime(ctx, filters={})
-    with pytest.raises(ValueError, match="unknown filter 'upper'"):
-        resolve_context_value("{{ name | upper }}", ctx)
+    with pytest.raises(ValueError, match="No filter named 'not_a_filter'"):
+        resolve_context_value("{{ name | not_a_filter }}", ctx)
+    with pytest.raises(ValueError, match="statement and comment blocks"):
+        resolve_context_value("{% if name %}Ada{% endif %}", ctx)
 
 
 def test_builder_returns_root_component_and_applies_registered_expansion(monkeypatch):
@@ -209,7 +237,7 @@ def test_builder_repeats_children_with_scoped_values_handlers_and_keyed_refs(mon
                                     {
                                         "label": {
                                             "ref": "segment_label",
-                                            "params": {"text": "#{{ $index }} {{ seg.label }}"},
+                                            "params": {"text": "#{{ loop.index0 }} {{ seg.label }}"},
                                             "on": {"click": "choose"},
                                         }
                                     }
